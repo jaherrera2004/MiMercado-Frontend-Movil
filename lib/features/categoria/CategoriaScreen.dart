@@ -65,16 +65,23 @@ class CategoriaScreen extends StatelessWidget {
               ),
             ),
             Spacer(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0), // Added horizontal padding to cart icon
-              child: Image.asset(
-                'lib/resources/carrito_icon.png', // Path to the custom cart icon
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: IconButton(
+              icon: Image.asset(
+                'lib/resources/carrito_icon.png',
                 height: 40,
                 width: 40,
               ),
+              onPressed: () {
+                Navigator.pushNamed(context, '/carrito');
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(

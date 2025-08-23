@@ -54,7 +54,6 @@ class HomePage extends StatelessWidget {
         automaticallyImplyLeading: false, // Removed the back arrow
         elevation: 0,
         backgroundColor: Colors.white,
-       
         title: Row(
           children: [
             Image.asset(
@@ -71,13 +70,20 @@ class HomePage extends StatelessWidget {
               ),
             ),
             Spacer(),
-            Image.asset(
-              'lib/resources/carrito_icon.png', // Path to the custom cart icon
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: Image.asset(
+              'lib/resources/carrito_icon.png',
               height: 40,
               width: 40,
             ),
-          ],
-        ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/carrito');
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
