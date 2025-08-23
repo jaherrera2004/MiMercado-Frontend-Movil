@@ -151,7 +151,7 @@ class CarritoScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  // Acción de continuar pago
+                  Navigator.pushNamed(context, '/pago');
                 },
                 child: Text(
                   "Continuar pago",
