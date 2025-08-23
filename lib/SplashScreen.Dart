@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'features/auth/pages/Register.dart'; // Asegúrate de importar la pantalla de registro
 
 class SplashScreen extends StatelessWidget {
   @override
@@ -15,7 +16,7 @@ class SplashScreen extends StatelessWidget {
               height: 480,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/homescreen_background_image.png'),
+                  image: AssetImage('lib/resources/homescreen_background_image.png'),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -40,13 +41,13 @@ class SplashScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        // Acción Iniciar sesión
+                        Navigator.pushNamed(context, '/iniciar-sesion');
                       },
                       child: Text(
                         "Iniciar sesión",
                         style: GoogleFonts.inter(
                           fontSize: 18,
-                          fontWeight: FontWeight.w600, // SemiBold
+                          fontWeight: FontWeight.w600, 
                           color: Colors.white,
                         ),
                       ),
@@ -64,7 +65,7 @@ class SplashScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        // Acción Registrarse
+                        Navigator.pushNamed(context, '/registro');
                       },
                       child: Text(
                         "Regístrate",
