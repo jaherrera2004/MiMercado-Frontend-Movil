@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 
-class HomePage extends StatelessWidget {
+class CategoriaScreen extends StatelessWidget {
   final List<Map<String, dynamic>> categorias = [
     {"img": "lib/resources/temp/lacteos_icon.png", "label": "Lácteos"},
     {"img": "lib/resources/temp/snacks_icon.png", "label": "Snacks"},
@@ -51,30 +51,27 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Removed the back arrow
-        elevation: 0,
-        backgroundColor: Colors.white,
-       
+        automaticallyImplyLeading: false,
         title: Row(
           children: [
-            Image.asset(
-              'lib/resources/address_icon.png', // Path to the custom location icon
-              height: 40,
-              width: 40,
-            ),
-            SizedBox(width: 10), // Increased spacing between the icon and 'Dirección'
-            Text(
-              "Dirección",
-              style: GoogleFonts.inter(
-                color: Colors.black,
-                fontWeight: FontWeight.bold, // Made the text bold
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Image.asset(
+                'lib/resources/go_back_icon.png',
+                height: 35,
+                width: 35,
               ),
             ),
             Spacer(),
-            Image.asset(
-              'lib/resources/carrito_icon.png', // Path to the custom cart icon
-              height: 40,
-              width: 40,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0), // Added horizontal padding to cart icon
+              child: Image.asset(
+                'lib/resources/carrito_icon.png', // Path to the custom cart icon
+                height: 40,
+                width: 40,
+              ),
             ),
           ],
         ),
@@ -99,38 +96,12 @@ class HomePage extends StatelessWidget {
               ),
               SizedBox(height: 15),
 
-              // Categorías como carrusel con imágenes
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: categorias
-                      .map((cat) => Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(context, '/categoria'); // Navigate to CategoriaScreen
-                              },
-                              child: Column(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundColor: Colors.grey[200],
-                                    radius: 30,
-                                    backgroundImage: AssetImage(cat["img"]),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(cat["label"]),
-                                ],
-                              ),
-                            ),
-                          ))
-                      .toList(),
-                ),
-              ),
+              
               SizedBox(height: 20),
 
               // Título productos
               Text(
-                "Nuestros Productos",
+                "Categoria",
                 style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 15),
