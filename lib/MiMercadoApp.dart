@@ -4,6 +4,7 @@ import 'package:mi_mercado/SplashScreen.dart';
 import 'package:mi_mercado/features/auth/pages/Register.dart';
 import 'package:mi_mercado/features/auth/pages/IniciarSesion.dart';
 import 'package:mi_mercado/features/homepage/HomePage.dart';
+import 'package:mi_mercado/features/categoria/CategoriaScreen.dart'; // Imported CategoriaScreen
 
 class MiMercadoApp extends StatelessWidget {
   @override
@@ -23,6 +24,7 @@ class MiMercadoApp extends StatelessWidget {
         '/registro': (context) => const RegistroScreen(),
         '/iniciar-sesion': (context) => const LoginScreen(),
         '/home': (context) => HomePage(),
+        '/categoria': (context) => CategoriaScreen(), // Registered CategoriaScreen route
       },
     );
   }
