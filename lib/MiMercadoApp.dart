@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mi_mercado/SplashScreen.dart';
 import 'package:mi_mercado/features/auth/pages/Register.dart';
 import 'package:mi_mercado/features/auth/pages/IniciarSesion.dart';
+import 'package:mi_mercado/features/homepage/HomePage.dart';
 
 class MiMercadoApp extends StatelessWidget {
   @override
@@ -21,6 +22,7 @@ class MiMercadoApp extends StatelessWidget {
         '/': (context) => SplashScreen(),
         '/registro': (context) => const RegistroScreen(),
         '/iniciar-sesion': (context) => const LoginScreen(),
+        '/home': (context) => HomePage(),
       },
     );
   }
