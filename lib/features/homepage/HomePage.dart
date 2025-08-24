@@ -51,6 +51,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
   // int currentIndex = 0; // Eliminado porque no se usa
   return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false, // Removed the back arrow
         elevation: 0,

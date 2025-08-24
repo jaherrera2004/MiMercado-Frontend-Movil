@@ -10,6 +10,7 @@ class EditarPerfilScreen extends StatelessWidget {
     const primaryColor = Color(0xFF58E181);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
