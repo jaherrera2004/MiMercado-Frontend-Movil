@@ -14,20 +14,36 @@ class DireccionesScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         title: Text(
           "Direcciones",
-          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.black),
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Image.asset(
+              'lib/resources/add_icon.png',
+              width: 28,
+              height: 28,
+            ),
+            onPressed: () {
+              // 👉 acción al presionar el botón
+            },
+          ),
+          const SizedBox(width: 12), // pequeño margen a la derecha
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: ListView(
           children: const [
             SizedBox(height: 30), // 👈 espacio debajo del AppBar
-              direccion(nombre: "Nombre", ubicacion: "Direccion"),
+            direccion(nombre: "Nombre", ubicacion: "Direccion"),
             Divider(),
-              direccion(nombre: "Nombre", ubicacion: "Direccion"),
+            direccion(nombre: "Nombre", ubicacion: "Direccion"),
             Divider(),
-              direccion(nombre: "Nombre", ubicacion: "Direccion"),
+            direccion(nombre: "Nombre", ubicacion: "Direccion"),
             Divider(),
           ],
         ),
