@@ -194,18 +194,7 @@ class CategoriaScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.black,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Inicio"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.location_on), label: "Direcciones"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long), label: "Pedidos"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Cuenta"),
-        ],
-      ),
+  // Barra de navegación inferior eliminada
     );
   }
 }
