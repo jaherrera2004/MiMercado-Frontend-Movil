@@ -3,8 +3,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mi_mercado/SplashScreen.dart';
 import 'package:mi_mercado/features/auth/pages/Register.dart';
 import 'package:mi_mercado/features/auth/pages/IniciarSesion.dart';
+import 'package:mi_mercado/features/pedidos/listaPedidos.dart';
+import 'package:mi_mercado/features/direcciones/listaDirecciones.dart';
+import 'package:mi_mercado/features/cuenta/perfil.dart';
+import 'package:mi_mercado/features/cuenta/datosPerfil.dart';
+import 'package:mi_mercado/features/cuenta/seguridad.dart';
+import 'package:mi_mercado/features/cuenta/editarPerfil.dart';
+import 'package:mi_mercado/features/cuenta/editarSeguridad.dart';
 
 class MiMercadoApp extends StatelessWidget {
+  const MiMercadoApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,9 +27,10 @@ class MiMercadoApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => SplashScreen(),
+        '/': (context) => EditarSeguridadScreen(),
         '/registro': (context) => const RegistroScreen(),
         '/iniciar-sesion': (context) => const LoginScreen(),
+        '/pedidos': (context) => const PedidosScreen(),
       },
     );
   }
