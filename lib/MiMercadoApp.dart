@@ -8,6 +8,7 @@ import 'package:mi_mercado/features/categoria/CategoriaScreen.dart'; // Imported
 import 'package:mi_mercado/features/carrito/CarritoScreen.dart';
 import 'package:mi_mercado/features/pago/PagoScreen.dart';
 import 'package:mi_mercado/features/pedidos/listaPedidos.dart';
+import 'package:mi_mercado/features/pedidos/datosPedido.dart';
 import 'package:mi_mercado/features/direcciones/listaDirecciones.dart';
 import 'package:mi_mercado/features/cuenta/perfil.dart';
 import 'package:mi_mercado/features/cuenta/datosPerfil.dart';
@@ -39,6 +40,7 @@ class MiMercadoApp extends StatelessWidget {
         '/carrito': (context) => CarritoScreen(),
         '/pago': (context) => PagoScreen(),
         '/pedidos': (context) => const PedidosScreen(),
+        '/detalle-pedido': (context) => const DatosPedidosScreen(),
         '/direcciones': (context) => const DireccionesScreen(),
         '/cuenta': (context) => const CuentaScreen(),
         '/datos-perfil': (context) => const DatosScreen(),

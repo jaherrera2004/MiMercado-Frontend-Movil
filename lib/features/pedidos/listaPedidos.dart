@@ -14,25 +14,49 @@ class PedidosScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         title: Text(
           "Pedidos",
-          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.black),
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: ListView(
-          children: const [
-            SizedBox(height: 30), // 👈 espacio debajo del AppBar
-             pedido(direccion: "Dirección", fecha: "Fecha"),
-            Divider(),
-             pedido(direccion: "Dirección", fecha: "Fecha"),
-            Divider(),
-             pedido(direccion: "Dirección", fecha: "Fecha"),
-            Divider(),
+          children: [
+            const SizedBox(height: 30),
+
+            pedido(
+              direccion: "Dirección 1",
+              fecha: "Fecha 1",
+              onTap: () {
+                Navigator.pushNamed(context, '/detalle-pedido');
+              },
+            ),
+            const Divider(),
+
+            pedido(
+              direccion: "Dirección 2",
+              fecha: "Fecha 2",
+              onTap: () {
+                Navigator.pushNamed(context, '/detalle-pedido');
+              },
+            ),
+            const Divider(),
+
+            pedido(
+              direccion: "Dirección 3",
+              fecha: "Fecha 3",
+              onTap: () {
+                Navigator.pushNamed(context, '/detalle-pedido');
+              },
+            ),
+            const Divider(),
           ],
         ),
       ),
-      
+
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black,
