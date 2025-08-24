@@ -81,7 +81,7 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          // Acción login
+                          Navigator.pushNamed(context, '/home');
                         },
                         child: Text(
                           "Iniciar sesión",
