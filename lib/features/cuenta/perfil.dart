@@ -14,6 +14,7 @@ class CuentaScreen extends StatelessWidget {
         return false;
       },
       child: Scaffold(
+        backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
