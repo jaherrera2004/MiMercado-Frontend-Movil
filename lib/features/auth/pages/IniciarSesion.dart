@@ -100,7 +100,7 @@ class LoginScreen extends StatelessWidget {
                         const Text("¿No tienes cuenta? Regístrate "),
                         GestureDetector(
                           onTap: () {
-                            // Ir a registro
+                            Navigator.pushReplacementNamed(context, '/registro');
                           },
                           child: Text(
                             "aquí",

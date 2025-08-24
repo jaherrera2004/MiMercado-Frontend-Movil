@@ -130,7 +130,7 @@ class RegistroScreen extends StatelessWidget {
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    // Ir a inicio de sesión
+                                    Navigator.pushReplacementNamed(context, '/iniciar-sesion');
                                   },
                                   child: Text(
                                     "aquí",
