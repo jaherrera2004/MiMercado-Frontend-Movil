@@ -49,7 +49,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+  // int currentIndex = 0; // Eliminado porque no se usa
+  return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false, // Removed the back arrow
         elevation: 0,
@@ -223,15 +224,51 @@ class HomePage extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.green,
+        selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black,
+        type: BottomNavigationBarType.fixed,
+        currentIndex: 0,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushReplacementNamed(context, '/home');
+              break;
+            case 1:
+              Navigator.pushReplacementNamed(context, '/direcciones');
+              break;
+            case 2:
+              Navigator.pushReplacementNamed(context, '/pedidos');
+              break;
+            case 3:
+              Navigator.pushReplacementNamed(context, '/cuenta');
+              break;
+          }
+        },
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Inicio"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.location_on), label: "Direcciones"),
+            icon: Image.asset('lib/resources/home.png', width: 25, height: 25),
+            label: "Inicio",
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long), label: "Pedidos"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Cuenta"),
+            icon: Image.asset(
+              'lib/resources/location.png',
+              width: 25,
+              height: 25,
+            ),
+            label: "Direcciones",
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'lib/resources/orders.png',
+              width: 25,
+              height: 25,
+            ),
+            label: "Pedidos",
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset('lib/resources/user.png', width: 25, height: 25),
+            label: "Cuenta",
+          ),
         ],
       ),
     );
