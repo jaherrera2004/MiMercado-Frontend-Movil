@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'widgets/pedido.dart';
 
+
 class PedidosScreen extends StatelessWidget {
   const PedidosScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacementNamed(context, '/home');
+        return false;
+      },
+      child: Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -104,6 +110,7 @@ class PedidosScreen extends StatelessWidget {
             label: "Cuenta",
           ),
         ],
+      ),
       ),
     );
   }
