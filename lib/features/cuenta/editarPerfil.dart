@@ -13,10 +13,13 @@ class EditarPerfilScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: Image.asset(
-          'lib/resources/go_back_icon.png',
-          width: 40,
-          height: 40,
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Image.asset(
+            'lib/resources/go_back_icon.png',
+            width: 40,
+            height: 40,
+          ),
         ),
         title: Text(
           "Editar Perfil",
@@ -69,9 +72,9 @@ class EditarPerfilScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 "Guardar cambios",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 15),
@@ -89,9 +92,9 @@ class EditarPerfilScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 "Cancelar",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 30),

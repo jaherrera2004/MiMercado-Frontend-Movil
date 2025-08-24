@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'widgets/camposDatos.dart';
 
 class DatosScreen extends StatelessWidget {
@@ -18,11 +19,19 @@ class DatosScreen extends StatelessWidget {
             height: 40,
           ),
         ),
-        title: const Text(
+        title: Text(
           "Datos",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Image.asset('lib/resources/editData.png', width: 30, height: 30),
+            onPressed: () {
+              Navigator.pushNamed(context, '/editar-perfil');
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30.0),
