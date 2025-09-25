@@ -43,9 +43,13 @@ class DatosPedidosScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: CustomBackButton(
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: Padding(
+              padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
+              child: CustomBackButton(
+                iconPath: 'lib/resources/go_back_icon.png',
+                size: 40,
+              ),
+            ),
         title: PageTitle(title: "Pedido #${pedido['numero']}"),
         centerTitle: true,
       ),

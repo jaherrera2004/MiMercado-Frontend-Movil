@@ -10,9 +10,6 @@ class PedidosAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Colors.white,
       elevation: 0,
       automaticallyImplyLeading: false,
-      leading: CustomBackButton(
-        onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
-      ),
       title: const PageTitle(title: "Pedidos"),
       centerTitle: true,
     );
