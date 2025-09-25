@@ -35,18 +35,6 @@ class _PagoScreenState extends State<PagoScreen> {
             const Divider(),
             const SizedBox(height: 24),
 
-            // Métodos de pago
-            MetodosPago(
-              metodoSeleccionado: _metodoSeleccionado,
-              onMetodoChanged: (metodo) {
-                setState(() {
-                  _metodoSeleccionado = metodo;
-                });
-              },
-            ),
-            
-            const SizedBox(height: 24),
-            const Divider(),
             const SizedBox(height: 24),
 
             // Resumen del pedido
