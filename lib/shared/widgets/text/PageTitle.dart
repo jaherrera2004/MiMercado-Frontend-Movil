@@ -13,7 +13,7 @@ class PageTitle extends StatelessWidget {
   const PageTitle({
     super.key,
     required this.title,
-    this.fontSize = 32,
+    this.fontSize = 24,
     this.fontWeight = FontWeight.bold,
     this.color,
     this.textAlign = TextAlign.center,
