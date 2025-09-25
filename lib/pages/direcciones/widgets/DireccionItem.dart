@@ -79,22 +79,28 @@ class DireccionItem extends StatelessWidget {
                   IconButton(
                     icon: Image.asset(
                       'lib/resources/edit.png',
-                      width: 20,
-                      height: 20,
+                      width: 28,
+                      height: 28,
                     ),
                     onPressed: onEdit,
-                    constraints: const BoxConstraints(),
-                    padding: const EdgeInsets.all(8),
+                    constraints: const BoxConstraints(
+                      minWidth: 44,
+                      minHeight: 44,
+                    ),
+                    padding: const EdgeInsets.all(10),
                   ),
                   IconButton(
                     icon: Image.asset(
                       'lib/resources/trashcan.png',
-                      width: 20,
-                      height: 20,
+                      width: 28,
+                      height: 28,
                     ),
                     onPressed: onDelete,
-                    constraints: const BoxConstraints(),
-                    padding: const EdgeInsets.all(8),
+                    constraints: const BoxConstraints(
+                      minWidth: 44,
+                      minHeight: 44,
+                    ),
+                    padding: const EdgeInsets.all(10),
                   ),
                 ],
               ),

@@ -52,7 +52,7 @@ class CarritoItem extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         trailing: SizedBox(
-          width: 120,
+          width: 160,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -61,19 +61,89 @@ class CarritoItem extends StatelessWidget {
                 onPressed: onDelete,
                 tooltip: 'Eliminar',
               ),
-              GestureDetector(
-                onTap: onDecrement,
-                child: const Icon(Icons.remove_circle_outline, color: Colors.black),
+              // Botón decrementar con diseño mejorado
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.grey.shade300,
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: onDecrement,
+                    borderRadius: BorderRadius.circular(16),
+                    child: const Icon(
+                      Icons.remove,
+                      size: 18,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(width: 4),
-              Text(
-                "${producto["cantidad"]}",
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              const SizedBox(width: 12),
+              
+              // Cantidad con mejor diseño
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.grey.shade300,
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  "${producto["cantidad"]}",
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Colors.black87,
+                  ),
+                ),
               ),
-              const SizedBox(width: 4),
-              GestureDetector(
-                onTap: onIncrement,
-                child: const Icon(Icons.add_circle_outline, color: Colors.black),
+              const SizedBox(width: 12),
+              
+              // Botón incrementar con diseño mejorado
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).primaryColor.withOpacity(0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: onIncrement,
+                    borderRadius: BorderRadius.circular(16),
+                    child: const Icon(
+                      Icons.add,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
