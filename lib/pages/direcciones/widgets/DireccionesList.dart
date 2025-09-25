@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'DireccionItem.dart';
+import '../models/direccion.dart';
 
 class DireccionesList extends StatelessWidget {
-  final List<Map<String, String>> direcciones;
-  final Function(Map<String, String>)? onEditDireccion;
-  final Function(Map<String, String>)? onDeleteDireccion;
-  final Function(Map<String, String>)? onTapDireccion;
+  final List<Direccion> direcciones;
+  final Function(Direccion)? onEditDireccion;
+  final Function(Direccion)? onDeleteDireccion;
+  final Function(Direccion)? onTapDireccion;
 
   const DireccionesList({
     super.key,
@@ -18,13 +19,13 @@ class DireccionesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
+      padding: const EdgeInsets.all(16),
       itemCount: direcciones.length,
-      separatorBuilder: (context, index) => const Divider(),
+      separatorBuilder: (context, index) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final direccion = direcciones[index];
         return DireccionItem(
-          nombre: direccion['nombre'] ?? '',
-          ubicacion: direccion['ubicacion'] ?? '',
+          direccion: direccion,
           onEdit: () => onEditDireccion?.call(direccion),
           onDelete: () => onDeleteDireccion?.call(direccion),
           onTap: () => onTapDireccion?.call(direccion),
