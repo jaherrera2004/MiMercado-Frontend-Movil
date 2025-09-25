@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../shared/widgets/forms/CustomTextField.dart';
 import '../../../shared/widgets/buttons/PrimaryButton.dart';
 import '../../../shared/widgets/navigation/NavigationLink.dart';
+import '../../../controllers/auth/register_controller.dart';
 
 /// Formulario de registro separado del widget principal
 class RegisterForm extends StatefulWidget {
@@ -19,7 +20,13 @@ class _RegisterFormState extends State<RegisterForm> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   
-  bool _isLoading = false;
+  late final RegisterController _registerController;
+
+  @override
+  void initState() {
+    super.initState();
+    _registerController = RegisterController();
+  }
 
   @override
   void dispose() {
@@ -28,23 +35,25 @@ class _RegisterFormState extends State<RegisterForm> {
     _telefonoController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _registerController.dispose();
     super.dispose();
   }
 
   void _handleRegister() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+      final success = await _registerController.registerUser(
+        nombre: _nombreController.text.trim(),
+        apellido: _apellidoController.text.trim(),
+        telefono: _telefonoController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        context: context,
+      );
 
-      // TODO: Implementar lógica de registro con Firebase
-      await Future.delayed(const Duration(seconds: 2)); // Simulación
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      // TODO: Navegar a la siguiente pantalla o mostrar mensaje de éxito
+      if (success) {
+        // Navegar al home después del registro exitoso
+        _registerController.navigateToHome(context);
+      }
     }
   }
 
@@ -105,11 +114,16 @@ class _RegisterFormState extends State<RegisterForm> {
             const SizedBox(height: 50),
 
             // Botón Registrarse
-            PrimaryButton(
-              text: "Registrarse",
-              onPressed: _handleRegister,
-              backgroundColor: primaryColor,
-              isLoading: _isLoading,
+            ListenableBuilder(
+              listenable: _registerController,
+              builder: (context, child) {
+                return PrimaryButton(
+                  text: "Registrarse",
+                  onPressed: _handleRegister,
+                  backgroundColor: primaryColor,
+                  isLoading: _registerController.isLoading,
+                );
+              },
             ),
 
             const SizedBox(height: 20),
@@ -120,7 +134,7 @@ class _RegisterFormState extends State<RegisterForm> {
               linkText: "aquí",
               linkColor: primaryColor,
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/iniciar-sesion');
+                _registerController.navigateToLogin(context);
               },
             ),
           ],
