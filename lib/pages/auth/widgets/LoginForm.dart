@@ -3,6 +3,7 @@ import '../../../shared/widgets/forms/CustomTextField.dart';
 import '../../../shared/widgets/buttons/PrimaryButton.dart';
 import '../../../shared/widgets/navigation/NavigationLink.dart';
 import '../../../shared/widgets/text/PageTitle.dart';
+import 'UserTypeSelector.dart';
 
 /// Formulario de inicio de sesión separado del widget principal
 class LoginForm extends StatefulWidget {
@@ -18,6 +19,7 @@ class _LoginFormState extends State<LoginForm> {
   final _passwordController = TextEditingController();
   
   bool _isLoading = false;
+  UserType _selectedUserType = UserType.usuario;
 
   @override
   void dispose() {
@@ -33,15 +35,24 @@ class _LoginFormState extends State<LoginForm> {
       });
 
       // TODO: Implementar lógica de inicio de sesión con Firebase
+      // Incluir el tipo de usuario seleccionado en la autenticación
+      print('Iniciando sesión como: ${_selectedUserType == UserType.usuario ? 'Usuario' : 'Repartidor'}');
+      print('Email: ${_emailController.text}');
+      
       await Future.delayed(const Duration(seconds: 2)); // Simulación
 
       setState(() {
         _isLoading = false;
       });
 
-      // Navegar a home
+      // Navegar a home o dashboard del repartidor según el tipo seleccionado
       if (mounted) {
-        Navigator.pushNamed(context, '/home');
+        if (_selectedUserType == UserType.usuario) {
+          Navigator.pushNamed(context, '/home');
+        } else {
+          // TODO: Crear ruta para dashboard del repartidor
+          Navigator.pushNamed(context, '/home'); // Por ahora va a home, después se puede cambiar
+        }
       }
     }
   }
@@ -63,6 +74,19 @@ class _LoginFormState extends State<LoginForm> {
               fontSize: 32,
               color: Colors.grey,
               textAlign: TextAlign.start,
+            ),
+            
+            const SizedBox(height: 30),
+            
+            // Selector de tipo de usuario
+            UserTypeSelector(
+              selectedType: _selectedUserType,
+              onChanged: (UserType type) {
+                setState(() {
+                  _selectedUserType = type;
+                });
+              },
+              primaryColor: primaryColor,
             ),
             
             const SizedBox(height: 30),
