@@ -9,7 +9,6 @@ class PagoScreen extends StatefulWidget {
 }
 
 class _PagoScreenState extends State<PagoScreen> {
-  String _metodoSeleccionado = 'efectivo';
   bool _isLoading = false;
 
   @override
