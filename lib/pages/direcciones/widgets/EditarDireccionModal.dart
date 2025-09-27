@@ -263,7 +263,7 @@ class _EditarDireccionModalState extends State<EditarDireccionModal> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: PrimaryButton(
-                      text: "Guardar Cambios",
+                      text: "Guardar",
                       onPressed: _guardarCambios,
                       backgroundColor: primaryColor,
                       isLoading: _isLoading,
