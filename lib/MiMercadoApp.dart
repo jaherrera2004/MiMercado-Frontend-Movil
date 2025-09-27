@@ -4,7 +4,7 @@ import 'package:mi_mercado/SplashScreen.dart';
 import 'package:mi_mercado/pages/auth/RegisterScreen.dart';
 import 'package:mi_mercado/pages/auth/IniciarSesionScreen.dart';
 import 'package:mi_mercado/pages/homepage/HomePageScreen.dart';
-import 'package:mi_mercado/pages/categoria/CategoriaScreen.dart'; // Imported CategoriaScreen
+import 'package:mi_mercado/pages/categoria/CategoriaScreen.dart';
 import 'package:mi_mercado/pages/carrito/CarritoScreen.dart';
 import 'package:mi_mercado/pages/pago/PagoScreen.dart';
 import 'package:mi_mercado/pages/pedidos/PedidosScreen.dart';
@@ -15,6 +15,7 @@ import 'package:mi_mercado/pages/cuenta/DatosPerfilScreen.dart';
 import 'package:mi_mercado/pages/cuenta/SeguridadScreen.dart';
 import 'package:mi_mercado/pages/cuenta/EditarPerfilScreen.dart';
 import 'package:mi_mercado/pages/cuenta/EditarContrase%C3%B1aScreen.dart';
+import 'package:mi_mercado/pages/repartidor/RepartidorPageScreen.dart';
 
 class MiMercadoApp extends StatelessWidget {
   const MiMercadoApp({super.key});
@@ -47,6 +48,7 @@ class MiMercadoApp extends StatelessWidget {
         '/seguridad': (context) => const PasswordScreen(),
         '/editar-perfil': (context) => const EditarPerfilScreen(),
         '/editar-seguridad': (context) => const EditarSeguridadScreen(),
+        '/repartidor': (context) => const RepartidorPage(),
       },
     );
   }
