@@ -50,8 +50,8 @@ class _LoginFormState extends State<LoginForm> {
         if (_selectedUserType == UserType.usuario) {
           Navigator.pushNamed(context, '/home');
         } else {
-          // TODO: Crear ruta para dashboard del repartidor
-          Navigator.pushNamed(context, '/home'); // Por ahora va a home, después se puede cambiar
+          // Navegar al módulo del repartidor
+          Navigator.pushNamed(context, '/repartidor');
         }
       }
     }
