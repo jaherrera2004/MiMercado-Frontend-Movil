@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../services/auth_service.dart';
 import '../../../models/user_model.dart';
 
@@ -31,15 +32,8 @@ class LoginController extends ChangeNotifier {
       );
 
       if (result.isSuccess) {
-        // TODO: Obtener datos completos del usuario desde la base de datos
-        _loggedInUser = UserModel(
-          id: result.userId!,
-          nombre: 'Usuario', // Placeholder
-          apellido: 'Simulado', // Placeholder
-          telefono: '', // Placeholder
-          email: email,
-          createdAt: DateTime.now(),
-        );
+        // Obtener datos completos del usuario desde Firestore
+        await _loadUserData(result.userId!);
 
         _showSuccessMessage(context);
         return true;
@@ -54,6 +48,30 @@ class LoginController extends ChangeNotifier {
       return false;
     } finally {
       _setLoading(false);
+    }
+  }
+
+  /// Carga los datos del usuario desde Firestore
+  Future<void> _loadUserData(String userId) async {
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        _loggedInUser = UserModel.fromMap(userDoc.data()!, userId);
+      }
+    } catch (e) {
+      print('Error cargando datos del usuario: $e');
+      // En caso de error, crear un usuario básico
+      _loggedInUser = UserModel(
+        id: userId,
+        nombre: 'Usuario',
+        apellido: '',
+        telefono: '',
+        correo: '',
+      );
     }
   }
 

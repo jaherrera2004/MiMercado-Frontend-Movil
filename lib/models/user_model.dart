@@ -4,7 +4,9 @@ class UserModel {
   final String nombre;
   final String apellido;
   final String telefono;
-  final String email;
+  final String correo; // Cambio de email a correo para coincidir con Firestore
+  final List<Map<String, dynamic>> direcciones;
+  final List<Map<String, dynamic>> historialPedidos;
   final DateTime? createdAt;
 
   UserModel({
@@ -12,7 +14,9 @@ class UserModel {
     required this.nombre,
     required this.apellido,
     required this.telefono,
-    required this.email,
+    required this.correo,
+    this.direcciones = const [],
+    this.historialPedidos = const [],
     this.createdAt,
   });
 
@@ -23,7 +27,9 @@ class UserModel {
       nombre: map['nombre'] ?? '',
       apellido: map['apellido'] ?? '',
       telefono: map['telefono'] ?? '',
-      email: map['email'] ?? '',
+      correo: map['correo'] ?? '',
+      direcciones: List<Map<String, dynamic>>.from(map['direcciones'] ?? []),
+      historialPedidos: List<Map<String, dynamic>>.from(map['historial_pedidos'] ?? []),
       createdAt: map['createdAt'] != null 
           ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
           : null,
@@ -36,7 +42,9 @@ class UserModel {
       'nombre': nombre,
       'apellido': apellido,
       'telefono': telefono,
-      'email': email,
+      'correo': correo,
+      'direcciones': direcciones,
+      'historial_pedidos': historialPedidos,
       'createdAt': createdAt?.millisecondsSinceEpoch,
     };
   }
@@ -48,7 +56,9 @@ class UserModel {
       nombre: json['nombre'] ?? '',
       apellido: json['apellido'] ?? '',
       telefono: json['telefono'] ?? '',
-      email: json['email'] ?? '',
+      correo: json['correo'] ?? '',
+      direcciones: List<Map<String, dynamic>>.from(json['direcciones'] ?? []),
+      historialPedidos: List<Map<String, dynamic>>.from(json['historial_pedidos'] ?? []),
       createdAt: json['createdAt'] != null 
           ? DateTime.parse(json['createdAt'])
           : null,
@@ -62,7 +72,9 @@ class UserModel {
       'nombre': nombre,
       'apellido': apellido,
       'telefono': telefono,
-      'email': email,
+      'correo': correo,
+      'direcciones': direcciones,
+      'historial_pedidos': historialPedidos,
       'createdAt': createdAt?.toIso8601String(),
     };
   }
@@ -76,7 +88,9 @@ class UserModel {
     String? nombre,
     String? apellido,
     String? telefono,
-    String? email,
+    String? correo,
+    List<Map<String, dynamic>>? direcciones,
+    List<Map<String, dynamic>>? historialPedidos,
     DateTime? createdAt,
   }) {
     return UserModel(
@@ -84,14 +98,16 @@ class UserModel {
       nombre: nombre ?? this.nombre,
       apellido: apellido ?? this.apellido,
       telefono: telefono ?? this.telefono,
-      email: email ?? this.email,
+      correo: correo ?? this.correo,
+      direcciones: direcciones ?? this.direcciones,
+      historialPedidos: historialPedidos ?? this.historialPedidos,
       createdAt: createdAt ?? this.createdAt,
     );
   }
 
   @override
   String toString() {
-    return 'UserModel(id: $id, nombre: $nombre, apellido: $apellido, email: $email)';
+    return 'UserModel(id: $id, nombre: $nombre, apellido: $apellido, correo: $correo)';
   }
 
   @override
@@ -103,7 +119,7 @@ class UserModel {
       other.nombre == nombre &&
       other.apellido == apellido &&
       other.telefono == telefono &&
-      other.email == email;
+      other.correo == correo;
   }
 
   @override
@@ -112,6 +128,6 @@ class UserModel {
       nombre.hashCode ^
       apellido.hashCode ^
       telefono.hashCode ^
-      email.hashCode;
+      correo.hashCode;
   }
 }

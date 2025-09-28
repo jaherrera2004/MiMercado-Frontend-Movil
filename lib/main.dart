@@ -4,10 +4,11 @@ import 'package:mi_mercado/MiMercadoApp.dart';
 import 'package:mi_mercado/firebase_options.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
-  runApp(MiMercadoApp());
+  );
+  runApp(const MiMercadoApp());
 }
 
   

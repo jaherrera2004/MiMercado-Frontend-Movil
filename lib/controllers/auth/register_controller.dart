@@ -43,7 +43,7 @@ class RegisterController extends ChangeNotifier {
           nombre: nombre,
           apellido: apellido,
           telefono: telefono,
-          email: email,
+          correo: email,
           createdAt: DateTime.now(),
         );
 
