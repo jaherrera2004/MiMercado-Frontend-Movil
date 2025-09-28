@@ -40,6 +40,8 @@ class _RegisterFormState extends State<RegisterForm> {
           'telefono': _telefonoController.text,
           'email': _emailController.text,
           'password': _passwordController.text,
+          "pedidos":[],
+          "direcciones":[] 
         }
       );
 

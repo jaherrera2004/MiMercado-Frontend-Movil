@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../shared/widgets/text/PageTitle.dart';
 import '../categoria/widgets/CategoriaSearchBar.dart';
 import '../categoria/widgets/ProductGrid.dart';
 import 'widgets/widgets.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final List<Map<String, dynamic>> categorias = [
     {"img": "lib/resources/temp/lacteos_icon.png", "label": "Lácteos"},
     {"img": "lib/resources/temp/snacks_icon.png", "label": "Snacks"},
@@ -15,39 +23,48 @@ class HomePage extends StatelessWidget {
     {"img": "lib/resources/temp/panaderia_icon.png", "label": "Panadería"},
   ];
 
-  final List<Map<String, dynamic>> productos = [
-    {
-      "nombre": "Corona 6 pack",
-      "precio": "18.000 \$",
-      "img": "lib/resources/temp/coronitasixpack.png"
-    },
-    {
-      "nombre": "Bimbo Pan Blanco",
-      "precio": "6.000 \$",
-      "img": "lib/resources/temp/panbimbo.png"
-    },
-    {
-      "nombre": "Barilla Penne Rigate",
-      "precio": "5.000 \$",
-      "img": "lib/resources/temp/rigate.png"
-    },
-    {
-      "nombre": "Chocoramo",
-      "precio": "3.000 \$",
-      "img": "lib/resources/temp/chocorramo.png"
-    },
-    {
-      "nombre": "Chocoramo",
-      "precio": "3.000 \$",
-      "img": "lib/resources/temp/chocorramo.png"
-    },
-    
-    {
-      "nombre": "Chocoramo",
-      "precio": "3.000 \$",
-      "img": "lib/resources/temp/chocorramo.png"
-    },
-  ];
+  final FirebaseFirestore firebase = FirebaseFirestore.instance;
+  List<Map<String, dynamic>> productos = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarProductos();
+  }
+
+  Future<void> _cargarProductos() async {
+    try {
+      final QuerySnapshot snapshot = await firebase.collection('productos').get();
+      
+      final List<Map<String, dynamic>> productosFirebase = [];
+      
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        productosFirebase.add({
+          'nombre': data['nombre'] ?? 'Producto sin nombre',
+          'precio': '${data['precio'] ?? 0} \$',
+          'img': 'lib/resources/temp/image.png', // Usar imagen que sabemos que funciona
+        });
+      }
+      
+      setState(() {
+        productos = productosFirebase;
+      });
+      
+    } catch (e) {
+      print('Error cargando productos: $e');
+      // Mantener productos de ejemplo si hay error
+      setState(() {
+        productos = [
+          {
+            "nombre": "Producto de ejemplo",
+            "precio": "5.000 \$",
+            "img": "lib/resources/image.png"
+          },
+        ];
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
