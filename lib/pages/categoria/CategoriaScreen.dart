@@ -66,7 +66,7 @@ class _CategoriaScreenState extends State<CategoriaScreen> {
         print('📊 Total productos en BD: ${allProductsSnapshot.docs.length}');
         
         for (var doc in allProductsSnapshot.docs) {
-          final data = doc.data() as Map<String, dynamic>;
+          final data = doc.data();
           print('🔍 Producto: ${data['nombre']} - id_categoria: ${data['id_categoria']}');
         }
       }
