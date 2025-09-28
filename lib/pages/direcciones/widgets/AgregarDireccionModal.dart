@@ -21,8 +21,6 @@ class _AgregarDireccionModalState extends State<AgregarDireccionModal> {
   final _formKey = GlobalKey<FormState>();
   final _nombreController = TextEditingController();
   final _direccionController = TextEditingController();
-  final _ciudadController = TextEditingController();
-  final _telefonoController = TextEditingController();
   final _referenciaController = TextEditingController();
   
   bool _esPrincipal = false;
@@ -32,8 +30,6 @@ class _AgregarDireccionModalState extends State<AgregarDireccionModal> {
   void dispose() {
     _nombreController.dispose();
     _direccionController.dispose();
-    _ciudadController.dispose();
-    _telefonoController.dispose();
     _referenciaController.dispose();
     super.dispose();
   }
@@ -49,8 +45,8 @@ class _AgregarDireccionModalState extends State<AgregarDireccionModal> {
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           nombre: _nombreController.text.trim(),
           direccion: _direccionController.text.trim(),
-          ciudad: _ciudadController.text.trim(),
-          telefono: _telefonoController.text.trim(),
+          ciudad: '',  // Campo por defecto
+          telefono: '', // Campo por defecto
           referencia: _referenciaController.text.trim().isEmpty 
               ? null 
               : _referenciaController.text.trim(),
@@ -157,38 +153,7 @@ class _AgregarDireccionModalState extends State<AgregarDireccionModal> {
                         },
                       ),
                       
-                      const SizedBox(height: 16),
-                      
-                      // Campo ciudad
-                      CustomTextField(
-                        label: "Ciudad",
-                        hint: "Ej: Bogotá, Medellín, Cali",
-                        primaryColor: primaryColor,
-                        controller: _ciudadController,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'La ciudad es requerida';
-                          }
-                          return null;
-                        },
-                      ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      // Campo teléfono
-                      CustomTextField(
-                        label: "Teléfono de contacto",
-                        hint: "Ej: +57 300 123 4567",
-                        primaryColor: primaryColor,
-                        controller: _telefonoController,
-                        keyboardType: TextInputType.phone,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'El teléfono es requerido';
-                          }
-                          return null;
-                        },
-                      ),
+
                       
                       const SizedBox(height: 16),
                       
