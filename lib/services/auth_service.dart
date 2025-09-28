@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Servicio de autenticación (simulado por ahora)
+/// Servicio de autenticación con Firebase
 class AuthService {
   static final AuthService _instance = AuthService._internal();
   factory AuthService() => _instance;
@@ -15,9 +17,6 @@ class AuthService {
     required String password,
   }) async {
     try {
-      // Simulación de delay de red
-      await Future.delayed(const Duration(seconds: 2));
-      
       // Validaciones básicas
       _validateRegistrationData(
         nombre: nombre,
@@ -26,36 +25,56 @@ class AuthService {
         password: password,
       );
 
-      // TODO: Aquí iría la implementación real con Firebase
-      /*
+      // Crear usuario en Firebase Auth
       final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+      // Crear documento del usuario en Firestore
+      await FirebaseFirestore.instance.collection('usuarios').doc(userCredential.user!.uid).set({
         'nombre': nombre,
         'apellido': apellido,
         'telefono': telefono,
-        'email': email,
+        'correo': email,
+        'contrasena': password, // Nota: En producción, no guardar contraseñas en texto plano
+        'direcciones': [],
+        'historial_pedidos': [],
         'createdAt': FieldValue.serverTimestamp(),
       });
 
+      print('Usuario registrado exitosamente: $nombre $apellido - $email');
       return UserRegistrationResult.success(
         userId: userCredential.user!.uid,
         email: email,
       );
-      */
 
-      // Simulación de registro exitoso
-      print('Usuario registrado exitosamente: $nombre $apellido - $email');
-      return UserRegistrationResult.success(
-        userId: 'simulated_user_id_${DateTime.now().millisecondsSinceEpoch}',
-        email: email,
-      );
-
+    } on FirebaseAuthException catch (e) {
+      print('FirebaseAuthException en registro: ${e.code} - ${e.message}');
+      String errorMessage;
+      switch (e.code) {
+        case 'weak-password':
+          errorMessage = 'La contraseña es muy débil';
+          break;
+        case 'email-already-in-use':
+          errorMessage = 'Ya existe una cuenta con este email';
+          break;
+        case 'invalid-email':
+          errorMessage = 'El email no es válido';
+          break;
+        case 'network-request-failed':
+          errorMessage = 'Error de conexión. Verifica tu internet';
+          break;
+        case 'too-many-requests':
+          errorMessage = 'Demasiados intentos. Intenta más tarde';
+          break;
+        default:
+          errorMessage = 'Error de autenticación: ${e.message ?? e.code}';
+      }
+      return UserRegistrationResult.failure(errorMessage);
     } catch (e) {
-      return UserRegistrationResult.failure(e.toString());
+      print('Error general en registro: $e');
+      return UserRegistrationResult.failure('Error inesperado: ${e.toString()}');
     }
   }
 
@@ -94,17 +113,47 @@ class AuthService {
     required String password,
   }) async {
     try {
-      await Future.delayed(const Duration(seconds: 2));
-      
-      // TODO: Implementar lógica real de login
-      print('Login simulado: $email');
-      
+      // Iniciar sesión con Firebase Auth
+      final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      print('Login exitoso: $email');
       return UserLoginResult.success(
-        userId: 'simulated_user_id',
+        userId: userCredential.user!.uid,
         email: email,
       );
+
+    } on FirebaseAuthException catch (e) {
+      print('FirebaseAuthException en login: ${e.code} - ${e.message}');
+      String errorMessage;
+      switch (e.code) {
+        case 'user-not-found':
+          errorMessage = 'No existe una cuenta con este email';
+          break;
+        case 'wrong-password':
+          errorMessage = 'Contraseña incorrecta';
+          break;
+        case 'invalid-email':
+          errorMessage = 'El email no es válido';
+          break;
+        case 'user-disabled':
+          errorMessage = 'Esta cuenta ha sido deshabilitada';
+          break;
+        case 'network-request-failed':
+          errorMessage = 'Error de conexión. Verifica tu internet';
+          break;
+        case 'too-many-requests':
+          errorMessage = 'Demasiados intentos. Intenta más tarde';
+          break;
+        default:
+          errorMessage = 'Error de autenticación: ${e.message ?? e.code}';
+      }
+      return UserLoginResult.failure(errorMessage);
     } catch (e) {
-      return UserLoginResult.failure(e.toString());
+      print('Error general en login: $e');
+      return UserLoginResult.failure('Error inesperado: ${e.toString()}');
     }
   }
 }
