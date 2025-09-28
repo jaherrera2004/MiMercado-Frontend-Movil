@@ -6,7 +6,7 @@ import '../models/direccion.dart';
 
 /// Modal para agregar una nueva dirección
 class AgregarDireccionModal extends StatefulWidget {
-  final Function(Direccion) onDireccionAgregada;
+  final Future<void> Function(Direccion) onDireccionAgregada;
 
   const AgregarDireccionModal({
     super.key,
@@ -44,27 +44,36 @@ class _AgregarDireccionModalState extends State<AgregarDireccionModal> {
         _isLoading = true;
       });
 
-      // Simular guardado (en una app real, aquí iría la llamada a la API)
-      await Future.delayed(const Duration(seconds: 1));
+      try {
+        final nuevaDireccion = Direccion(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          nombre: _nombreController.text.trim(),
+          direccion: _direccionController.text.trim(),
+          ciudad: _ciudadController.text.trim(),
+          telefono: _telefonoController.text.trim(),
+          referencia: _referenciaController.text.trim().isEmpty 
+              ? null 
+              : _referenciaController.text.trim(),
+          esPrincipal: _esPrincipal,
+        );
 
-      final nuevaDireccion = Direccion(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        nombre: _nombreController.text.trim(),
-        direccion: _direccionController.text.trim(),
-        ciudad: _ciudadController.text.trim(),
-        telefono: _telefonoController.text.trim(),
-        referencia: _referenciaController.text.trim().isEmpty 
-            ? null 
-            : _referenciaController.text.trim(),
-        esPrincipal: _esPrincipal,
-      );
+        // Llamar al callback que manejará el guardado en Firebase
+        await widget.onDireccionAgregada(nuevaDireccion);
+        
+        setState(() {
+          _isLoading = false;
+        });
 
-      setState(() {
-        _isLoading = false;
-      });
-
-      widget.onDireccionAgregada(nuevaDireccion);
-      Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        // El error ya se maneja en el método padre, no necesitamos hacer nada aquí
+        print('Error en modal: $e');
+      }
     }
   }
 

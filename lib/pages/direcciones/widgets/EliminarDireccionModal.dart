@@ -5,7 +5,7 @@ import '../models/direccion.dart';
 /// Modal de confirmación para eliminar una dirección
 class EliminarDireccionModal extends StatefulWidget {
   final Direccion direccion;
-  final Function(Direccion) onDireccionEliminada;
+  final Future<void> Function(Direccion) onDireccionEliminada;
 
   const EliminarDireccionModal({
     super.key,
@@ -25,15 +25,24 @@ class _EliminarDireccionModalState extends State<EliminarDireccionModal> {
       _isLoading = true;
     });
 
-    // Simular eliminación (en una app real, aquí iría la llamada a la API)
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      // Llamar al callback que manejará la eliminación en Firebase
+      await widget.onDireccionEliminada(widget.direccion);
+      
+      setState(() {
+        _isLoading = false;
+      });
 
-    setState(() {
-      _isLoading = false;
-    });
-
-    widget.onDireccionEliminada(widget.direccion);
-    Navigator.of(context).pop();
+      Navigator.of(context).pop();
+      
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      
+      // El error ya se maneja en el método padre, no necesitamos hacer nada aquí
+      print('Error en modal: $e');
+    }
   }
 
   @override
