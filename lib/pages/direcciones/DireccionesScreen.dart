@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../homepage/widgets/HomeBottomNavigation.dart';
 import 'widgets/widgets.dart';
 import 'widgets/AgregarDireccionModal.dart';
@@ -14,26 +15,101 @@ class DireccionesScreen extends StatefulWidget {
 }
 
 class _DireccionesScreenState extends State<DireccionesScreen> {
-  // Lista de direcciones - en una app real, esto vendría de un servicio o estado global
-  List<Direccion> direcciones = [
-    Direccion(
-      id: '1',
-      nombre: 'Casa',
-      direccion: 'Carrera 15 #123-45, Chapinero',
-      ciudad: 'Bogotá',
-      telefono: '+57 300 123 4567',
-      referencia: 'Frente al parque principal',
-      esPrincipal: true,
-    ),
-    Direccion(
-      id: '2',
-      nombre: 'Oficina',
-      direccion: 'Calle 100 #67-89, Zona Rosa',
-      ciudad: 'Bogotá',
-      telefono: '+57 310 987 6543',
-      esPrincipal: false,
-    ),
-  ];
+  final FirebaseFirestore firebase = FirebaseFirestore.instance;
+  List<Direccion> direcciones = [];
+  bool isLoading = true;
+  String currentUserId = ''; // En una app real, esto vendría del sistema de autenticación
+
+  @override
+  void initState() {
+    super.initState();
+    // Por ahora, usar un email de ejemplo para buscar el usuario
+    // En una app real, esto vendría del usuario autenticado
+    _cargarDirecciones('dayro@gmail.com');
+  }
+
+  Future<void> _cargarDirecciones(String userEmail) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      print('🔍 Buscando usuario con email: $userEmail');
+
+      // Buscar el usuario por email
+      final QuerySnapshot userQuery = await firebase
+          .collection('usuarios')
+          .where('email', isEqualTo: userEmail)
+          .limit(1)
+          .get();
+
+      if (userQuery.docs.isEmpty) {
+        print('❌ Usuario no encontrado');
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+
+      final userData = userQuery.docs.first.data() as Map<String, dynamic>;
+      currentUserId = userQuery.docs.first.id;
+      
+      print('✅ Usuario encontrado: ${userData['nombre']}');
+
+      // Obtener las direcciones del array
+      final List<dynamic> direccionesData = userData['direcciones'] ?? [];
+      print('📍 Direcciones encontradas: ${direccionesData.length}');
+
+      final List<Direccion> direccionesFirebase = [];
+
+      for (int i = 0; i < direccionesData.length; i++) {
+        final direccionData = direccionesData[i] as Map<String, dynamic>;
+        
+        final direccion = Direccion(
+          id: i.toString(), // Usar índice como ID temporal
+          nombre: direccionData['nombre'] ?? 'Sin nombre',
+          direccion: direccionData['direccion'] ?? 'Sin dirección',
+          ciudad: 'Bogotá', // Por defecto, ya que no está en tu estructura
+          telefono: userData['telefono'] ?? '', // Usar teléfono del usuario
+          referencia: direccionData['referencias'] ?? '',
+          esPrincipal: direccionData['principal'] ?? false,
+        );
+
+        direccionesFirebase.add(direccion);
+        print('✅ Dirección cargada: ${direccion.nombre} - ${direccion.direccion}');
+      }
+
+      setState(() {
+        direcciones = direccionesFirebase;
+        isLoading = false;
+      });
+
+    } catch (e) {
+      print('❌ Error cargando direcciones: $e');
+      setState(() {
+        isLoading = false;
+        // Direcciones de ejemplo en caso de error
+        direcciones = [
+          Direccion(
+            id: '1',
+            nombre: 'Casa',
+            direccion: 'Dirección de ejemplo',
+            ciudad: 'Bogotá',
+            telefono: '123456789',
+            referencia: 'Sin referencia',
+            esPrincipal: true,
+          ),
+        ];
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al cargar direcciones: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   void _mostrarModalAgregar() {
     showDialog(
@@ -64,69 +140,265 @@ class _DireccionesScreenState extends State<DireccionesScreen> {
     );
   }
 
-  void _agregarDireccion(Direccion nuevaDireccion) {
-    setState(() {
-      // Si es principal, quitar principal a las demás
-      if (nuevaDireccion.esPrincipal) {
-        direcciones = direcciones.map((d) => d.copyWith(esPrincipal: false)).toList();
+  Future<void> _agregarDireccion(Direccion nuevaDireccion) async {
+    try {
+      print('💾 Guardando nueva dirección en Firebase...');
+      
+      if (currentUserId.isEmpty) {
+        throw Exception('Usuario no identificado');
       }
-      direcciones.add(nuevaDireccion);
-    });
 
-    // Mostrar mensaje de éxito
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Dirección "${nuevaDireccion.nombre}" agregada exitosamente'),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
+      // Obtener el documento del usuario
+      final userDoc = firebase.collection('usuarios').doc(currentUserId);
+      final userData = await userDoc.get();
+      
+      if (!userData.exists) {
+        throw Exception('Usuario no encontrado');
+      }
 
-  void _editarDireccion(Direccion direccionEditada) {
-    setState(() {
-      final index = direcciones.indexWhere((d) => d.id == direccionEditada.id);
-      if (index != -1) {
+      // Obtener direcciones actuales
+      final Map<String, dynamic> currentData = userData.data() as Map<String, dynamic>;
+      List<dynamic> direccionesActuales = List.from(currentData['direcciones'] ?? []);
+
+      // Si la nueva dirección es principal, marcar las demás como no principales
+      if (nuevaDireccion.esPrincipal) {
+        for (int i = 0; i < direccionesActuales.length; i++) {
+          direccionesActuales[i]['principal'] = false;
+        }
+      }
+
+      // Agregar la nueva dirección
+      final nuevaDireccionMap = {
+        'nombre': nuevaDireccion.nombre,
+        'direccion': nuevaDireccion.direccion,
+        'referencias': nuevaDireccion.referencia ?? '',
+        'principal': nuevaDireccion.esPrincipal,
+      };
+
+      direccionesActuales.add(nuevaDireccionMap);
+
+      // Actualizar en Firebase
+      await userDoc.update({
+        'direcciones': direccionesActuales,
+      });
+
+      print('✅ Dirección guardada exitosamente');
+
+      // Actualizar la UI
+      setState(() {
         // Si es principal, quitar principal a las demás
-        if (direccionEditada.esPrincipal) {
+        if (nuevaDireccion.esPrincipal) {
           direcciones = direcciones.map((d) => d.copyWith(esPrincipal: false)).toList();
         }
-        direcciones[index] = direccionEditada;
-      }
-    });
+        direcciones.add(nuevaDireccion);
+      });
 
-    // Mostrar mensaje de éxito
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Dirección "${direccionEditada.nombre}" actualizada exitosamente'),
-        backgroundColor: Colors.blue,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+      // Mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Dirección "${nuevaDireccion.nombre}" agregada exitosamente'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+    } catch (e) {
+      print('❌ Error al guardar dirección: $e');
+      
+      // Mostrar mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al guardar la dirección: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
-  void _eliminarDireccion(Direccion direccion) {
-    setState(() {
-      direcciones.removeWhere((d) => d.id == direccion.id);
-    });
+  Future<void> _editarDireccion(Direccion direccionEditada) async {
+    try {
+      print('✏️ Actualizando dirección en Firebase...');
+      
+      if (currentUserId.isEmpty) {
+        throw Exception('Usuario no identificado');
+      }
 
-    // Mostrar mensaje de éxito
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Dirección "${direccion.nombre}" eliminada exitosamente'),
-        backgroundColor: Colors.red,
-        duration: const Duration(seconds: 2),
-        action: SnackBarAction(
-          label: 'Deshacer',
-          textColor: Colors.white,
-          onPressed: () {
-            setState(() {
-              direcciones.add(direccion);
-            });
-          },
+      // Obtener el documento del usuario
+      final userDoc = firebase.collection('usuarios').doc(currentUserId);
+      final userData = await userDoc.get();
+      
+      if (!userData.exists) {
+        throw Exception('Usuario no encontrado');
+      }
+
+      // Obtener direcciones actuales
+      final Map<String, dynamic> currentData = userData.data() as Map<String, dynamic>;
+      List<dynamic> direccionesActuales = List.from(currentData['direcciones'] ?? []);
+
+      // Encontrar el índice de la dirección a editar
+      int indexToEdit = -1;
+      final direccionIndex = int.tryParse(direccionEditada.id ?? '-1') ?? -1;
+      
+      if (direccionIndex >= 0 && direccionIndex < direccionesActuales.length) {
+        indexToEdit = direccionIndex;
+      } else {
+        // Buscar por coincidencia si no se encontró por índice
+        final direccionOriginal = direcciones.firstWhere((d) => d.id == direccionEditada.id);
+        for (int i = 0; i < direccionesActuales.length; i++) {
+          final dir = direccionesActuales[i];
+          if (dir['nombre'] == direccionOriginal.nombre && dir['direccion'] == direccionOriginal.direccion) {
+            indexToEdit = i;
+            break;
+          }
+        }
+      }
+
+      if (indexToEdit == -1) {
+        throw Exception('Dirección no encontrada');
+      }
+
+      // Si la dirección editada es principal, marcar las demás como no principales
+      if (direccionEditada.esPrincipal) {
+        for (int i = 0; i < direccionesActuales.length; i++) {
+          direccionesActuales[i]['principal'] = false;
+        }
+      }
+
+      // Actualizar la dirección específica
+      direccionesActuales[indexToEdit] = {
+        'nombre': direccionEditada.nombre,
+        'direccion': direccionEditada.direccion,
+        'referencias': direccionEditada.referencia ?? '',
+        'principal': direccionEditada.esPrincipal,
+      };
+
+      // Actualizar en Firebase
+      await userDoc.update({
+        'direcciones': direccionesActuales,
+      });
+
+      print('✅ Dirección actualizada exitosamente');
+
+      // Actualizar la UI
+      setState(() {
+        final index = direcciones.indexWhere((d) => d.id == direccionEditada.id);
+        if (index != -1) {
+          // Si es principal, quitar principal a las demás
+          if (direccionEditada.esPrincipal) {
+            direcciones = direcciones.map((d) => d.copyWith(esPrincipal: false)).toList();
+          }
+          direcciones[index] = direccionEditada;
+        }
+      });
+
+      // Mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Dirección "${direccionEditada.nombre}" actualizada exitosamente'),
+          backgroundColor: Colors.blue,
+          duration: const Duration(seconds: 2),
         ),
-      ),
-    );
+      );
+
+    } catch (e) {
+      print('❌ Error al actualizar dirección: $e');
+      
+      // Mostrar mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al actualizar la dirección: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  Future<void> _eliminarDireccion(Direccion direccion) async {
+    try {
+      print('🗑️ Eliminando dirección de Firebase...');
+      
+      if (currentUserId.isEmpty) {
+        throw Exception('Usuario no identificado');
+      }
+
+      // Obtener el documento del usuario
+      final userDoc = firebase.collection('usuarios').doc(currentUserId);
+      final userData = await userDoc.get();
+      
+      if (!userData.exists) {
+        throw Exception('Usuario no encontrado');
+      }
+
+      // Obtener direcciones actuales
+      final Map<String, dynamic> currentData = userData.data() as Map<String, dynamic>;
+      List<dynamic> direccionesActuales = List.from(currentData['direcciones'] ?? []);
+
+      // Encontrar el índice de la dirección a eliminar
+      int indexToRemove = -1;
+      final direccionIndex = int.tryParse(direccion.id ?? '-1') ?? -1;
+      
+      if (direccionIndex >= 0 && direccionIndex < direccionesActuales.length) {
+        // Verificar que es la dirección correcta comparando nombre y dirección
+        final direccionFirebase = direccionesActuales[direccionIndex];
+        if (direccionFirebase['nombre'] == direccion.nombre && 
+            direccionFirebase['direccion'] == direccion.direccion) {
+          indexToRemove = direccionIndex;
+        }
+      }
+
+      if (indexToRemove == -1) {
+        // Buscar por coincidencia de nombre y dirección si no se encontró por índice
+        for (int i = 0; i < direccionesActuales.length; i++) {
+          final dir = direccionesActuales[i];
+          if (dir['nombre'] == direccion.nombre && dir['direccion'] == direccion.direccion) {
+            indexToRemove = i;
+            break;
+          }
+        }
+      }
+
+      if (indexToRemove == -1) {
+        throw Exception('Dirección no encontrada');
+      }
+
+      // Eliminar la dirección del array
+      direccionesActuales.removeAt(indexToRemove);
+
+      // Actualizar en Firebase
+      await userDoc.update({
+        'direcciones': direccionesActuales,
+      });
+
+      print('✅ Dirección eliminada exitosamente');
+
+      // Actualizar la UI
+      setState(() {
+        direcciones.removeWhere((d) => d.id == direccion.id);
+      });
+
+      // Mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Dirección "${direccion.nombre}" eliminada exitosamente'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+    } catch (e) {
+      print('❌ Error al eliminar dirección: $e');
+      
+      // Mostrar mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al eliminar la dirección: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
   void _seleccionarDireccion(Direccion direccion) {
@@ -146,15 +418,42 @@ class _DireccionesScreenState extends State<DireccionesScreen> {
       appBar: DireccionesAppBar(
         onAddPressed: _mostrarModalAgregar,
       ),
-      body: direcciones.isEmpty
-          ? _buildEmptyState()
-          : DireccionesList(
-              direcciones: direcciones,
-              onEditDireccion: _mostrarModalEditar,
-              onDeleteDireccion: _mostrarModalEliminar,
-              onTapDireccion: _seleccionarDireccion,
-            ),
+      body: _buildBody(),
       bottomNavigationBar: const HomeBottomNavigation(),
+    );
+  }
+
+  Widget _buildBody() {
+    if (isLoading) {
+      return _buildLoadingState();
+    } else if (direcciones.isEmpty) {
+      return _buildEmptyState();
+    } else {
+      return DireccionesList(
+        direcciones: direcciones,
+        onEditDireccion: _mostrarModalEditar,
+        onDeleteDireccion: _mostrarModalEliminar,
+        onTapDireccion: _seleccionarDireccion,
+      );
+    }
+  }
+
+  Widget _buildLoadingState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 16),
+          Text(
+            'Cargando direcciones...',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

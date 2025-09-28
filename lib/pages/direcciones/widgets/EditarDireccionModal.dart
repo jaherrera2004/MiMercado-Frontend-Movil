@@ -7,7 +7,7 @@ import '../models/direccion.dart';
 /// Modal para editar una dirección existente
 class EditarDireccionModal extends StatefulWidget {
   final Direccion direccion;
-  final Function(Direccion) onDireccionEditada;
+  final Future<void> Function(Direccion) onDireccionEditada;
 
   const EditarDireccionModal({
     super.key,
@@ -58,26 +58,35 @@ class _EditarDireccionModalState extends State<EditarDireccionModal> {
         _isLoading = true;
       });
 
-      // Simular guardado (en una app real, aquí iría la llamada a la API)
-      await Future.delayed(const Duration(seconds: 1));
+      try {
+        final direccionEditada = widget.direccion.copyWith(
+          nombre: _nombreController.text.trim(),
+          direccion: _direccionController.text.trim(),
+          ciudad: _ciudadController.text.trim(),
+          telefono: _telefonoController.text.trim(),
+          referencia: _referenciaController.text.trim().isEmpty 
+              ? null 
+              : _referenciaController.text.trim(),
+          esPrincipal: _esPrincipal,
+        );
 
-      final direccionEditada = widget.direccion.copyWith(
-        nombre: _nombreController.text.trim(),
-        direccion: _direccionController.text.trim(),
-        ciudad: _ciudadController.text.trim(),
-        telefono: _telefonoController.text.trim(),
-        referencia: _referenciaController.text.trim().isEmpty 
-            ? null 
-            : _referenciaController.text.trim(),
-        esPrincipal: _esPrincipal,
-      );
+        // Llamar al callback que manejará la actualización en Firebase
+        await widget.onDireccionEditada(direccionEditada);
+        
+        setState(() {
+          _isLoading = false;
+        });
 
-      setState(() {
-        _isLoading = false;
-      });
-
-      widget.onDireccionEditada(direccionEditada);
-      Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        // El error ya se maneja en el método padre, no necesitamos hacer nada aquí
+        print('Error en modal: $e');
+      }
     }
   }
 
