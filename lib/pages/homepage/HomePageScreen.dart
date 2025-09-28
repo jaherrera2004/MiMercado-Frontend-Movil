@@ -13,23 +13,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<Map<String, dynamic>> categorias = [
-    {"img": "lib/resources/temp/lacteos_icon.png", "label": "Lácteos"},
-    {"img": "lib/resources/temp/snacks_icon.png", "label": "Snacks"},
-    {"img": "lib/resources/temp/bebidas_icon.png", "label": "Bebidas"},
-    {"img": "lib/resources/temp/panaderia_icon.png", "label": "Panadería"},
-    {"img": "lib/resources/temp/panaderia_icon.png", "label": "Panadería"},
-    {"img": "lib/resources/temp/panaderia_icon.png", "label": "Panadería"},
-    {"img": "lib/resources/temp/panaderia_icon.png", "label": "Panadería"},
-  ];
-
   final FirebaseFirestore firebase = FirebaseFirestore.instance;
+  List<Map<String, dynamic>> categorias = [];
   List<Map<String, dynamic>> productos = [];
 
   @override
   void initState() {
     super.initState();
+    _cargarCategorias();
     _cargarProductos();
+  }
+
+  Future<void> _cargarCategorias() async {
+    try {
+      final QuerySnapshot snapshot = await firebase.collection('categorias').get();
+      
+      final List<Map<String, dynamic>> categoriasFirebase = [];
+      
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        categoriasFirebase.add({
+          'label': data['nombre'] ?? 'Categoría sin nombre',
+          'img': "lib/resources/temp/image.png", // imagen por defecto
+        });
+      }
+      
+      setState(() {
+        categorias = categoriasFirebase;
+      });
+      
+    } catch (e) {
+      print('Error cargando categorías: $e');
+      // Mantener categorías de ejemplo si hay error
+      setState(() {
+        categorias = [
+          {"img": "lib/resources/temp/lacteos_icon.png", "label": "Lácteos"},
+          {"img": "lib/resources/temp/snacks_icon.png", "label": "Snacks"},
+          {"img": "lib/resources/temp/bebidas_icon.png", "label": "Bebidas"},
+          {"img": "lib/resources/temp/panaderia_icon.png", "label": "Panadería"},
+        ];
+      });
+    }
   }
 
   Future<void> _cargarProductos() async {
