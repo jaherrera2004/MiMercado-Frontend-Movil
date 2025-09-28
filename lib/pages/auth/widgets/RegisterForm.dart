@@ -1,8 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../../shared/widgets/forms/CustomTextField.dart';
 import '../../../shared/widgets/buttons/PrimaryButton.dart';
 import '../../../shared/widgets/navigation/NavigationLink.dart';
-import '../../../controllers/auth/register_controller.dart';
 
 /// Formulario de registro separado del widget principal
 class RegisterForm extends StatefulWidget {
@@ -19,14 +19,7 @@ class _RegisterFormState extends State<RegisterForm> {
   final _telefonoController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  
-  late final RegisterController _registerController;
-
-  @override
-  void initState() {
-    super.initState();
-    _registerController = RegisterController();
-  }
+  final firebase = FirebaseFirestore.instance;
 
   @override
   void dispose() {
@@ -35,26 +28,28 @@ class _RegisterFormState extends State<RegisterForm> {
     _telefonoController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _registerController.dispose();
     super.dispose();
   }
 
-  void _handleRegister() async {
-    if (_formKey.currentState!.validate()) {
-      final success = await _registerController.registerUser(
-        nombre: _nombreController.text.trim(),
-        apellido: _apellidoController.text.trim(),
-        telefono: _telefonoController.text.trim(),
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-        context: context,
+  void _registrarUsuario() async {
+    try {
+      await firebase.collection('usuarios').doc().set(
+        { 
+          'nombre': _nombreController.text,
+          'apellido': _apellidoController.text,
+          'telefono': _telefonoController.text,
+          'email': _emailController.text,
+          'password': _passwordController.text,
+        }
       );
 
-      if (success) {
-        // Navegar al home después del registro exitoso
-        _registerController.navigateToHome(context);
-      }
+    } catch (e) {
+      print('Error: '+e.toString());
     }
+  }
+
+  void _navigateToLogin() {
+    Navigator.of(context).pop();
   }
 
   @override
@@ -114,16 +109,10 @@ class _RegisterFormState extends State<RegisterForm> {
             const SizedBox(height: 50),
 
             // Botón Registrarse
-            ListenableBuilder(
-              listenable: _registerController,
-              builder: (context, child) {
-                return PrimaryButton(
-                  text: "Registrarse",
-                  onPressed: _handleRegister,
-                  backgroundColor: primaryColor,
-                  isLoading: _registerController.isLoading,
-                );
-              },
+            PrimaryButton(
+              text: "Registrarse",
+              onPressed: _registrarUsuario,
+              backgroundColor: primaryColor,
             ),
 
             const SizedBox(height: 20),
@@ -133,9 +122,7 @@ class _RegisterFormState extends State<RegisterForm> {
               text: "¿Ya tienes cuenta? Inicia Sesión ",
               linkText: "aquí",
               linkColor: primaryColor,
-              onTap: () {
-                _registerController.navigateToLogin(context);
-              },
+              onTap: _navigateToLogin,
             ),
           ],
         ),
