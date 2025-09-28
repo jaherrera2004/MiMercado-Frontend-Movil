@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../shared/widgets/forms/CustomTextField.dart';
 import '../../../shared/widgets/buttons/PrimaryButton.dart';
 import '../../../shared/widgets/navigation/NavigationLink.dart';
-import '../../../controllers/auth/register_controller.dart';
 
 /// Formulario de registro separado del widget principal
 class RegisterForm extends StatefulWidget {
@@ -19,14 +18,6 @@ class _RegisterFormState extends State<RegisterForm> {
   final _telefonoController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  
-  late final RegisterController _registerController;
-
-  @override
-  void initState() {
-    super.initState();
-    _registerController = RegisterController();
-  }
 
   @override
   void dispose() {
@@ -35,26 +26,23 @@ class _RegisterFormState extends State<RegisterForm> {
     _telefonoController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _registerController.dispose();
     super.dispose();
   }
 
-  void _handleRegister() async {
+  void _handleRegister() {
     if (_formKey.currentState!.validate()) {
-      final success = await _registerController.registerUser(
-        nombre: _nombreController.text.trim(),
-        apellido: _apellidoController.text.trim(),
-        telefono: _telefonoController.text.trim(),
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-        context: context,
-      );
-
-      if (success) {
-        // Navegar al home después del registro exitoso
-        _registerController.navigateToHome(context);
-      }
+      // Aquí se puede agregar la lógica de registro
+      print('Datos del formulario:');
+      print('Nombre: ${_nombreController.text}');
+      print('Apellido: ${_apellidoController.text}');
+      print('Teléfono: ${_telefonoController.text}');
+      print('Email: ${_emailController.text}');
+      print('Contraseña: ${_passwordController.text}');
     }
+  }
+
+  void _navigateToLogin() {
+    Navigator.of(context).pop();
   }
 
   @override
@@ -114,16 +102,10 @@ class _RegisterFormState extends State<RegisterForm> {
             const SizedBox(height: 50),
 
             // Botón Registrarse
-            ListenableBuilder(
-              listenable: _registerController,
-              builder: (context, child) {
-                return PrimaryButton(
-                  text: "Registrarse",
-                  onPressed: _handleRegister,
-                  backgroundColor: primaryColor,
-                  isLoading: _registerController.isLoading,
-                );
-              },
+            PrimaryButton(
+              text: "Registrarse",
+              onPressed: _handleRegister,
+              backgroundColor: primaryColor,
             ),
 
             const SizedBox(height: 20),
@@ -133,9 +115,7 @@ class _RegisterFormState extends State<RegisterForm> {
               text: "¿Ya tienes cuenta? Inicia Sesión ",
               linkText: "aquí",
               linkColor: primaryColor,
-              onTap: () {
-                _registerController.navigateToLogin(context);
-              },
+              onTap: _navigateToLogin,
             ),
           ],
         ),
