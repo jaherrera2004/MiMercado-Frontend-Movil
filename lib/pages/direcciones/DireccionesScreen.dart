@@ -69,8 +69,6 @@ class _DireccionesScreenState extends State<DireccionesScreen> {
           id: i.toString(), // Usar índice como ID temporal
           nombre: direccionData['nombre'] ?? 'Sin nombre',
           direccion: direccionData['direccion'] ?? 'Sin dirección',
-          ciudad: 'Bogotá', // Por defecto, ya que no está en tu estructura
-          telefono: userData['telefono'] ?? '', // Usar teléfono del usuario
           referencia: direccionData['referencias'] ?? '',
           esPrincipal: direccionData['principal'] ?? false,
         );
@@ -94,8 +92,6 @@ class _DireccionesScreenState extends State<DireccionesScreen> {
             id: '1',
             nombre: 'Casa',
             direccion: 'Dirección de ejemplo',
-            ciudad: 'Bogotá',
-            telefono: '123456789',
             referencia: 'Sin referencia',
             esPrincipal: true,
           ),

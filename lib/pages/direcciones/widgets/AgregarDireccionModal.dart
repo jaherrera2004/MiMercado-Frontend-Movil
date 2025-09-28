@@ -45,8 +45,6 @@ class _AgregarDireccionModalState extends State<AgregarDireccionModal> {
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           nombre: _nombreController.text.trim(),
           direccion: _direccionController.text.trim(),
-          ciudad: '',  // Campo por defecto
-          telefono: '', // Campo por defecto
           referencia: _referenciaController.text.trim().isEmpty 
               ? null 
               : _referenciaController.text.trim(),
