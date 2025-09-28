@@ -33,6 +33,7 @@ class _HomePageState extends State<HomePage> {
       for (var doc in snapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
         categoriasFirebase.add({
+          'id': doc.id, // ID autogenerado por Firebase
           'label': data['nombre'] ?? 'Categoría sin nombre',
           'img': "lib/resources/temp/image.png", // imagen por defecto
         });
@@ -114,7 +115,14 @@ class _HomePageState extends State<HomePage> {
               CategoriesCarousel(
                 categorias: categorias,
                 onCategoryTap: (categoria) {
-                  Navigator.pushNamed(context, '/categoria');
+                  Navigator.pushNamed(
+                    context, 
+                    '/categoria',
+                    arguments: {
+                      'categoriaId': categoria['id'],
+                      'categoriaNombre': categoria['label'],
+                    },
+                  );
                 },
               ),
               const SizedBox(height: 20),
