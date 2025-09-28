@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "291752603937",
+    "project_id": "mimercado-33616",
+    "storage_bucket": "mimercado-33616.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:291752603937:android:30eb10cd29f27667acce60",
+        "android_client_info": {
+          "package_name": "com.example.mi_mercado"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxkJMW62VUqxaM9EuGxJFcc-icuJZUzDU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
