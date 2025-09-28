@@ -156,14 +156,7 @@ class _EliminarDireccionModalState extends State<EliminarDireccionModal> {
                       color: Colors.black54,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${widget.direccion.ciudad} • ${widget.direccion.telefono}',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: Colors.black45,
-                    ),
-                  ),
+
                 ],
               ),
             ),

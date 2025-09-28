@@ -23,8 +23,6 @@ class _EditarDireccionModalState extends State<EditarDireccionModal> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nombreController;
   late final TextEditingController _direccionController;
-  late final TextEditingController _ciudadController;
-  late final TextEditingController _telefonoController;
   late final TextEditingController _referenciaController;
   
   late bool _esPrincipal;
@@ -36,8 +34,6 @@ class _EditarDireccionModalState extends State<EditarDireccionModal> {
     // Inicializar controladores con los datos existentes
     _nombreController = TextEditingController(text: widget.direccion.nombre);
     _direccionController = TextEditingController(text: widget.direccion.direccion);
-    _ciudadController = TextEditingController(text: widget.direccion.ciudad);
-    _telefonoController = TextEditingController(text: widget.direccion.telefono);
     _referenciaController = TextEditingController(text: widget.direccion.referencia ?? '');
     _esPrincipal = widget.direccion.esPrincipal;
   }
@@ -46,8 +42,6 @@ class _EditarDireccionModalState extends State<EditarDireccionModal> {
   void dispose() {
     _nombreController.dispose();
     _direccionController.dispose();
-    _ciudadController.dispose();
-    _telefonoController.dispose();
     _referenciaController.dispose();
     super.dispose();
   }
@@ -62,8 +56,6 @@ class _EditarDireccionModalState extends State<EditarDireccionModal> {
         final direccionEditada = widget.direccion.copyWith(
           nombre: _nombreController.text.trim(),
           direccion: _direccionController.text.trim(),
-          ciudad: _ciudadController.text.trim(),
-          telefono: _telefonoController.text.trim(),
           referencia: _referenciaController.text.trim().isEmpty 
               ? null 
               : _referenciaController.text.trim(),
@@ -170,38 +162,7 @@ class _EditarDireccionModalState extends State<EditarDireccionModal> {
                         },
                       ),
                       
-                      const SizedBox(height: 16),
-                      
-                      // Campo ciudad
-                      CustomTextField(
-                        label: "Ciudad",
-                        hint: "Ej: Bogotá, Medellín, Cali",
-                        primaryColor: primaryColor,
-                        controller: _ciudadController,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'La ciudad es requerida';
-                          }
-                          return null;
-                        },
-                      ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      // Campo teléfono
-                      CustomTextField(
-                        label: "Teléfono de contacto",
-                        hint: "Ej: +57 300 123 4567",
-                        primaryColor: primaryColor,
-                        controller: _telefonoController,
-                        keyboardType: TextInputType.phone,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'El teléfono es requerido';
-                          }
-                          return null;
-                        },
-                      ),
+
                       
                       const SizedBox(height: 16),
                       
