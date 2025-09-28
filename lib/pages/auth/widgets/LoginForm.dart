@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../shared/widgets/forms/CustomTextField.dart';
 import '../../../shared/widgets/buttons/PrimaryButton.dart';
 import '../../../shared/widgets/navigation/NavigationLink.dart';
@@ -17,9 +18,37 @@ class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final firebase = FirebaseFirestore.instance;
   
   bool _isLoading = false;
   UserType _selectedUserType = UserType.usuario;
+
+  // Validación de email
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'El email es requerido';
+    }
+    
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Ingresa un email válido';
+    }
+    
+    return null;
+  }
+
+  // Validación de contraseña
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'La contraseña es requerida';
+    }
+    
+    if (value.length < 6) {
+      return 'La contraseña debe tener al menos 6 caracteres';
+    }
+    
+    return null;
+  }
 
   @override
   void dispose() {
@@ -29,32 +58,88 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   void _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+    // Validar formulario
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
-      // TODO: Implementar lógica de inicio de sesión con Firebase
-      // Incluir el tipo de usuario seleccionado en la autenticación
-      print('Iniciando sesión como: ${_selectedUserType == UserType.usuario ? 'Usuario' : 'Repartidor'}');
-      print('Email: ${_emailController.text}');
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Determinar la colección según el tipo de usuario seleccionado
+      final String collection = _selectedUserType == UserType.usuario ? 'usuarios' : 'repartidores';
       
-      await Future.delayed(const Duration(seconds: 2)); // Simulación
+      // Buscar en la colección correspondiente por email
+      final QuerySnapshot userQuery = await firebase
+          .collection(collection)
+          .where('email', isEqualTo: _emailController.text.trim().toLowerCase())
+          .limit(1)
+          .get();
 
-      setState(() {
-        _isLoading = false;
-      });
+      if (userQuery.docs.isEmpty) {
+        // Usuario no encontrado en la colección correspondiente
+        final String userTypeName = _selectedUserType == UserType.usuario ? 'usuario' : 'repartidor';
+        _showErrorMessage('$userTypeName no encontrado');
+        return;
+      }
 
-      // Navegar a home o dashboard del repartidor según el tipo seleccionado
+      final userData = userQuery.docs.first.data() as Map<String, dynamic>;
+      final storedPassword = userData['password'] as String;
+
+      // Verificar contraseña (en producción deberías usar hash)
+      if (storedPassword != _passwordController.text) {
+        _showErrorMessage('Contraseña incorrecta');
+        return;
+      }
+
+      // Login exitoso
+      _showSuccessMessage('Inicio de sesión exitoso');
+      
+      // Limpiar formulario
+      _emailController.clear();
+      _passwordController.clear();
+
+      // Navegar según el tipo de usuario
       if (mounted) {
         if (_selectedUserType == UserType.usuario) {
-          Navigator.pushNamed(context, '/home');
+          Navigator.pushReplacementNamed(context, '/home');
         } else {
-          // Navegar al módulo del repartidor
-          Navigator.pushNamed(context, '/repartidor');
+          Navigator.pushReplacementNamed(context, '/repartidor');
         }
       }
+
+    } catch (e) {
+      print('Error en login: $e');
+      _showErrorMessage('Error al iniciar sesión: ${e.toString()}');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
+  }
+
+  void _showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _showSuccessMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -98,6 +183,7 @@ class _LoginFormState extends State<LoginForm> {
               primaryColor: primaryColor,
               keyboardType: TextInputType.emailAddress,
               controller: _emailController,
+              validator: _validateEmail,
             ),
             
             const SizedBox(height: 20),
@@ -109,6 +195,7 @@ class _LoginFormState extends State<LoginForm> {
               primaryColor: primaryColor,
               obscureText: true,
               controller: _passwordController,
+              validator: _validatePassword,
             ),
             
             const SizedBox(height: 30),
