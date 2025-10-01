@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/Pedidos.dart';
+import '../../models/Repartidor.dart';
 import 'widgets/pedidosDisponibles/pedido_card.dart';
 import 'widgets/pedidosDisponibles/confirmar_pedido_dialog.dart';
 
@@ -71,10 +72,20 @@ class _PedidosDisponiblesScreenState extends State<PedidosDisponiblesScreen> {
           final bool exito = await pedido.serTomadoPorRepartidor();
           
           if (exito) {
-            _mostrarMensaje(
-              'Pedido tomado exitosamente',
-              const Color(0xFF58E181)
-            );
+            // Cambiar estado del repartidor a "Ocupado"
+            final bool estadoCambiado = await Repartidor.cambiarEstado(EstadoRepartidor.ocupado);
+            
+            if (estadoCambiado) {
+              _mostrarMensaje(
+                'Pedido tomado exitosamente',
+                const Color(0xFF58E181)
+              );
+            } else {
+              _mostrarMensaje(
+                'Pedido tomado pero no se pudo actualizar el estado',
+                Colors.orange[600]!
+              );
+            }
             
             // Remover el pedido de la lista local
             setState(() {
