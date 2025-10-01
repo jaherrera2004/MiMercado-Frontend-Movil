@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../models/Repartidor.dart';
 import 'widgets/datosRepartidor/repartidor_data_model.dart';
 import 'widgets/datosRepartidor/perfil_header.dart';
 import 'widgets/datosRepartidor/seccion_informacion.dart';
@@ -27,13 +28,49 @@ class _DatosPersonalesRepartidorScreenState extends State<DatosPersonalesReparti
       _isLoading = true;
     });
     
-    // Simular carga de datos
-    await Future.delayed(const Duration(seconds: 1));
-    
-    setState(() {
-      _datosRepartidor = RepartidorData.ejemplo;
-      _isLoading = false;
-    });
+    try {
+      // Obtener datos del repartidor desde Firebase
+      final Repartidor? repartidor = await Repartidor.obtenerRepartidorActual();
+      
+      if (repartidor != null) {
+        // Convertir datos reales a RepartidorData para la UI
+        final repartidorData = RepartidorData(
+          nombre: '${repartidor.nombre ?? ''} ${repartidor.apellido ?? ''}'.trim(),
+          cedula: repartidor.cedula.isNotEmpty ? repartidor.cedula : 'No especificada',
+          telefono: repartidor.telefono?.isNotEmpty == true ? repartidor.telefono! : 'No especificado',
+          email: repartidor.email?.isNotEmpty == true ? repartidor.email! : 'No especificado',
+          // Campos con valores por defecto ya que no están en Firebase
+          fechaIngreso: '', // Campo eliminado
+          vehiculo: 'No especificado',
+          placa: 'No especificada',
+          licencia: 'No especificada',
+          calificacion: 0.0,
+          totalPedidos: 0,
+          estado: 'No especificado',
+          zona: 'No especificada',
+          banco: 'No especificado',
+          numeroCuenta: 'No especificada',
+          direccion: '', // Campo eliminado
+        );
+        
+        setState(() {
+          _datosRepartidor = repartidorData;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _datosRepartidor = null;
+          _isLoading = false;
+        });
+      }
+      
+    } catch (e) {
+      print('Error cargando datos del repartidor: $e');
+      setState(() {
+        _datosRepartidor = null;
+        _isLoading = false;
+      });
+    }
   }
 
 
@@ -82,8 +119,6 @@ class _DatosPersonalesRepartidorScreenState extends State<DatosPersonalesReparti
                             InfoItem(icon: Icons.badge, label: 'Cédula', value: _datosRepartidor!.cedula),
                             InfoItem(icon: Icons.phone, label: 'Teléfono', value: _datosRepartidor!.telefono),
                             InfoItem(icon: Icons.email, label: 'Email', value: _datosRepartidor!.email),
-                            InfoItem(icon: Icons.home, label: 'Dirección', value: _datosRepartidor!.direccion),
-                            InfoItem(icon: Icons.calendar_today, label: 'Fecha de Ingreso', value: _datosRepartidor!.fechaIngreso),
                           ],
                         ),
                         

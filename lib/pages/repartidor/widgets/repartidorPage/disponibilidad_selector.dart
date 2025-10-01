@@ -95,14 +95,14 @@ class _DisponibilidadSelectorState extends State<DisponibilidadSelector> {
             ],
           ),
           
-          // Selector de estado cuando está conectado
+          // Indicador de estado cuando está conectado
           if (estaConectado) ...[
             const SizedBox(height: 24),
             Divider(color: Colors.grey[200]),
             const SizedBox(height: 16),
             
             Text(
-              'Estado de disponibilidad',
+              'Estado actual',
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -111,28 +111,8 @@ class _DisponibilidadSelectorState extends State<DisponibilidadSelector> {
             ),
             const SizedBox(height: 16),
             
-            // Opciones de disponibilidad
-            Row(
-              children: [
-                Expanded(
-                  child: _buildEstadoOption(
-                    'Disponible',
-                    'Listo para pedidos',
-                    Icons.check_circle,
-                    const Color(0xFF58E181),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildEstadoOption(
-                    'Ocupado',
-                    'No disponible',
-                    Icons.delivery_dining,
-                    Colors.orange,
-                  ),
-                ),
-              ],
-            ),
+            // Indicador de estado actual (solo lectura)
+            _buildEstadoIndicator(),
           ],
           
           const SizedBox(height: 16),
@@ -168,86 +148,76 @@ class _DisponibilidadSelectorState extends State<DisponibilidadSelector> {
     );
   }
 
-  Widget _buildEstadoOption(
-    String estado,
-    String descripcion,
-    IconData icon,
-    Color color,
-  ) {
-    final bool isSelected = widget.estadoActual == estado;
+  Widget _buildEstadoIndicator() {
+    final bool estaOcupado = widget.estadoActual == 'Ocupado';
+    final String estado = estaOcupado ? 'Ocupado' : 'Disponible';
+    final String descripcion = estaOcupado ? 'Entregando un pedido' : 'Listo para recibir pedidos';
+    final IconData icon = estaOcupado ? Icons.delivery_dining : Icons.check_circle;
+    final Color color = estaOcupado ? Colors.orange : const Color(0xFF58E181);
     
-    return GestureDetector(
-      onTap: () {
-        if (!isSelected) {
-          widget.onEstadoChanged(estado);
-          
-          // Mostrar confirmación
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(
-                    icon,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Estado cambiado a $estado',
-                    style: GoogleFonts.inter(color: Colors.white),
-                  ),
-                ],
-              ),
-              backgroundColor: color,
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.grey[50],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? color : Colors.grey[200]!,
-            width: 2,
-          ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color,
+          width: 2,
         ),
-        child: Column(
-          children: [
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 32,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            estado,
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            descripcion,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          if (estaOcupado) ...[
+            const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: isSelected ? color.withOpacity(0.2) : Colors.grey[200],
-                borderRadius: BorderRadius.circular(8),
+                color: Colors.orange.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
               ),
-              child: Icon(
-                icon,
-                color: isSelected ? color : Colors.grey[600],
-                size: 24,
+              child: Text(
+                'No se pueden recibir nuevos pedidos',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.orange[700],
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              estado,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? color : Colors.grey[800],
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              descripcion,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
             ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -314,7 +284,7 @@ class _DisponibilidadSelectorState extends State<DisponibilidadSelector> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        conectar ? 'Conectado - Estado: Disponible' : 'Te has desconectado',
+                        conectar ? 'Conectado - Listo para recibir pedidos' : 'Te has desconectado',
                         style: GoogleFonts.inter(color: Colors.white),
                       ),
                     ],

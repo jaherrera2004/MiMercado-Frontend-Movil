@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'widgets/pedidosDisponibles/pedido_model.dart';
+import '../../models/Pedidos.dart';
 import 'widgets/pedidosDisponibles/pedido_card.dart';
 import 'widgets/pedidosDisponibles/confirmar_pedido_dialog.dart';
 
@@ -26,34 +26,98 @@ class _PedidosDisponiblesScreenState extends State<PedidosDisponiblesScreen> {
       _isLoading = true;
     });
     
-    // Simular carga de datos
-    await Future.delayed(const Duration(seconds: 1));
-    
-    setState(() {
-      _pedidos = Pedido.pedidosEjemplo;
-      _isLoading = false;
-    });
+    try {
+      // Cargar pedidos en proceso desde Firebase
+      final List<Pedido> pedidos = await Pedido.obtenerPedidosEnProceso();
+      
+      setState(() {
+        _pedidos = pedidos;
+        _isLoading = false;
+      });
+      
+      // Mostrar mensaje de éxito si se cargaron pedidos
+      if (pedidos.isNotEmpty) {
+        _mostrarMensaje(
+          '${pedidos.length} pedidos disponibles cargados', 
+          const Color(0xFF58E181)
+        );
+      }
+      
+    } catch (e) {
+      print('Error cargando pedidos: $e');
+      setState(() {
+        _pedidos = [];
+        _isLoading = false;
+      });
+      
+      _mostrarMensaje(
+        'Error al cargar pedidos: ${e.toString()}', 
+        Colors.red[600]!
+      );
+    }
   }
 
-  void _tomarPedido(int index) {
+  Future<void> _tomarPedido(int index) async {
+    final Pedido pedido = _pedidos[index];
+    
     ConfirmarPedidoDialog.mostrar(
       context,
-      () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
+      () async {
+        try {
+          // Mostrar indicador de carga
+          _mostrarMensaje('Tomando pedido...', Colors.blue[600]!);
+          
+          // Usar el nuevo método completo para tomar el pedido
+          final bool exito = await pedido.serTomadoPorRepartidor();
+          
+          if (exito) {
+            _mostrarMensaje(
               'Pedido tomado exitosamente',
-              style: GoogleFonts.inter(),
-            ),
-            backgroundColor: const Color(0xFF58E181),
-          ),
-        );
-        
-        // Remover el pedido de la lista
-        setState(() {
-          _pedidos.removeAt(index);
-        });
+              const Color(0xFF58E181)
+            );
+            
+            // Remover el pedido de la lista local
+            setState(() {
+              _pedidos.removeAt(index);
+            });
+          } else {
+            _mostrarMensaje(
+              'No se pudo tomar el pedido',
+              Colors.red[600]!
+            );
+          }
+          
+        } catch (e) {
+          print('Error tomando pedido: $e');
+          String mensajeError = 'Error al tomar el pedido';
+          
+          // Personalizar mensaje según el tipo de error
+          if (e.toString().contains('ya no está disponible')) {
+            mensajeError = 'El pedido ya fue tomado por otro repartidor';
+          } else if (e.toString().contains('No se pudo obtener el ID del repartidor')) {
+            mensajeError = 'Error de sesión. Inicia sesión nuevamente';
+          }
+          
+          _mostrarMensaje(mensajeError, Colors.red[600]!);
+          
+          // Recargar la lista para mostrar el estado actualizado
+          _cargarPedidos();
+        }
       },
+    );
+  }
+
+  /// Muestra un mensaje en la pantalla
+  void _mostrarMensaje(String mensaje, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          mensaje,
+          style: GoogleFonts.inter(color: Colors.white),
+        ),
+        backgroundColor: color,
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 
@@ -118,7 +182,7 @@ class _PedidosDisponiblesScreenState extends State<PedidosDisponiblesScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No hay pedidos disponibles',
+            'No hay pedidos en proceso',
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w500,
@@ -127,7 +191,7 @@ class _PedidosDisponiblesScreenState extends State<PedidosDisponiblesScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Revisa nuevamente en unos minutos',
+            'Los pedidos en proceso aparecerán aquí',
             style: GoogleFonts.inter(
               fontSize: 14,
               color: Colors.grey[500],
