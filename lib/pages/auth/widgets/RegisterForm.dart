@@ -1,8 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../../shared/widgets/forms/CustomTextField.dart';
 import '../../../shared/widgets/buttons/PrimaryButton.dart';
 import '../../../shared/widgets/navigation/NavigationLink.dart';
+import '../../../models/Usuario.dart';
 
 /// Formulario de registro separado del widget principal
 class RegisterForm extends StatefulWidget {
@@ -19,7 +19,6 @@ class _RegisterFormState extends State<RegisterForm> {
   final _telefonoController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final firebase = FirebaseFirestore.instance;
 
   @override
   void dispose() {
@@ -31,22 +30,27 @@ class _RegisterFormState extends State<RegisterForm> {
     super.dispose();
   }
 
-  void _registrarUsuario() async {
+  void _handleRegister() async {
     try {
-      await firebase.collection('usuarios').doc().set(
-        { 
-          'nombre': _nombreController.text,
-          'apellido': _apellidoController.text,
-          'telefono': _telefonoController.text,
-          'email': _emailController.text,
-          'password': _passwordController.text,
-          "pedidos":[],
-          "direcciones":[] 
-        }
+      // Crear objeto Usuario con los datos del formulario
+      Usuario nuevoUsuario = Usuario(
+        nombre: _nombreController.text,
+        apellido: _apellidoController.text,
+        telefono: _telefonoController.text,
+        email: _emailController.text,
+        password: _passwordController.text,
+        pedidos: [],
+        direcciones: [],
       );
 
+      // Llamar al método registrarUsuario del modelo
+      await nuevoUsuario.registrarUsuario();
+      
+      // Mensaje de éxito
+      print('Usuario registrado exitosamente');
+      
     } catch (e) {
-      print('Error: '+e.toString());
+      print('Error: ${e.toString()}');
     }
   }
 
@@ -113,7 +117,7 @@ class _RegisterFormState extends State<RegisterForm> {
             // Botón Registrarse
             PrimaryButton(
               text: "Registrarse",
-              onPressed: _registrarUsuario,
+              onPressed: _handleRegister,
               backgroundColor: primaryColor,
             ),
 
