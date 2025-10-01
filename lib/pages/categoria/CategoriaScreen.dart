@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../shared/widgets/navigation/BackButton.dart';
 import '../../shared/widgets/text/PageTitle.dart';
+import '../../models/Producto.dart';
 import 'widgets/widgets.dart';
 
 class CategoriaScreen extends StatefulWidget {
@@ -13,7 +14,7 @@ class CategoriaScreen extends StatefulWidget {
 
 class _CategoriaScreenState extends State<CategoriaScreen> {
   final FirebaseFirestore firebase = FirebaseFirestore.instance;
-  List<Map<String, dynamic>> productos = [];
+  List<Producto> productos = [];
   bool isLoading = true;
   String categoriaId = '';
   String categoriaNombre = 'Categoría';
@@ -51,40 +52,10 @@ class _CategoriaScreenState extends State<CategoriaScreen> {
 
       print('🔍 Buscando productos para categoría ID: $categoriaId');
 
-      // Buscar productos solo por ID (sin referencia)
-      final QuerySnapshot snapshot = await firebase
-          .collection('productos')
-          .where('id_categoria', isEqualTo: categoriaId)
-          .get();
+      // Usar el método del modelo Producto para obtener productos por categoría
+      final List<Producto> productosFirebase = await Producto.obtenerProductosPorCategoria(categoriaId);
 
-      print('🔍 Productos encontrados: ${snapshot.docs.length}');
-
-      // Si no encontramos productos, hagamos una consulta de debug
-      if (snapshot.docs.isEmpty) {
-        print('⚠️ No se encontraron productos. Haciendo consulta de debug...');
-        final allProductsSnapshot = await firebase.collection('productos').get();
-        print('📊 Total productos en BD: ${allProductsSnapshot.docs.length}');
-        
-        for (var doc in allProductsSnapshot.docs) {
-          final data = doc.data();
-          print('🔍 Producto: ${data['nombre']} - id_categoria: ${data['id_categoria']}');
-        }
-      }
-
-      final List<Map<String, dynamic>> productosFirebase = [];
-
-      for (var doc in snapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
-        print('✅ Producto encontrado: ${data['nombre']} - ${data['id_categoria']}');
-        
-        productosFirebase.add({
-          'id': doc.id,
-          'nombre': data['nombre'] ?? 'Producto sin nombre',
-          'precio': '${data['precio'] ?? 0} \$',
-          'img': 'lib/resources/temp/image.png', // Usar imagen fija
-          'categoria': data['id_categoria'] ?? '',
-        });
-      }
+      print('✅ Productos cargados: ${productosFirebase.length}');
 
       setState(() {
         productos = productosFirebase;
@@ -92,18 +63,10 @@ class _CategoriaScreenState extends State<CategoriaScreen> {
       });
 
     } catch (e) {
-      print('Error cargando productos de categoría: $e');
+      print('❌ Error cargando productos de categoría: $e');
       setState(() {
         isLoading = false;
-        // Productos de ejemplo en caso de error
-        productos = [
-          {
-            "id": "ejemplo1",
-            "nombre": "Producto de ejemplo",
-            "precio": "5.000 \$",
-            "img": "lib/resources/temp/image.png"
-          },
-        ];
+        productos = [];
       });
     }
   }
@@ -197,7 +160,15 @@ class _CategoriaScreenState extends State<CategoriaScreen> {
                 )
               else
                 ProductGrid(
-                  productos: productos,
+                  productos: productos.map((producto) => {
+                    'nombre': producto.nombre,
+                    'precio': '\$${producto.precio.toStringAsFixed(0)}',
+                    'img': producto.imagenUrl.isNotEmpty 
+                        ? producto.imagenUrl 
+                        : 'lib/resources/temp/image.png',
+                    'stock': producto.stock,
+                    'disponible': producto.disponible,
+                  }).toList(),
                   onAddToCart: (producto) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
