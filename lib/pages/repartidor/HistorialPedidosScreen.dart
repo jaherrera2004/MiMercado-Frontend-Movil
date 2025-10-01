@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../models/Repartidor.dart';
+import '../../models/Pedidos.dart';
 import 'widgets/historialPedidos/historial_pedido_model.dart';
 import 'widgets/historialPedidos/historial_card.dart';
 
@@ -13,6 +15,7 @@ class HistorialPedidosScreen extends StatefulWidget {
 class _HistorialPedidosScreenState extends State<HistorialPedidosScreen> {
   bool _isLoading = true;
   List<HistorialPedido> _historialPedidos = [];
+  String? _error;
 
   @override
   void initState() {
@@ -23,15 +26,68 @@ class _HistorialPedidosScreenState extends State<HistorialPedidosScreen> {
   Future<void> _cargarHistorial() async {
     setState(() {
       _isLoading = true;
+      _error = null;
     });
     
-    // Simular carga de datos
-    await Future.delayed(const Duration(seconds: 1));
-    
-    setState(() {
-      _historialPedidos = HistorialPedido.historialEjemplo;
-      _isLoading = false;
-    });
+    try {
+      // Obtener IDs del historial desde Firebase
+      final List<String> historialIds = await Repartidor.obtenerHistorialPedidos();
+      
+      if (historialIds.isEmpty) {
+        setState(() {
+          _historialPedidos = [];
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Cargar detalles de cada pedido
+      final List<Pedido> pedidosCompletos = [];
+      final List<HistorialPedido> historialCompleto = [];
+
+      for (String pedidoId in historialIds) {
+        try {
+          final Pedido? pedido = await Pedido.obtenerPedidoPorId(pedidoId);
+          if (pedido != null) {
+            pedidosCompletos.add(pedido);
+            
+            // Convertir Pedido a HistorialPedido para la UI
+            final historialPedido = HistorialPedido(
+              id: pedido.id.substring(0, 8) + '...',
+              cliente: pedido.idUsuario.substring(0, 8) + '...',
+              direccion: pedido.direccion,
+              total: pedido.costoTotal.toInt(),
+              fecha: _formatearFecha(pedido.fecha),
+              estado: pedido.estado == Pedido.estadoEntregado 
+                  ? EstadoPedido.entregado 
+                  : EstadoPedido.cancelado,
+              tiempo: _calcularTiempoEntrega(pedido.fecha),
+              distancia: '2.5 km', // Placeholder - se puede calcular después
+            );
+            
+            historialCompleto.add(historialPedido);
+          }
+        } catch (e) {
+          print('Error cargando pedido $pedidoId: $e');
+          // Continuar con los demás pedidos
+        }
+      }
+
+      // Ordenar por fecha (más recientes primero)
+      historialCompleto.sort((a, b) => b.fecha.compareTo(a.fecha));
+      
+      setState(() {
+        _historialPedidos = historialCompleto;
+        _isLoading = false;
+      });
+      
+    } catch (e) {
+      print('Error cargando historial: $e');
+      setState(() {
+        _error = 'Error al cargar el historial: ${e.toString()}';
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -61,9 +117,11 @@ class _HistorialPedidosScreenState extends State<HistorialPedidosScreen> {
                 color: Color(0xFF58E181),
               ),
             )
-          : _historialPedidos.isEmpty
-              ? _buildEmptyState()
-              : Column(
+          : _error != null
+              ? _buildErrorState()
+              : _historialPedidos.isEmpty
+                  ? _buildEmptyState()
+                  : Column(
                   children: [
                     // Estadísticas rápidas
                     _buildEstadisticas(),
@@ -94,7 +152,6 @@ class _HistorialPedidosScreenState extends State<HistorialPedidosScreen> {
 
   Widget _buildEstadisticas() {
     final entregados = _historialPedidos.where((p) => p.fueEntregado).length;
-    final cancelados = _historialPedidos.length - entregados;
 
     return Container(
       margin: const EdgeInsets.all(16),
@@ -119,12 +176,6 @@ class _HistorialPedidosScreenState extends State<HistorialPedidosScreen> {
             entregados.toString(),
             Colors.green,
             Icons.check_circle,
-          ),
-          _buildEstadisticaItem(
-            'Cancelados',
-            cancelados.toString(),
-            Colors.red,
-            Icons.cancel,
           ),
         ],
       ),
@@ -209,5 +260,89 @@ class _HistorialPedidosScreenState extends State<HistorialPedidosScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 64,
+            color: Colors.red[400],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Error al cargar historial',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              _error ?? 'Ha ocurrido un error inesperado',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Colors.grey[500],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: _cargarHistorial,
+            icon: const Icon(Icons.refresh),
+            label: Text(
+              'Reintentar',
+              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF58E181),
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Formatear fecha para mostrar en el historial
+  String _formatearFecha(DateTime fecha) {
+    final now = DateTime.now();
+    final difference = now.difference(fecha);
+
+    if (difference.inDays == 0) {
+      // Hoy
+      return 'Hoy ${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}';
+    } else if (difference.inDays == 1) {
+      // Ayer
+      return 'Ayer ${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}';
+    } else if (difference.inDays < 7) {
+      // Esta semana
+      const dias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+      return '${dias[fecha.weekday - 1]} ${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}';
+    } else {
+      // Fecha completa
+      return '${fecha.day.toString().padLeft(2, '0')}/${fecha.month.toString().padLeft(2, '0')}/${fecha.year}';
+    }
+  }
+
+  /// Calcular tiempo estimado de entrega basado en la fecha del pedido
+  String _calcularTiempoEntrega(DateTime fechaPedido) {
+    final now = DateTime.now();
+    final difference = now.difference(fechaPedido);
+
+    if (difference.inHours < 1) {
+      return '${difference.inMinutes} min';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}h ${difference.inMinutes % 60}min';
+    } else {
+      return '${difference.inDays} días';
+    }
   }
 }

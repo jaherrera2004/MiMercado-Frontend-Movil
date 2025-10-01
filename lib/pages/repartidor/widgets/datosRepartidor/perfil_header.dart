@@ -66,24 +66,6 @@ class PerfilHeader extends StatelessWidget {
                     color: Colors.grey[600],
                   ),
                 ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: repartidor.estaActivo 
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    repartidor.estado,
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: repartidor.estaActivo ? Colors.green[700] : Colors.red[700],
-                    ),
-                  ),
-                ),
               ],
             ),
           ),

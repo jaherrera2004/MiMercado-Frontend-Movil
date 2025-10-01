@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mi_mercado/models/SharedPreferences.dart';
+import 'Repartidor.dart';
 
 /// Clase que representa un producto dentro de un pedido
 class ProductoPedido {
@@ -218,6 +219,103 @@ class Pedido {
     }
   }
 
+  /// Método estático para obtener pedidos que están "En Proceso"
+  static Future<List<Pedido>> obtenerPedidosEnProceso() async {
+    try {
+      print('🔄 Obteniendo pedidos en proceso...');
+      
+      final firebase = FirebaseFirestore.instance;
+      
+      // Obtener pedidos filtrados por estado "En Proceso" (sin orderBy para evitar índice compuesto)
+      final QuerySnapshot querySnapshot = await firebase
+          .collection('pedidos')
+          .where('estado', isEqualTo: estadoEnProceso)
+          .get();
+
+      print('📊 Pedidos en proceso encontrados: ${querySnapshot.docs.length}');
+
+      // Convertir cada documento a un objeto Pedido
+      final List<Pedido> pedidos = querySnapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return Pedido.fromMap(data, doc.id);
+      }).toList();
+
+      // Ordenar localmente por fecha ascendente (FIFO - los más antiguos primero)
+      pedidos.sort((a, b) => a.fecha.compareTo(b.fecha));
+
+      print('✅ Pedidos en proceso cargados exitosamente');
+      return pedidos;
+      
+    } catch (e) {
+      print('❌ Error obteniendo pedidos en proceso: $e');
+      throw Exception('Error al obtener pedidos en proceso: ${e.toString()}');
+    }
+  }
+
+  /// Método estático para obtener pedidos "En Proceso" para un repartidor específico
+  static Future<List<Pedido>> obtenerPedidosEnProcesoPorRepartidor() async {
+    try {
+      final String? repartidorId = await SharedPreferencesService.getCurrentUserId();
+      if (repartidorId == null) {
+        throw Exception('No se pudo obtener el ID del repartidor');
+      }
+
+      print('🔄 Obteniendo pedidos en proceso del repartidor: $repartidorId');
+      
+      final firebase = FirebaseFirestore.instance;
+      
+      // Obtener pedidos que están en proceso y asignados a este repartidor (sin orderBy)
+      final QuerySnapshot querySnapshot = await firebase
+          .collection('pedidos')
+          .where('estado', isEqualTo: estadoEnProceso)
+          .where('id_repartidor', isEqualTo: repartidorId)
+          .get();
+
+      print('📊 Pedidos en proceso del repartidor encontrados: ${querySnapshot.docs.length}');
+
+      // Convertir cada documento a un objeto Pedido
+      final List<Pedido> pedidos = querySnapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return Pedido.fromMap(data, doc.id);
+      }).toList();
+
+      // Ordenar localmente por fecha ascendente (los más antiguos primero)
+      pedidos.sort((a, b) => a.fecha.compareTo(b.fecha));
+
+      print('✅ Pedidos en proceso del repartidor cargados exitosamente');
+      return pedidos;
+      
+    } catch (e) {
+      print('❌ Error obteniendo pedidos en proceso del repartidor: $e');
+      throw Exception('Error al obtener pedidos en proceso del repartidor: ${e.toString()}');
+    }
+  }
+
+  /// Método estático para contar pedidos en proceso
+  static Future<int> contarPedidosEnProceso() async {
+    try {
+      print('🔢 Contando pedidos en proceso...');
+      
+      final firebase = FirebaseFirestore.instance;
+      
+      final QuerySnapshot querySnapshot = await firebase
+          .collection('pedidos')
+          .where('estado', isEqualTo: estadoEnProceso)
+          .get();
+
+      final int count = querySnapshot.docs.length;
+      print('📊 Total de pedidos en proceso: $count');
+      
+      return count;
+      
+    } catch (e) {
+      print('❌ Error contando pedidos en proceso: $e');
+      throw Exception('Error al contar pedidos en proceso: ${e.toString()}');
+    }
+  }
+
+
+
  
   /// Método para crear un nuevo pedido en Firebase
   static Future<String> crearPedido(Pedido pedido) async {
@@ -249,6 +347,16 @@ class Pedido {
         'estado': nuevoEstado,
       });
       
+      // Si el pedido se completa (entregado) o se cancela, liberar del repartidor
+      if (nuevoEstado == estadoEntregado || nuevoEstado == estadoCancelado) {
+        final bool repartidorLiberado = await Repartidor.liberarPedidoActual();
+        if (!repartidorLiberado) {
+          print('⚠️ Advertencia: No se pudo liberar el pedido del repartidor');
+        } else {
+          print('✅ Pedido liberado del repartidor exitosamente');
+        }
+      }
+      
       // Actualizar el estado local
       estado = nuevoEstado;
       
@@ -260,6 +368,74 @@ class Pedido {
     }
   }
 
+  /// Método estático para que un repartidor tome un pedido
+  /// Asigna el repartidor al pedido y cambia el estado a "En Camino"
+  static Future<bool> tomarPedido(String pedidoId) async {
+    try {
+      // Obtener el ID del repartidor desde SharedPreferences
+      final String? repartidorId = await SharedPreferencesService.getCurrentUserId();
+      if (repartidorId == null || repartidorId.isEmpty) {
+        print('❌ Error: No se encontró el ID del repartidor');
+        throw Exception('No se pudo obtener el ID del repartidor');
+      }
+
+      print('🚚 Repartidor $repartidorId tomando pedido $pedidoId...');
+      
+      final firebase = FirebaseFirestore.instance;
+      final DocumentReference pedidoRef = firebase.collection('pedidos').doc(pedidoId);
+      
+      // Verificar que el pedido existe y está en estado "En Proceso"
+      final DocumentSnapshot pedidoDoc = await pedidoRef.get();
+      if (!pedidoDoc.exists) {
+        throw Exception('El pedido no existe');
+      }
+      
+      final Map<String, dynamic> pedidoData = pedidoDoc.data() as Map<String, dynamic>;
+      final String estadoActual = pedidoData['estado'] ?? '';
+      
+      if (estadoActual != estadoEnProceso) {
+        throw Exception('El pedido ya no está disponible (Estado: $estadoActual)');
+      }
+      
+      // Actualizar el pedido con el repartidor asignado y nuevo estado
+      await pedidoRef.update({
+        'id_repartidor': repartidorId,
+        'estado': estadoEnCamino,
+      });
+      
+      // Actualizar el pedido actual en la colección del repartidor
+      final bool repartidorActualizado = await Repartidor.asignarPedido(pedidoId);
+      if (!repartidorActualizado) {
+        print('⚠️ Advertencia: No se pudo actualizar el pedido actual del repartidor');
+        // Nota: No lanzamos excepción aquí porque el pedido ya fue asignado exitosamente
+      }
+      
+      print('✅ Pedido tomado exitosamente por repartidor $repartidorId');
+      return true;
+      
+    } catch (e) {
+      print('❌ Error tomando pedido: $e');
+      throw Exception('Error al tomar el pedido: ${e.toString()}');
+    }
+  }
+
+  /// Método de instancia para que el pedido actual sea tomado por un repartidor
+  Future<bool> serTomadoPorRepartidor() async {
+    try {
+      final bool exito = await Pedido.tomarPedido(id);
+      if (exito) {
+        // Actualizar el estado local
+        final String? repartidorId = await SharedPreferencesService.getCurrentUserId();
+        if (repartidorId != null) {
+          idRepartidor = repartidorId;
+          estado = estadoEnCamino;
+        }
+      }
+      return exito;
+    } catch (e) {
+      throw Exception('Error al ser tomado por repartidor: ${e.toString()}');
+    }
+  }
 
   /// Método para obtener un pedido por ID
   static Future<Pedido?> obtenerPedidoPorId(String id) async {
