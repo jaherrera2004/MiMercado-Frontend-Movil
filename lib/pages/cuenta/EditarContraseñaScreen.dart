@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'widgets/widgets.dart';
+import '../../models/Usuario.dart';
 
 /// Pantalla para cambiar la contraseña del usuario
 class EditarSeguridadScreen extends StatefulWidget {
@@ -74,8 +75,11 @@ class _EditarSeguridadScreenState extends State<EditarSeguridadScreen> {
     });
 
     try {
-      // TODO: Implementar lógica real de cambio de contraseña
-      await Future.delayed(const Duration(seconds: 2)); // Simulación
+      // Llamar al método editarContrasena del modelo Usuario
+      await Usuario.editarContrasena(
+        contrasenaActual: _contrasenaActualController.text.trim(),
+        contrasenaNueva: _nuevaContrasenaController.text.trim(),
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -84,13 +88,19 @@ class _EditarSeguridadScreenState extends State<EditarSeguridadScreen> {
             backgroundColor: Color(0xFF58E181),
           ),
         );
+        
+        // Limpiar los campos
+        _contrasenaActualController.clear();
+        _nuevaContrasenaController.clear();
+        _confirmarContrasenaController.clear();
+        
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error al cambiar la contraseña'),
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
             backgroundColor: Colors.red,
           ),
         );
