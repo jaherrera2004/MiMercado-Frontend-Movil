@@ -227,26 +227,6 @@ class _DetallePedidoActualScreenState extends State<DetallePedidoActualScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _abrirMapa,
-                icon: const Icon(Icons.map),
-                label: Text(
-                  'Abrir en Mapa',
-                  style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[600],
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -520,19 +500,6 @@ class _DetallePedidoActualScreenState extends State<DetallePedidoActualScreen> {
 
   String _formatearFecha(DateTime fecha) {
     return '${fecha.day.toString().padLeft(2, '0')}/${fecha.month.toString().padLeft(2, '0')}/${fecha.year} ${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}';
-  }
-
-  void _abrirMapa() {
-    // TODO: Implementar apertura de mapa con la dirección
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Función de mapa en desarrollo',
-          style: GoogleFonts.inter(color: Colors.white),
-        ),
-        backgroundColor: Colors.blue[600],
-      ),
-    );
   }
 
   Future<void> _marcarComoEntregado() async {
