@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../homepage/widgets/HomeBottomNavigation.dart';
 import '../../models/Pedidos.dart';
-import '../../models/SharedPreferences.dart';
 import 'widgets/widgets.dart';
 
 class PedidosScreen extends StatefulWidget {
