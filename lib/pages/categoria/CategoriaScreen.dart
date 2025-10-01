@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../shared/widgets/navigation/BackButton.dart';
 import '../../shared/widgets/text/PageTitle.dart';
 import '../../models/Producto.dart';
+import '../../models/CarritoService.dart';
 import 'widgets/widgets.dart';
 
 class CategoriaScreen extends StatefulWidget {
@@ -161,22 +162,38 @@ class _CategoriaScreenState extends State<CategoriaScreen> {
               else
                 ProductGrid(
                   productos: productos.map((producto) => {
+                    'id': producto.id, // Agregar el ID del producto
                     'nombre': producto.nombre,
                     'precio': '\$${producto.precio.toStringAsFixed(0)}',
+                    'precioNumerico': producto.precio, // Agregar precio numérico
                     'img': producto.imagenUrl.isNotEmpty 
                         ? producto.imagenUrl 
                         : 'lib/resources/temp/image.png',
                     'stock': producto.stock,
                     'disponible': producto.disponible,
                   }).toList(),
-                  onAddToCart: (producto) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('${producto["nombre"]} agregado al carrito'),
-                        duration: const Duration(seconds: 2),
-                        backgroundColor: Colors.green,
-                      ),
+                  onAddToCart: (producto) async {
+                    // Guardar el producto en el carrito usando CarritoService
+                    final carritoService = CarritoService();
+                    
+                    await carritoService.agregarProducto(
+                      idProducto: producto['id'] as String,
+                      nombre: producto['nombre'] as String,
+                      precio: producto['precioNumerico'] as double,
+                      imagenUrl: producto['img'] as String,
+                      cantidad: 1,
                     );
+                    
+                    // Mostrar confirmación
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${producto["nombre"]} agregado al carrito'),
+                          duration: const Duration(seconds: 2),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
                   },
                 ),
             ],
