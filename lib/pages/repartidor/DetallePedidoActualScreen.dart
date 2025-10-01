@@ -521,6 +521,13 @@ class _DetallePedidoActualScreenState extends State<DetallePedidoActualScreen> {
       // 3. Liberar el pedido actual del repartidor
       await Repartidor.liberarPedidoActual();
 
+      // 4. Cambiar estado del repartidor a "Disponible"
+      final bool estadoCambiado = await Repartidor.cambiarEstado(EstadoRepartidor.conectado);
+      
+      if (!estadoCambiado) {
+        print('Advertencia: No se pudo cambiar el estado del repartidor a disponible');
+      }
+
       setState(() {
         _isLoading = false;
       });
@@ -534,8 +541,8 @@ class _DetallePedidoActualScreenState extends State<DetallePedidoActualScreen> {
               Expanded(
                 child: Text(
                   historialActualizado 
-                    ? 'Pedido entregado y agregado al historial'
-                    : 'Pedido entregado (error en historial)',
+                    ? 'Pedido entregado y repartidor disponible'
+                    : 'Pedido entregado (verificar historial)',
                   style: GoogleFonts.inter(color: Colors.white),
                 ),
               ),
