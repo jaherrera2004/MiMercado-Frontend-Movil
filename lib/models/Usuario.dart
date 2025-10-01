@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Persona.dart';
-import 'SharedPreferencesServices.dart';
+import 'SharedPreferences.dart';
 
 class Usuario extends Persona {
 
@@ -435,4 +435,77 @@ class Usuario extends Persona {
       throw Exception('Error al actualizar datos del usuario: ${e.toString()}');
     }
   }
+
+  /// Método estático para editar la contraseña del usuario actual
+  static Future<void> editarContrasena({
+    required String contrasenaActual,
+    required String contrasenaNueva,
+  }) async {
+    try {
+      print('🔐 Iniciando proceso de cambio de contraseña...');
+      
+      // Obtener el ID del usuario actual desde SharedPreferences
+      final String? currentUserId = await SharedPreferencesService.getCurrentUserId();
+      
+      if (currentUserId == null || currentUserId.isEmpty) {
+        throw Exception('No hay usuario autenticado');
+      }
+
+      print('🔍 Usuario ID: $currentUserId');
+      
+      final firebase = FirebaseFirestore.instance;
+      
+      // Obtener el documento del usuario actual
+      final DocumentReference userDoc = firebase.collection('usuarios').doc(currentUserId);
+      final DocumentSnapshot userData = await userDoc.get();
+
+      if (!userData.exists) {
+        print('❌ Usuario no encontrado con ID: $currentUserId');
+        throw Exception('Usuario no encontrado');
+      }
+
+      // Obtener los datos actuales del usuario
+      final Map<String, dynamic> currentData = userData.data() as Map<String, dynamic>;
+      final String? passwordGuardada = currentData['password'];
+
+      // Validar que los campos no estén vacíos
+      if (contrasenaActual.trim().isEmpty) {
+        throw Exception('La contraseña actual no puede estar vacía');
+      }
+      if (contrasenaNueva.trim().isEmpty) {
+        throw Exception('La nueva contraseña no puede estar vacía');
+      }
+
+      // Verificar que la contraseña actual sea correcta
+      if (passwordGuardada != contrasenaActual.trim()) {
+        print('❌ Contraseña actual incorrecta');
+        throw Exception('La contraseña actual es incorrecta');
+      }
+
+      // Validar la nueva contraseña (mínimo 6 caracteres)
+      if (contrasenaNueva.trim().length < 6) {
+        throw Exception('La nueva contraseña debe tener al menos 6 caracteres');
+      }
+
+      // Verificar que la nueva contraseña sea diferente a la actual
+      if (contrasenaActual.trim() == contrasenaNueva.trim()) {
+        throw Exception('La nueva contraseña debe ser diferente a la actual');
+      }
+
+      print('✅ Validaciones de contraseña completadas');
+
+      // Actualizar la contraseña en Firebase
+      await userDoc.update({
+        'password': contrasenaNueva.trim(),
+      });
+
+      print('✅ Contraseña actualizada exitosamente');
+      
+    } catch (e) {
+      print('❌ Error cambiando contraseña: $e');
+      throw Exception('Error al cambiar contraseña: ${e.toString()}');
+    }
+  }
+
+  
 }

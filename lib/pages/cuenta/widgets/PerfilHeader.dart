@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../models/SharedPreferencesServices.dart';
+import '../../../models/SharedPreferences.dart';
 
 /// Widget que muestra la imagen de perfil y nombre del usuario
 class PerfilHeader extends StatefulWidget {

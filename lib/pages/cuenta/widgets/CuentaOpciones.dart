@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'opcion.dart';
+import '../../../models/Persona.dart';
 
 /// Widget que contiene todas las opciones del menú de cuenta
 class CuentaOpciones extends StatelessWidget {
@@ -55,13 +56,42 @@ class CuentaOpciones extends StatelessWidget {
               child: const Text('Cancelar'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop(); // Cerrar diálogo
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/',
-                  (route) => false,
-                ); // Ir al splash screen
+                
+                try {
+                  // Llamar al método cerrarSesion de Persona
+                  await Persona.cerrarSesion();
+                  
+                  // Mostrar mensaje de éxito
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Sesión cerrada exitosamente'),
+                        backgroundColor: Color(0xFF58E181),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                    
+                    // Navegar al splash screen y limpiar el stack de navegación
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/',
+                      (route) => false,
+                    );
+                  }
+                } catch (e) {
+                  // Mostrar mensaje de error
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(e.toString().replaceAll('Exception: ', '')),
+                        backgroundColor: Colors.red,
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                }
               },
               child: const Text(
                 'Cerrar sesión',

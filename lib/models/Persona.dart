@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mi_mercado/models/SharedPreferences.dart';
 import 'Usuario.dart';
 import 'Repartidor.dart';
 
@@ -83,9 +84,28 @@ abstract class Persona {
       return null;
     }
   }
+  /// Método estático para cerrar sesión del usuario actual
+  static Future<void> cerrarSesion() async {
+    try {
+      print('🚪 Cerrando sesión del usuario...');
+      
+      // Obtener el ID del usuario actual para logging
+      final String? currentUserId = await SharedPreferencesService.getCurrentUserId();
+      
+      if (currentUserId != null && currentUserId.isNotEmpty) {
+        print('👤 Cerrando sesión del usuario ID: $currentUserId');
+      }
+      
+      // Limpiar todos los datos de sesión en SharedPreferences
+      await SharedPreferencesService.clearSessionData();
+      
+      print('✅ Sesión cerrada exitosamente');
+      print('🧹 Datos de sesión eliminados de SharedPreferences');
+      
+    } catch (e) {
+      print('❌ Error cerrando sesión: $e');
+      throw Exception('Error al cerrar sesión: ${e.toString()}');
+    }
+  }
 }
 
-// Función auxiliar para login (mantengo compatibilidad)
-Future<Persona?> login(String email, String password, String tipoUsuario) async {
-  return await Persona.login(email, password, tipoUsuario);
-}
