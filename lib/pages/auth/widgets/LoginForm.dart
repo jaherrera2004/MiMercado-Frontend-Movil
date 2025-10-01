@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../shared/widgets/forms/CustomTextField.dart';
 import '../../../shared/widgets/buttons/PrimaryButton.dart';
 import '../../../shared/widgets/navigation/NavigationLink.dart';
 import '../../../shared/widgets/text/PageTitle.dart';
 import 'UserTypeSelector.dart';
+import '../../../models/Persona.dart';
+import '../../../models/Usuario.dart';
+import '../../../models/Repartidor.dart';
+import '../../../models/SharedPreferences.dart';
 
 /// Formulario de inicio de sesión separado del widget principal
 class LoginForm extends StatefulWidget {
@@ -69,43 +72,57 @@ class _LoginFormState extends State<LoginForm> {
     });
 
     try {
-      // Determinar la colección según el tipo de usuario seleccionado
-      final String collection = _selectedUserType == UserType.usuario ? 'usuarios' : 'repartidores';
+      // Determinar el tipo de usuario
+      final String tipoUsuario = _selectedUserType == UserType.usuario ? 'usuario' : 'repartidor';
       
-      // Buscar en la colección correspondiente por email
-      final QuerySnapshot userQuery = await firebase
-          .collection(collection)
-          .where('email', isEqualTo: _emailController.text.trim().toLowerCase())
-          .limit(1)
-          .get();
+      // Llamar al método de login de Persona
+      final Persona? persona = await Persona.login(
+        _emailController.text.trim().toLowerCase(),
+        _passwordController.text,
+        tipoUsuario,
+      );
 
-      if (userQuery.docs.isEmpty) {
-        // Usuario no encontrado en la colección correspondiente
-        final String userTypeName = _selectedUserType == UserType.usuario ? 'usuario' : 'repartidor';
-        _showErrorMessage('$userTypeName no encontrado');
+      if (persona == null) {
+        // Login fallido
+        _showErrorMessage('Email o contraseña incorrectos');
         return;
       }
-
-  final doc = userQuery.docs.first;
-  final userData = doc.data() as Map<String, dynamic>;
-      final storedPassword = userData['password'] as String;
-
-      // Verificar contraseña (en producción deberías usar hash)
-      if (storedPassword != _passwordController.text) {
-        _showErrorMessage('Contraseña incorrecta');
-        return;
-      }
-
+      print(persona.nombre);
       // Login exitoso
       _showSuccessMessage('Inicio de sesión exitoso');
 
-      // Guardar datos en SharedPreferences (id, nombre, email, direccion principal)
-      await _saveSessionData(
-        userId: doc.id,
-        email: (userData['email'] ?? '').toString(),
-        nombre: (userData['nombre'] ?? '').toString(),
-        direcciones: userData['direcciones'],
-      );
+ 
+
+      // Validar datos antes de guardar con null safety
+      final String userId = persona.id;
+      final String userName = persona.nombre ?? 'Usuario';
+      final String userRole = persona is Usuario ? 'usuario' : 'repartidor';
+      
+      
+      // Validar que no sean nulos o vacíos
+      if (userId.isEmpty) {
+        throw Exception('ID del usuario está vacío');
+      }
+      if (userName.isEmpty) {
+        throw Exception('Nombre del usuario está vacío o es nulo');
+      }
+
+      // Guardar datos en SharedPreferences usando el servicio apropiado
+      if (persona is Repartidor) {
+        await SharedPreferencesService.saveRepartidorSessionData(
+          id: userId,
+          nombre: userName,
+          rol: userRole,
+          pedidoActual: persona.pedidoActual,
+          estadoActual: persona.estadoActual,
+        );
+      } else {
+        await SharedPreferencesService.saveSessionData(
+          id: userId,
+          nombre: userName,
+          rol: userRole,
+        );
+      }
       
       // Limpiar formulario
       _emailController.clear();
@@ -113,15 +130,14 @@ class _LoginFormState extends State<LoginForm> {
 
       // Navegar según el tipo de usuario
       if (mounted) {
-        if (_selectedUserType == UserType.usuario) {
+        if (persona is Usuario) {
           Navigator.pushReplacementNamed(context, '/home');
-        } else {
+        } else if (persona is Repartidor) {
           Navigator.pushReplacementNamed(context, '/repartidor');
         }
       }
 
     } catch (e) {
-      print('Error en login: $e');
       _showErrorMessage('Error al iniciar sesión: ${e.toString()}');
     } finally {
       if (mounted) {
@@ -129,48 +145,6 @@ class _LoginFormState extends State<LoginForm> {
           _isLoading = false;
         });
       }
-    }
-  }
-
-  Future<void> _saveSessionData({
-    required String userId,
-    required String email,
-    required String nombre,
-    dynamic direcciones,
-  }) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-
-      // Determinar direccion principal
-      String mainAddress = '';
-      if (direcciones is List) {
-        // Cada elemento se espera sea un Map con 'principal': bool y 'direccion'
-        for (final d in direcciones) {
-          if (d is Map<String, dynamic>) {
-            final isPrincipal = d['principal'] == true;
-            if (isPrincipal) {
-              mainAddress = (d['direccion'] ?? '').toString();
-              break;
-            }
-          }
-        }
-        // Si no se encontró principal, tomar la primera direccion (si existe)
-        if (mainAddress.isEmpty && direcciones.isNotEmpty) {
-          final first = direcciones.first;
-          if (first is Map<String, dynamic>) {
-            mainAddress = (first['direccion'] ?? '').toString();
-          }
-        }
-      }
-
-      await prefs.setString('id', userId);
-      await prefs.setString('email', email);
-      await prefs.setString('nombre', nombre);
-      await prefs.setString('direccionPrincipal', mainAddress);
-      await prefs.setString('rol', _selectedUserType == UserType.usuario ? 'usuario' : 'repartidor');
-    } catch (e) {
-      // No bloqueamos el login si falla el guardado; solo log
-      debugPrint('Error guardando SharedPreferences: $e');
     }
   }
 
