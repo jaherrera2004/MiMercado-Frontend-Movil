@@ -13,7 +13,6 @@ import 'package:mi_mercado/pages/direcciones/DireccionesScreen.dart';
 import 'package:mi_mercado/pages/cuenta/MiCuentaScreen.dart';
 import 'package:mi_mercado/pages/cuenta/DatosPerfilScreen.dart';
 import 'package:mi_mercado/pages/cuenta/SeguridadScreen.dart';
-import 'package:mi_mercado/pages/cuenta/EditarPerfilScreen.dart';
 import 'package:mi_mercado/pages/cuenta/EditarContrase%C3%B1aScreen.dart';
 import 'package:mi_mercado/pages/repartidor/RepartidorPageScreen.dart';
 
@@ -46,7 +45,6 @@ class MiMercadoApp extends StatelessWidget {
         '/cuenta': (context) => const CuentaScreen(),
         '/datos-perfil': (context) => const DatosScreen(),
         '/seguridad': (context) => const PasswordScreen(),
-        '/editar-perfil': (context) => const EditarPerfilScreen(),
         '/editar-seguridad': (context) => const EditarSeguridadScreen(),
         '/repartidor': (context) => const RepartidorPage(),
       },

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Persona.dart';
-import 'SharedPreferences.dart';
+import 'SharedPreferencesServices.dart';
 
 class Usuario extends Persona {
 
@@ -320,6 +320,119 @@ class Usuario extends Persona {
     } catch (e) {
       print('❌ Error eliminando dirección: $e');
       throw Exception('Error al eliminar dirección: ${e.toString()}');
+    }
+  }
+
+
+  /// Método estático para obtener solo la información básica del usuario actual
+  static Future<Map<String, dynamic>?> obtenerDatosUsuarioActual() async {
+    try {
+      // Obtener el ID del usuario actual desde SharedPreferences
+      final String? currentUserId = await SharedPreferencesService.getCurrentUserId();
+      
+      if (currentUserId == null || currentUserId.isEmpty) {
+        throw Exception('No hay usuario autenticado');
+      }
+
+      print('🔍 Obteniendo datos básicos del usuario ID: $currentUserId');
+      
+      final firebase = FirebaseFirestore.instance;
+      
+      // Obtener el documento del usuario actual
+      final DocumentSnapshot userDoc = await firebase
+          .collection('usuarios')
+          .doc(currentUserId)
+          .get();
+
+      if (!userDoc.exists) {
+        print('❌ Usuario no encontrado con ID: $currentUserId');
+        return null;
+      }
+
+      final userData = userDoc.data() as Map<String, dynamic>;
+      
+      // Retornar solo los datos básicos
+      final datosBasicos = {
+        'id': currentUserId,
+        'nombre': userData['nombre'] ?? '',
+        'apellido': userData['apellido'] ?? '',
+        'email': userData['email'] ?? '',
+        'telefono': userData['telefono'] ?? '',
+      };
+
+      print('✅ Datos básicos obtenidos: ${datosBasicos['nombre']} ${datosBasicos['apellido']}');
+      return datosBasicos;
+      
+    } catch (e) {
+      print('❌ Error obteniendo datos básicos del usuario: $e');
+      throw Exception('Error al obtener datos básicos del usuario: ${e.toString()}');
+    }
+  }
+
+  /// Método estático para actualizar los datos básicos del usuario actual
+  static Future<void> actualizarDatosUsuario({
+    required String nombre,
+    required String apellido,
+    required String telefono,
+    required String email,
+  }) async {
+    try {
+      print('✏️ Actualizando datos del usuario...');
+      
+      // Obtener el ID del usuario actual desde SharedPreferences
+      final String? currentUserId = await SharedPreferencesService.getCurrentUserId();
+      
+      if (currentUserId == null || currentUserId.isEmpty) {
+        throw Exception('No hay usuario autenticado');
+      }
+
+      print('🔍 Usuario ID: $currentUserId');
+      
+      final firebase = FirebaseFirestore.instance;
+      
+      // Obtener el documento del usuario actual
+      final DocumentReference userDoc = firebase.collection('usuarios').doc(currentUserId);
+      final DocumentSnapshot userData = await userDoc.get();
+
+      if (!userData.exists) {
+        print('❌ Usuario no encontrado con ID: $currentUserId');
+        throw Exception('Usuario no encontrado');
+      }
+
+      // Validar que los campos no estén vacíos
+      if (nombre.trim().isEmpty) {
+        throw Exception('El nombre no puede estar vacío');
+      }
+      if (apellido.trim().isEmpty) {
+        throw Exception('El apellido no puede estar vacío');
+      }
+      if (telefono.trim().isEmpty) {
+        throw Exception('El teléfono no puede estar vacío');
+      }
+      if (email.trim().isEmpty) {
+        throw Exception('El email no puede estar vacío');
+      }
+
+      // Crear el mapa con los datos actualizados
+      final datosActualizados = {
+        'nombre': nombre.trim(),
+        'apellido': apellido.trim(),
+        'telefono': telefono.trim(),
+        'email': email.trim(),
+      };
+
+      // Actualizar en Firebase
+      await userDoc.update(datosActualizados);
+
+      // Actualizar el nombre en SharedPreferences también
+      await SharedPreferencesService.updateUserName(nombre.trim());
+
+      print('✅ Datos del usuario actualizados exitosamente');
+      print('📊 Nuevos datos: $nombre $apellido - $email');
+      
+    } catch (e) {
+      print('❌ Error actualizando datos del usuario: $e');
+      throw Exception('Error al actualizar datos del usuario: ${e.toString()}');
     }
   }
 }
