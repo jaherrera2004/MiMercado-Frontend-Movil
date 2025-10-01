@@ -75,6 +75,9 @@ class _DatosPedidosScreenState extends State<DatosPedidosScreen> {
     final Map<String, dynamic>? pedidoArgs = 
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     
+    // Obtener el objeto Pedido completo si está disponible
+    final Pedido? pedidoCompleto = pedidoArgs?['pedidoCompleto'] as Pedido?;
+    
     // Datos por defecto si no se pasan argumentos
     final Map<String, dynamic> pedido = pedidoArgs ?? {
       'numero': 1,
@@ -84,8 +87,16 @@ class _DatosPedidosScreenState extends State<DatosPedidosScreen> {
       'total': 58000,
     };
 
+    // Usar datos del pedido completo si está disponible
+    final String idPedido = pedidoCompleto?.id ?? pedido['numero'].toString();
+    final String direccion = pedidoCompleto?.direccion ?? pedido['direccion'] ?? 'Dirección no disponible';
+    final String estado = pedidoCompleto?.estado ?? pedido['estado'] ?? 'Desconocido';
+    final String fecha = pedidoCompleto != null 
+        ? '${pedidoCompleto.fecha.day}/${pedidoCompleto.fecha.month}/${pedidoCompleto.fecha.year}'
+        : pedido['fecha'];
+    
     // Calcular subtotal, domicilio y servicio
-    final double total = pedido['total']?.toDouble() ?? 0.0;
+    final double total = pedidoCompleto?.costoTotal ?? pedido['total']?.toDouble() ?? 0.0;
     final double domicilio = 5000.0; // Valor fijo por ahora
     final double servicio = 3000.0; // Valor fijo por ahora
     final double subtotal = total - domicilio - servicio;
@@ -102,7 +113,7 @@ class _DatosPedidosScreenState extends State<DatosPedidosScreen> {
                 size: 40,
               ),
             ),
-        title: PageTitle(title: "Pedido #${pedido['numero']}"),
+        title: PageTitle(title: "Pedido"),
         centerTitle: true,
       ),
       body: isLoading
@@ -114,10 +125,10 @@ class _DatosPedidosScreenState extends State<DatosPedidosScreen> {
                 children: [
                   // Información del pedido
                   PedidoInfo(
-                    numeroPedido: pedido['numero'].toString(),
-                    direccion: pedido['direccion'] ?? 'Dirección no disponible',
-                    fecha: pedido['fecha'],
-                    estado: pedido['estado'],
+                    numeroPedido: idPedido,
+                    direccion: direccion,
+                    fecha: fecha,
+                    estado: estado,
                   ),
                   
                   const SizedBox(height: 24),
