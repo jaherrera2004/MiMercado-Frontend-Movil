@@ -6,7 +6,7 @@ class ProductoPedido {
   String idProducto;
   int cantidad;
 
-  double valorDomicilio = 5000; // Valor por defecto
+  static double valorDomicilio = 5000; // Valor por defecto
 
   ProductoPedido({
     required this.idProducto,
