@@ -6,6 +6,7 @@ import 'widgets/AgregarDireccionModal.dart';
 import 'widgets/EditarDireccionModal.dart';
 import 'widgets/EliminarDireccionModal.dart';
 import 'models/direccion.dart';
+import '../../models/Usuario.dart';
 
 class DireccionesScreen extends StatefulWidget {
   const DireccionesScreen({super.key});
@@ -18,55 +19,31 @@ class _DireccionesScreenState extends State<DireccionesScreen> {
   final FirebaseFirestore firebase = FirebaseFirestore.instance;
   List<Direccion> direcciones = [];
   bool isLoading = true;
-  String currentUserId = ''; // En una app real, esto vendría del sistema de autenticación
 
   @override
   void initState() {
     super.initState();
-    // Por ahora, usar un email de ejemplo para buscar el usuario
-    // En una app real, esto vendría del usuario autenticado
-    _cargarDirecciones('dayro@gmail.com');
+    // Usar el nuevo método de Usuario para cargar direcciones
+    _cargarDireccionesActuales();
   }
 
-  Future<void> _cargarDirecciones(String userEmail) async {
+  Future<void> _cargarDireccionesActuales() async {
     try {
       setState(() {
         isLoading = true;
       });
 
-      print('🔍 Buscando usuario con email: $userEmail');
+      print('🔍 Cargando direcciones usando Usuario.obtenerDireccionesActuales()');
 
-      // Buscar el usuario por email
-      final QuerySnapshot userQuery = await firebase
-          .collection('usuarios')
-          .where('email', isEqualTo: userEmail)
-          .limit(1)
-          .get();
-
-      if (userQuery.docs.isEmpty) {
-        print('❌ Usuario no encontrado');
-        setState(() {
-          isLoading = false;
-        });
-        return;
-      }
-
-      final userData = userQuery.docs.first.data() as Map<String, dynamic>;
-      currentUserId = userQuery.docs.first.id;
+      // Usar el método estático de Usuario para obtener direcciones
+      final List<Map<String, dynamic>> direccionesData = await Usuario.obtenerDireccionesActuales();
       
-      print('✅ Usuario encontrado: ${userData['nombre']}');
-
-      // Obtener las direcciones del array
-      final List<dynamic> direccionesData = userData['direcciones'] ?? [];
-      print('📍 Direcciones encontradas: ${direccionesData.length}');
-
+      // Convertir los datos a objetos Direccion
       final List<Direccion> direccionesFirebase = [];
 
-      for (int i = 0; i < direccionesData.length; i++) {
-        final direccionData = direccionesData[i] as Map<String, dynamic>;
-        
+      for (final direccionData in direccionesData) {
         final direccion = Direccion(
-          id: i.toString(), // Usar índice como ID temporal
+          id: direccionData['id']?.toString(),
           nombre: direccionData['nombre'] ?? 'Sin nombre',
           direccion: direccionData['direccion'] ?? 'Sin dirección',
           referencia: direccionData['referencias'] ?? '',
@@ -111,7 +88,7 @@ class _DireccionesScreenState extends State<DireccionesScreen> {
     showDialog(
       context: context,
       builder: (context) => AgregarDireccionModal(
-        onDireccionAgregada: _agregarDireccion,
+        onDireccionAgregada: _handleAgregarDireccion,
       ),
     );
   }
@@ -121,7 +98,7 @@ class _DireccionesScreenState extends State<DireccionesScreen> {
       context: context,
       builder: (context) => EditarDireccionModal(
         direccion: direccion,
-        onDireccionEditada: _editarDireccion,
+        onDireccionEditada: _handleEditarDireccion,
       ),
     );
   }
@@ -131,63 +108,27 @@ class _DireccionesScreenState extends State<DireccionesScreen> {
       context: context,
       builder: (context) => EliminarDireccionModal(
         direccion: direccion,
-        onDireccionEliminada: _eliminarDireccion,
+        onDireccionEliminada: _handleEliminarDireccion,
       ),
     );
   }
 
-  Future<void> _agregarDireccion(Direccion nuevaDireccion) async {
+  Future<void> _handleAgregarDireccion(Direccion nuevaDireccion) async {
     try {
-      print('💾 Guardando nueva dirección en Firebase...');
+      print('💾 Agregando nueva dirección usando Usuario.agregarDireccion()...');
       
-      if (currentUserId.isEmpty) {
-        throw Exception('Usuario no identificado');
-      }
+      // Usar el método estático de Usuario para agregar la dirección
+      await Usuario.agregarDireccion(
+        nombre: nuevaDireccion.nombre,
+        direccion: nuevaDireccion.direccion,
+        referencia: nuevaDireccion.referencia,
+        esPrincipal: nuevaDireccion.esPrincipal,
+      );
 
-      // Obtener el documento del usuario
-      final userDoc = firebase.collection('usuarios').doc(currentUserId);
-      final userData = await userDoc.get();
-      
-      if (!userData.exists) {
-        throw Exception('Usuario no encontrado');
-      }
+      print('✅ Dirección agregada exitosamente usando Usuario.agregarDireccion()');
 
-      // Obtener direcciones actuales
-      final Map<String, dynamic> currentData = userData.data() as Map<String, dynamic>;
-      List<dynamic> direccionesActuales = List.from(currentData['direcciones'] ?? []);
-
-      // Si la nueva dirección es principal, marcar las demás como no principales
-      if (nuevaDireccion.esPrincipal) {
-        for (int i = 0; i < direccionesActuales.length; i++) {
-          direccionesActuales[i]['principal'] = false;
-        }
-      }
-
-      // Agregar la nueva dirección
-      final nuevaDireccionMap = {
-        'nombre': nuevaDireccion.nombre,
-        'direccion': nuevaDireccion.direccion,
-        'referencias': nuevaDireccion.referencia ?? '',
-        'principal': nuevaDireccion.esPrincipal,
-      };
-
-      direccionesActuales.add(nuevaDireccionMap);
-
-      // Actualizar en Firebase
-      await userDoc.update({
-        'direcciones': direccionesActuales,
-      });
-
-      print('✅ Dirección guardada exitosamente');
-
-      // Actualizar la UI
-      setState(() {
-        // Si es principal, quitar principal a las demás
-        if (nuevaDireccion.esPrincipal) {
-          direcciones = direcciones.map((d) => d.copyWith(esPrincipal: false)).toList();
-        }
-        direcciones.add(nuevaDireccion);
-      });
+      // Recargar las direcciones desde Firebase para asegurar consistencia
+      await _cargarDireccionesActuales();
 
       // Mostrar mensaje de éxito
       ScaffoldMessenger.of(context).showSnackBar(
@@ -199,12 +140,12 @@ class _DireccionesScreenState extends State<DireccionesScreen> {
       );
 
     } catch (e) {
-      print('❌ Error al guardar dirección: $e');
+      print('❌ Error al agregar dirección: $e');
       
       // Mostrar mensaje de error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al guardar la dirección: ${e.toString()}'),
+          content: Text('Error al agregar la dirección: ${e.toString()}'),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 3),
         ),
@@ -212,81 +153,28 @@ class _DireccionesScreenState extends State<DireccionesScreen> {
     }
   }
 
-  Future<void> _editarDireccion(Direccion direccionEditada) async {
+  Future<void> _handleEditarDireccion(Direccion direccionEditada) async {
     try {
-      print('✏️ Actualizando dirección en Firebase...');
+      print('✏️ Editando dirección usando Usuario.editarDireccion()...');
       
-      if (currentUserId.isEmpty) {
-        throw Exception('Usuario no identificado');
+      // Validar que la dirección tenga un ID válido
+      if (direccionEditada.id == null || direccionEditada.id!.isEmpty) {
+        throw Exception('ID de dirección no válido');
       }
-
-      // Obtener el documento del usuario
-      final userDoc = firebase.collection('usuarios').doc(currentUserId);
-      final userData = await userDoc.get();
       
-      if (!userData.exists) {
-        throw Exception('Usuario no encontrado');
-      }
+      // Usar el método estático de Usuario para editar la dirección
+      await Usuario.editarDireccion(
+        direccionId: direccionEditada.id!,
+        nombre: direccionEditada.nombre,
+        direccion: direccionEditada.direccion,
+        referencia: direccionEditada.referencia,
+        esPrincipal: direccionEditada.esPrincipal,
+      );
 
-      // Obtener direcciones actuales
-      final Map<String, dynamic> currentData = userData.data() as Map<String, dynamic>;
-      List<dynamic> direccionesActuales = List.from(currentData['direcciones'] ?? []);
+      print('✅ Dirección editada exitosamente usando Usuario.editarDireccion()');
 
-      // Encontrar el índice de la dirección a editar
-      int indexToEdit = -1;
-      final direccionIndex = int.tryParse(direccionEditada.id ?? '-1') ?? -1;
-      
-      if (direccionIndex >= 0 && direccionIndex < direccionesActuales.length) {
-        indexToEdit = direccionIndex;
-      } else {
-        // Buscar por coincidencia si no se encontró por índice
-        final direccionOriginal = direcciones.firstWhere((d) => d.id == direccionEditada.id);
-        for (int i = 0; i < direccionesActuales.length; i++) {
-          final dir = direccionesActuales[i];
-          if (dir['nombre'] == direccionOriginal.nombre && dir['direccion'] == direccionOriginal.direccion) {
-            indexToEdit = i;
-            break;
-          }
-        }
-      }
-
-      if (indexToEdit == -1) {
-        throw Exception('Dirección no encontrada');
-      }
-
-      // Si la dirección editada es principal, marcar las demás como no principales
-      if (direccionEditada.esPrincipal) {
-        for (int i = 0; i < direccionesActuales.length; i++) {
-          direccionesActuales[i]['principal'] = false;
-        }
-      }
-
-      // Actualizar la dirección específica
-      direccionesActuales[indexToEdit] = {
-        'nombre': direccionEditada.nombre,
-        'direccion': direccionEditada.direccion,
-        'referencias': direccionEditada.referencia ?? '',
-        'principal': direccionEditada.esPrincipal,
-      };
-
-      // Actualizar en Firebase
-      await userDoc.update({
-        'direcciones': direccionesActuales,
-      });
-
-      print('✅ Dirección actualizada exitosamente');
-
-      // Actualizar la UI
-      setState(() {
-        final index = direcciones.indexWhere((d) => d.id == direccionEditada.id);
-        if (index != -1) {
-          // Si es principal, quitar principal a las demás
-          if (direccionEditada.esPrincipal) {
-            direcciones = direcciones.map((d) => d.copyWith(esPrincipal: false)).toList();
-          }
-          direcciones[index] = direccionEditada;
-        }
-      });
+      // Recargar las direcciones desde Firebase para asegurar consistencia
+      await _cargarDireccionesActuales();
 
       // Mostrar mensaje de éxito
       ScaffoldMessenger.of(context).showSnackBar(
@@ -298,7 +186,7 @@ class _DireccionesScreenState extends State<DireccionesScreen> {
       );
 
     } catch (e) {
-      print('❌ Error al actualizar dirección: $e');
+      print('❌ Error al editar dirección: $e');
       
       // Mostrar mensaje de error
       ScaffoldMessenger.of(context).showSnackBar(
@@ -311,68 +199,24 @@ class _DireccionesScreenState extends State<DireccionesScreen> {
     }
   }
 
-  Future<void> _eliminarDireccion(Direccion direccion) async {
+  Future<void> _handleEliminarDireccion(Direccion direccion) async {
     try {
-      print('🗑️ Eliminando dirección de Firebase...');
+      print('🗑️ Eliminando dirección usando Usuario.eliminarDireccion()...');
       
-      if (currentUserId.isEmpty) {
-        throw Exception('Usuario no identificado');
+      // Validar que la dirección tenga un ID válido
+      if (direccion.id == null || direccion.id!.isEmpty) {
+        throw Exception('ID de dirección no válido');
       }
-
-      // Obtener el documento del usuario
-      final userDoc = firebase.collection('usuarios').doc(currentUserId);
-      final userData = await userDoc.get();
       
-      if (!userData.exists) {
-        throw Exception('Usuario no encontrado');
-      }
+      // Usar el método estático de Usuario para eliminar la dirección
+      await Usuario.eliminarDireccion(
+        direccionId: direccion.id!,
+      );
 
-      // Obtener direcciones actuales
-      final Map<String, dynamic> currentData = userData.data() as Map<String, dynamic>;
-      List<dynamic> direccionesActuales = List.from(currentData['direcciones'] ?? []);
+      print('✅ Dirección eliminada exitosamente usando Usuario.eliminarDireccion()');
 
-      // Encontrar el índice de la dirección a eliminar
-      int indexToRemove = -1;
-      final direccionIndex = int.tryParse(direccion.id ?? '-1') ?? -1;
-      
-      if (direccionIndex >= 0 && direccionIndex < direccionesActuales.length) {
-        // Verificar que es la dirección correcta comparando nombre y dirección
-        final direccionFirebase = direccionesActuales[direccionIndex];
-        if (direccionFirebase['nombre'] == direccion.nombre && 
-            direccionFirebase['direccion'] == direccion.direccion) {
-          indexToRemove = direccionIndex;
-        }
-      }
-
-      if (indexToRemove == -1) {
-        // Buscar por coincidencia de nombre y dirección si no se encontró por índice
-        for (int i = 0; i < direccionesActuales.length; i++) {
-          final dir = direccionesActuales[i];
-          if (dir['nombre'] == direccion.nombre && dir['direccion'] == direccion.direccion) {
-            indexToRemove = i;
-            break;
-          }
-        }
-      }
-
-      if (indexToRemove == -1) {
-        throw Exception('Dirección no encontrada');
-      }
-
-      // Eliminar la dirección del array
-      direccionesActuales.removeAt(indexToRemove);
-
-      // Actualizar en Firebase
-      await userDoc.update({
-        'direcciones': direccionesActuales,
-      });
-
-      print('✅ Dirección eliminada exitosamente');
-
-      // Actualizar la UI
-      setState(() {
-        direcciones.removeWhere((d) => d.id == direccion.id);
-      });
+      // Recargar las direcciones desde Firebase para asegurar consistencia
+      await _cargarDireccionesActuales();
 
       // Mostrar mensaje de éxito
       ScaffoldMessenger.of(context).showSnackBar(
