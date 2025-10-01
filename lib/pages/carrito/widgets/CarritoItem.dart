@@ -28,12 +28,7 @@ class CarritoItem extends StatelessWidget {
           backgroundColor: Colors.white,
           radius: 25,
           child: ClipOval(
-            child: Image.asset(
-              producto["img"],
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
-            ),
+            child: _buildImage(producto["img"]),
           ),
         ),
         title: Text(
@@ -150,5 +145,37 @@ class CarritoItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // Helper method to build image widget
+  Widget _buildImage(String imageUrl) {
+    // Check if it's a network URL
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return Image.network(
+        imageUrl,
+        width: 40,
+        height: 40,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Image.asset(
+            'lib/resources/temp/image.png',
+            width: 40,
+            height: 40,
+            fit: BoxFit.cover,
+          );
+        },
+      );
+    } else {
+      // It's a local asset
+      return Image.asset(
+        imageUrl,
+        width: 40,
+        height: 40,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return const Icon(Icons.image_not_supported, size: 40);
+        },
+      );
+    }
   }
 }
