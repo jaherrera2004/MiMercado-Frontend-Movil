@@ -138,6 +138,30 @@ class Producto {
     }
   }
 
+  /// Método estático para obtener un producto por ID
+  static Future<Producto?> obtenerProductoPorId(String id) async {
+    try {
+      print('🔍 Buscando producto con ID: $id');
+      
+      final firebase = FirebaseFirestore.instance;
+      
+      final DocumentSnapshot doc = await firebase.collection('productos').doc(id).get();
+      
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+        print('✅ Producto encontrado: ${data['nombre']}');
+        return Producto.fromMap(data, doc.id);
+      } else {
+        print('⚠️ Producto no encontrado con ID: $id');
+        return null;
+      }
+      
+    } catch (e) {
+      print('❌ Error obteniendo producto por ID: $e');
+      return null;
+    }
+  }
+
   @override
   String toString() {
     return 'Producto(id: $id, nombre: $nombre, precio: \$${precio.toStringAsFixed(2)}, stock: $stock)';
