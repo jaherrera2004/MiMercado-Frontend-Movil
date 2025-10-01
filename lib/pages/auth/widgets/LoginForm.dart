@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../shared/widgets/forms/CustomTextField.dart';
 import '../../../shared/widgets/buttons/PrimaryButton.dart';
 import '../../../shared/widgets/navigation/NavigationLink.dart';
@@ -85,7 +86,8 @@ class _LoginFormState extends State<LoginForm> {
         return;
       }
 
-      final userData = userQuery.docs.first.data() as Map<String, dynamic>;
+  final doc = userQuery.docs.first;
+  final userData = doc.data() as Map<String, dynamic>;
       final storedPassword = userData['password'] as String;
 
       // Verificar contraseña (en producción deberías usar hash)
@@ -96,6 +98,14 @@ class _LoginFormState extends State<LoginForm> {
 
       // Login exitoso
       _showSuccessMessage('Inicio de sesión exitoso');
+
+      // Guardar datos en SharedPreferences (id, nombre, email, direccion principal)
+      await _saveSessionData(
+        userId: doc.id,
+        email: (userData['email'] ?? '').toString(),
+        nombre: (userData['nombre'] ?? '').toString(),
+        direcciones: userData['direcciones'],
+      );
       
       // Limpiar formulario
       _emailController.clear();
@@ -119,6 +129,48 @@ class _LoginFormState extends State<LoginForm> {
           _isLoading = false;
         });
       }
+    }
+  }
+
+  Future<void> _saveSessionData({
+    required String userId,
+    required String email,
+    required String nombre,
+    dynamic direcciones,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      // Determinar direccion principal
+      String mainAddress = '';
+      if (direcciones is List) {
+        // Cada elemento se espera sea un Map con 'principal': bool y 'direccion'
+        for (final d in direcciones) {
+          if (d is Map<String, dynamic>) {
+            final isPrincipal = d['principal'] == true;
+            if (isPrincipal) {
+              mainAddress = (d['direccion'] ?? '').toString();
+              break;
+            }
+          }
+        }
+        // Si no se encontró principal, tomar la primera direccion (si existe)
+        if (mainAddress.isEmpty && direcciones.isNotEmpty) {
+          final first = direcciones.first;
+          if (first is Map<String, dynamic>) {
+            mainAddress = (first['direccion'] ?? '').toString();
+          }
+        }
+      }
+
+      await prefs.setString('id', userId);
+      await prefs.setString('email', email);
+      await prefs.setString('nombre', nombre);
+      await prefs.setString('direccionPrincipal', mainAddress);
+      await prefs.setString('rol', _selectedUserType == UserType.usuario ? 'usuario' : 'repartidor');
+    } catch (e) {
+      // No bloqueamos el login si falla el guardado; solo log
+      debugPrint('Error guardando SharedPreferences: $e');
     }
   }
 
