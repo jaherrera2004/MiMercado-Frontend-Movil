@@ -1,34 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'Persona.dart';
 
-class Usuario {
-  String apellido;
+class Usuario extends Persona {
+
   List<Map<String, dynamic>> direcciones;
-  String email;
-  String nombre;
-  String password;
   List<dynamic> pedidos;
-  String telefono;
-
-  String firebaseCollection = 'usuarios';
 
   Usuario({
-    required this.apellido,
+    required super.id,
+    super.nombre,
+    super.apellido,
+    super.email,
+    super.password,
+    super.telefono,
     required this.direcciones,
-    required this.email,
-    required this.nombre,
-    required this.password,
     required this.pedidos,
-    required this.telefono,
-  });
+  }) : super(firebaseCollection: 'usuarios');
+
+  @override
+  String toString() {
+    return 'Usuario(id: $id, nombre: $nombre, apellido: $apellido, email: $email, telefono: $telefono)';
+  }
 
   // Método público para registrar usuario en Firebase.
   Future<void> registrarUsuario() async {
     try {
       final firebase = FirebaseFirestore.instance;
       await firebase.collection(firebaseCollection).doc().set({
-        'nombre': nombre,
+        'nombre': nombre ,
         'apellido': apellido,
-        'telefono': telefono,
+        'telefono': telefono ,
         'email': email,
         'password': password,
         'pedidos': pedidos,

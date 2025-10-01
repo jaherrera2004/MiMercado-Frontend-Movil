@@ -34,6 +34,7 @@ class _RegisterFormState extends State<RegisterForm> {
     try {
       // Crear objeto Usuario con los datos del formulario
       Usuario nuevoUsuario = Usuario(
+        id: '', // Aquí podrías generar un ID único si es necesario
         nombre: _nombreController.text,
         apellido: _apellidoController.text,
         telefono: _telefonoController.text,
@@ -42,7 +43,7 @@ class _RegisterFormState extends State<RegisterForm> {
         pedidos: [],
         direcciones: [],
       );
-
+      
       // Llamar al método registrarUsuario del modelo
       await nuevoUsuario.registrarUsuario();
       
