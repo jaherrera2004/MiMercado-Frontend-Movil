@@ -4,6 +4,8 @@ import '../../shared/widgets/text/PageTitle.dart';
 import '../categoria/widgets/CategoriaSearchBar.dart';
 import '../categoria/widgets/ProductGrid.dart';
 import 'widgets/widgets.dart';
+import '../../models/Producto.dart';
+import '../../models/Categoria.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,8 +16,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FirebaseFirestore firebase = FirebaseFirestore.instance;
-  List<Map<String, dynamic>> categorias = [];
-  List<Map<String, dynamic>> productos = [];
+  List<Categoria> categorias = [];
+  List<Producto> productos = [];
 
   @override
   void initState() {
@@ -26,51 +28,34 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _cargarCategorias() async {
     try {
-      final QuerySnapshot snapshot = await firebase.collection('categorias').get();
+      // Usar el método del modelo Categoria para obtener categorías
+      final List<Categoria> categoriasFirebase = await Categoria.obtenerCategorias();
       
-      final List<Map<String, dynamic>> categoriasFirebase = [];
+      print('📦 Categorías cargadas en HomePage: ${categoriasFirebase.length}');
       
-      for (var doc in snapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
-        categoriasFirebase.add({
-          'id': doc.id, // ID autogenerado por Firebase
-          'label': data['nombre'] ?? 'Categoría sin nombre',
-          'img': "lib/resources/temp/image.png", // imagen por defecto
-        });
+      // Validar que todas las categorías tengan datos válidos
+      for (var cat in categoriasFirebase) {
+        print('  - ID: ${cat.id}, Nombre: ${cat.nombre}, Imagen: ${cat.imagenUrl}');
       }
       
       setState(() {
         categorias = categoriasFirebase;
       });
       
-    } catch (e) {
-      print('Error cargando categorías: $e');
-      // Mantener categorías de ejemplo si hay error
+    } catch (e, stackTrace) {
+      print('❌ Error cargando categorías: $e');
+      print('StackTrace: $stackTrace');
+      // En caso de error, mantener lista vacía
       setState(() {
-        categorias = [
-          {"img": "lib/resources/temp/lacteos_icon.png", "label": "Lácteos"},
-          {"img": "lib/resources/temp/snacks_icon.png", "label": "Snacks"},
-          {"img": "lib/resources/temp/bebidas_icon.png", "label": "Bebidas"},
-          {"img": "lib/resources/temp/panaderia_icon.png", "label": "Panadería"},
-        ];
+        categorias = [];
       });
     }
   }
 
   Future<void> _cargarProductos() async {
     try {
-      final QuerySnapshot snapshot = await firebase.collection('productos').get();
-      
-      final List<Map<String, dynamic>> productosFirebase = [];
-      
-      for (var doc in snapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
-        productosFirebase.add({
-          'nombre': data['nombre'] ?? 'Producto sin nombre',
-          'precio': '${data['precio'] ?? 0} \$',
-          'img': 'lib/resources/temp/image.png', // Usar imagen que sabemos que funciona
-        });
-      }
+      // Usar el método del modelo Producto para obtener productos
+      final List<Producto> productosFirebase = await Producto.obtenerProductos();
       
       setState(() {
         productos = productosFirebase;
@@ -78,15 +63,9 @@ class _HomePageState extends State<HomePage> {
       
     } catch (e) {
       print('Error cargando productos: $e');
-      // Mantener productos de ejemplo si hay error
+      // En caso de error, mantener lista vacía
       setState(() {
-        productos = [
-          {
-            "nombre": "Producto de ejemplo",
-            "precio": "5.000 \$",
-            "img": "lib/resources/image.png"
-          },
-        ];
+        productos = [];
       });
     }
   }
@@ -112,9 +91,18 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 15),
 
               // Categorías como carrusel con imágenes
-              CategoriesCarousel(
-                categorias: categorias,
-                onCategoryTap: (categoria) {
+              if (categorias.isNotEmpty)
+                CategoriesCarousel(
+                  categorias: categorias.map((categoria) {
+                    return {
+                      'id': categoria.id,
+                      'label': categoria.nombre,
+                      'img': categoria.imagenUrl.isEmpty
+                          ? 'lib/resources/temp/image.png'
+                          : categoria.imagenUrl,
+                    };
+                  }).toList(),
+                  onCategoryTap: (categoria) {
                   Navigator.pushNamed(
                     context, 
                     '/categoria',
@@ -124,7 +112,14 @@ class _HomePageState extends State<HomePage> {
                     },
                   );
                 },
-              ),
+              )
+              else
+                const Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Center(
+                    child: Text('Cargando categorías...'),
+                  ),
+                ),
               const SizedBox(height: 20),
 
               // Título productos
@@ -137,7 +132,15 @@ class _HomePageState extends State<HomePage> {
 
               // Grid de productos
               ProductGrid(
-                productos: productos,
+                productos: productos.map((producto) => {
+                  'nombre': producto.nombre,
+                  'precio': '\$${producto.precio.toStringAsFixed(0)}',
+                  'img': producto.imagenUrl.isNotEmpty 
+                      ? producto.imagenUrl 
+                      : 'lib/resources/temp/image.png',
+                  'stock': producto.stock,
+                  'disponible': producto.disponible,
+                }).toList(),
                 onAddToCart: (producto) {
                   // Lógica para agregar al carrito desde home
                   ScaffoldMessenger.of(context).showSnackBar(
