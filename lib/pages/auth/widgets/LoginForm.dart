@@ -8,7 +8,7 @@ import 'UserTypeSelector.dart';
 import '../../../models/Persona.dart';
 import '../../../models/Usuario.dart';
 import '../../../models/Repartidor.dart';
-import '../../../models/SharedPreferences.dart';
+import '../../../models/SharedPreferencesServices.dart';
 
 /// Formulario de inicio de sesión separado del widget principal
 class LoginForm extends StatefulWidget {
