@@ -50,7 +50,6 @@ class CarritoItem {
 /// Servicio para manejar el carrito de compras usando GetStorage
 class CarritoService {
   static const String _keyCarrito = 'carrito_items';
-  static const String _keyUserId = 'carrito_user_id';
   static const String _keyFechaActualizacion = 'carrito_fecha';
   
   final GetStorage _storage = GetStorage();
@@ -96,22 +95,6 @@ class CarritoService {
     }
   }
 
-  /// Obtiene el ID del usuario del carrito
-  String? obtenerUserId() {
-    return _storage.read<String>(_keyUserId);
-  }
-
-  /// Establece el ID del usuario del carrito
-  Future<void> establecerUserId(String userId) async {
-    await _storage.write(_keyUserId, userId);
-  }
-
-  /// Obtiene la fecha de última actualización
-  DateTime? obtenerFechaActualizacion() {
-    final fecha = _storage.read<String>(_keyFechaActualizacion);
-    return fecha != null ? DateTime.parse(fecha) : null;
-  }
-
   // ==================== OPERACIONES DEL CARRITO ====================
 
   /// Agrega un producto al carrito
@@ -144,23 +127,6 @@ class CarritoService {
     }
     
     await _guardarItems(items);
-  }
-
-  /// Actualiza la cantidad de un producto
-  Future<void> actualizarCantidad(String idProducto, int nuevaCantidad) async {
-    final items = obtenerItems();
-    final index = items.indexWhere((item) => item.idProducto == idProducto);
-    
-    if (index != -1) {
-      if (nuevaCantidad <= 0) {
-        // Si la cantidad es 0 o negativa, eliminar el item
-        await eliminarProducto(idProducto);
-      } else {
-        items[index].cantidad = nuevaCantidad;
-        await _guardarItems(items);
-        print('✅ Cantidad actualizada: ${items[index].nombre} -> $nuevaCantidad');
-      }
-    }
   }
 
   /// Incrementa la cantidad de un producto en 1
@@ -220,42 +186,7 @@ class CarritoService {
     print('🗑️ Carrito vaciado completamente');
   }
 
-  /// Elimina todo (carrito + user id)
-  Future<void> limpiarTodo() async {
-    await _storage.remove(_keyCarrito);
-    await _storage.remove(_keyUserId);
-    await _storage.remove(_keyFechaActualizacion);
-    print('🗑️ Carrito y datos eliminados completamente');
-  }
-
   // ==================== CONSULTAS ====================
-
-  /// Obtiene la cantidad de un producto específico
-  int obtenerCantidadProducto(String idProducto) {
-    final items = obtenerItems();
-    final item = items.firstWhere(
-      (item) => item.idProducto == idProducto,
-      orElse: () => CarritoItem(
-        idProducto: '',
-        cantidad: 0,
-        precio: 0,
-        nombre: '',
-      ),
-    );
-    return item.cantidad;
-  }
-
-  /// Verifica si un producto está en el carrito
-  bool contieneProducto(String idProducto) {
-    final items = obtenerItems();
-    return items.any((item) => item.idProducto == idProducto);
-  }
-
-  /// Calcula el total de items en el carrito
-  int get totalItems {
-    final items = obtenerItems();
-    return items.fold(0, (sum, item) => sum + item.cantidad);
-  }
 
   /// Calcula el subtotal del carrito
   double get subtotal {
@@ -263,72 +194,8 @@ class CarritoService {
     return items.fold(0.0, (sum, item) => sum + item.subtotal);
   }
 
-  /// Calcula el total con domicilio y servicio
-  double calcularTotal({double domicilio = 5000.0, double servicio = 3000.0}) {
-    return subtotal + domicilio + servicio;
-  }
-
-  /// Verifica si el carrito está vacío
-  bool get isEmpty {
-    return obtenerItems().isEmpty;
-  }
-
-  /// Verifica si el carrito tiene items
-  bool get isNotEmpty {
-    return obtenerItems().isNotEmpty;
-  }
-
-  /// Obtiene un resumen del carrito
-  Map<String, dynamic> obtenerResumen() {
-    final items = obtenerItems();
-    const domicilio = 5000.0;
-    const servicio = 3000.0;
-    final subtotalCarrito = subtotal;
-    final totalCarrito = calcularTotal(domicilio: domicilio, servicio: servicio);
-
-    return {
-      'items': items.map((item) => item.toMap()).toList(),
-      'cantidad_items': items.length,
-      'total_productos': totalItems,
-      'subtotal': subtotalCarrito,
-      'domicilio': domicilio,
-      'servicio': servicio,
-      'total': totalCarrito,
-      'fecha_actualizacion': obtenerFechaActualizacion()?.toIso8601String(),
-    };
-  }
-
   // ==================== UTILIDADES ====================
 
-  /// Imprime el estado actual del carrito (útil para debugging)
-  void imprimirEstado() {
-    final items = obtenerItems();
-    print('🛒 === ESTADO DEL CARRITO ===');
-    print('   Usuario: ${obtenerUserId() ?? "No definido"}');
-    print('   Total items: $totalItems');
-    print('   Productos diferentes: ${items.length}');
-    print('   Subtotal: \$${subtotal.toStringAsFixed(2)}');
-    print('   Total: \$${calcularTotal().toStringAsFixed(2)}');
-    print('   Última actualización: ${obtenerFechaActualizacion()}');
-    
-    if (items.isNotEmpty) {
-      print('   Productos:');
-      for (var item in items) {
-        print('     - ${item.nombre}: ${item.cantidad} x \$${item.precio.toStringAsFixed(2)} = \$${item.subtotal.toStringAsFixed(2)}');
-      }
-    }
-    print('🛒 ========================');
-  }
 
-  /// Exporta el carrito a un formato listo para crear un pedido
-  Map<String, dynamic> exportarParaPedido() {
-    final items = obtenerItems();
-    return {
-      'lista_productos': items.map((item) => {
-        'id_producto': item.idProducto,
-        'cantidad': item.cantidad,
-      }).toList(),
-      'costo_total': calcularTotal(),
-    };
-  }
+
 }

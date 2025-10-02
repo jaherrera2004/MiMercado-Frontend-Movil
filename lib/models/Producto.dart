@@ -46,9 +46,6 @@ class Producto {
   /// Verifica si el producto está disponible (tiene stock)
   bool get disponible => stock > 0;
 
-  /// Verifica si el producto está agotado
-  bool get agotado => stock <= 0;
-
   /// Método estático para obtener todos los productos desde Firebase
   static Future<List<Producto>> obtenerProductos() async {
     try {
@@ -108,36 +105,6 @@ class Producto {
     }
   }
 
-  /// Método estático para obtener productos disponibles (con stock > 0)
-  static Future<List<Producto>> obtenerProductosDisponibles() async {
-    try {
-      print('📦 Obteniendo productos disponibles desde Firebase...');
-      
-      final firebase = FirebaseFirestore.instance;
-      
-      // Obtener productos con stock mayor a 0
-      final QuerySnapshot querySnapshot = await firebase
-          .collection('productos')
-          .where('stock', isGreaterThan: 0)
-          .get();
-
-      print('📊 Productos disponibles encontrados: ${querySnapshot.docs.length}');
-
-      // Convertir cada documento a un objeto Producto
-      final List<Producto> productos = querySnapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return Producto.fromMap(data, doc.id);
-      }).toList();
-
-      print('✅ Productos disponibles cargados exitosamente');
-      return productos;
-      
-    } catch (e) {
-      print('❌ Error obteniendo productos disponibles: $e');
-      throw Exception('Error al obtener productos disponibles: ${e.toString()}');
-    }
-  }
-
   /// Método estático para obtener un producto por ID
   static Future<Producto?> obtenerProductoPorId(String id) async {
     try {
@@ -161,20 +128,4 @@ class Producto {
       return null;
     }
   }
-
-  @override
-  String toString() {
-    return 'Producto(id: $id, nombre: $nombre, precio: \$${precio.toStringAsFixed(2)}, stock: $stock)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is Producto && other.id == id;
-  }
-
-  @override
-  int get hashCode => id.hashCode;
-
- 
 }
