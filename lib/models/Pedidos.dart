@@ -111,44 +111,8 @@ class Pedido {
   static const String estadoEntregado = 'Entregado';
   static const String estadoCancelado = 'Cancelado';
 
-  /// Verifica si el pedido está activo (no entregado ni cancelado)
-  bool get estaActivo => estado != estadoEntregado && estado != estadoCancelado;
-
-  /// Verifica si el pedido está completado
-  bool get estaCompletado => estado == estadoEntregado;
-
   /// Obtiene el total de productos en el pedido
   int get totalProductos => listaProductos.fold(0, (sum, item) => sum + item.cantidad);
-
-  /// Método estático para obtener todos los pedidos desde Firebase
-  static Future<List<Pedido>> obtenerPedidos() async {
-    try {
-      print('📦 Obteniendo pedidos desde Firebase...');
-      
-      final firebase = FirebaseFirestore.instance;
-      
-      // Obtener todos los documentos de la colección pedidos
-      final QuerySnapshot querySnapshot = await firebase
-          .collection('pedidos')
-          .orderBy('fecha', descending: true)
-          .get();
-
-      print('📊 Total de pedidos encontrados: ${querySnapshot.docs.length}');
-
-      // Convertir cada documento a un objeto Pedido
-      final List<Pedido> pedidos = querySnapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return Pedido.fromMap(data, doc.id);
-      }).toList();
-
-      print('✅ Pedidos cargados exitosamente');
-      return pedidos;
-      
-    } catch (e) {
-      print('❌ Error obteniendo pedidos: $e');
-      throw Exception('Error al obtener pedidos: ${e.toString()}');
-    }
-  }
 
   /// Método estático para obtener pedidos por usuario
   static Future<List<Pedido>> obtenerPedidosPorUsuario() async {
@@ -188,37 +152,6 @@ class Pedido {
     }
   }
 
-  /// Método estático para obtener pedidos por repartidor
-  static Future<List<Pedido>> obtenerPedidosPorRepartidor(String idRepartidor) async {
-    try {
-      print('📦 Obteniendo pedidos del repartidor: $idRepartidor');
-      
-      final firebase = FirebaseFirestore.instance;
-      
-      // Obtener pedidos filtrados por repartidor
-      final QuerySnapshot querySnapshot = await firebase
-          .collection('pedidos')
-          .where('id_repartidor', isEqualTo: idRepartidor)
-          .orderBy('fecha', descending: true)
-          .get();
-
-      print('📊 Pedidos encontrados para el repartidor: ${querySnapshot.docs.length}');
-
-      // Convertir cada documento a un objeto Pedido
-      final List<Pedido> pedidos = querySnapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return Pedido.fromMap(data, doc.id);
-      }).toList();
-
-      print('✅ Pedidos del repartidor cargados exitosamente');
-      return pedidos;
-      
-    } catch (e) {
-      print('❌ Error obteniendo pedidos del repartidor: $e');
-      throw Exception('Error al obtener pedidos del repartidor: ${e.toString()}');
-    }
-  }
-
   /// Método estático para obtener pedidos que están "En Proceso"
   static Future<List<Pedido>> obtenerPedidosEnProceso() async {
     try {
@@ -251,70 +184,6 @@ class Pedido {
       throw Exception('Error al obtener pedidos en proceso: ${e.toString()}');
     }
   }
-
-  /// Método estático para obtener pedidos "En Proceso" para un repartidor específico
-  static Future<List<Pedido>> obtenerPedidosEnProcesoPorRepartidor() async {
-    try {
-      final String? repartidorId = await SharedPreferencesService.getCurrentUserId();
-      if (repartidorId == null) {
-        throw Exception('No se pudo obtener el ID del repartidor');
-      }
-
-      print('🔄 Obteniendo pedidos en proceso del repartidor: $repartidorId');
-      
-      final firebase = FirebaseFirestore.instance;
-      
-      // Obtener pedidos que están en proceso y asignados a este repartidor (sin orderBy)
-      final QuerySnapshot querySnapshot = await firebase
-          .collection('pedidos')
-          .where('estado', isEqualTo: estadoEnProceso)
-          .where('id_repartidor', isEqualTo: repartidorId)
-          .get();
-
-      print('📊 Pedidos en proceso del repartidor encontrados: ${querySnapshot.docs.length}');
-
-      // Convertir cada documento a un objeto Pedido
-      final List<Pedido> pedidos = querySnapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return Pedido.fromMap(data, doc.id);
-      }).toList();
-
-      // Ordenar localmente por fecha ascendente (los más antiguos primero)
-      pedidos.sort((a, b) => a.fecha.compareTo(b.fecha));
-
-      print('✅ Pedidos en proceso del repartidor cargados exitosamente');
-      return pedidos;
-      
-    } catch (e) {
-      print('❌ Error obteniendo pedidos en proceso del repartidor: $e');
-      throw Exception('Error al obtener pedidos en proceso del repartidor: ${e.toString()}');
-    }
-  }
-
-  /// Método estático para contar pedidos en proceso
-  static Future<int> contarPedidosEnProceso() async {
-    try {
-      print('🔢 Contando pedidos en proceso...');
-      
-      final firebase = FirebaseFirestore.instance;
-      
-      final QuerySnapshot querySnapshot = await firebase
-          .collection('pedidos')
-          .where('estado', isEqualTo: estadoEnProceso)
-          .get();
-
-      final int count = querySnapshot.docs.length;
-      print('📊 Total de pedidos en proceso: $count');
-      
-      return count;
-      
-    } catch (e) {
-      print('❌ Error contando pedidos en proceso: $e');
-      throw Exception('Error al contar pedidos en proceso: ${e.toString()}');
-    }
-  }
-
-
 
  
   /// Método para crear un nuevo pedido en Firebase

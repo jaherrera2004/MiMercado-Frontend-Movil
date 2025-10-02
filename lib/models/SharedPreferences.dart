@@ -58,43 +58,6 @@ class SharedPreferencesService {
     }
   }
 
-  /// Obtiene los datos de sesión almacenados
-  static Future<Map<String, String?>> getSessionData() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      
-      return {
-        'id': prefs.getString(_keyId),
-        'nombre': prefs.getString(_keyNombre),
-        'rol': prefs.getString(_keyRol),
-        'pedido_actual': prefs.getString(_keyPedidoActual),
-        'estado_actual': prefs.getString(_keyEstadoActual),
-      };
-    } catch (e) {
-      throw Exception('Error obteniendo datos de sesión: ${e.toString()}');
-    }
-  }
-
-  /// Verifica si hay una sesión activa
-  static Future<bool> hasActiveSession() async {
-    try {
-      final sessionData = await getSessionData();
-      return sessionData['id'] != null && sessionData['rol'] != null;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Obtiene el rol del usuario actual
-  static Future<String?> getCurrentUserRole() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getString(_keyRol);
-    } catch (e) {
-      return null;
-    }
-  }
-
   /// Obtiene el ID del usuario actual
   static Future<String?> getCurrentUserId() async {
     try {

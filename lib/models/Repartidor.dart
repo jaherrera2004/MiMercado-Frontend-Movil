@@ -122,10 +122,15 @@ class Repartidor extends Persona {
     }
   }
 
-  /// Método para cambiar el pedido actual del repartidor
-  /// Permite cambiar entre el ID del pedido tomado y una cadena vacía
-  /// Se usa cuando toma un pedido (asignar ID) o cuando lo entrega/cancela (vaciar)
-  static Future<bool> cambiarPedidoActual(String nuevoPedidoId) async {
+
+
+  /// Método para asignar un pedido al repartidor (tomar pedido)
+  static Future<bool> asignarPedido(String pedidoId) async {
+    if (pedidoId.isEmpty) {
+      print('Error: El ID del pedido no puede estar vacío');
+      return false;
+    }
+    
     try {
       // Obtener el ID del repartidor desde SharedPreferences
       final String? repartidorId = await SharedPreferencesService.getCurrentUserId();
@@ -150,40 +155,60 @@ class Repartidor extends Persona {
 
       // Actualizar el pedido actual en Firebase
       await repartidorRef.update({
-        'pedido_actual': nuevoPedidoId,
+        'pedido_actual': pedidoId,
       });
 
       // Actualizar el pedido actual en SharedPreferences
-      await SharedPreferencesService.updatePedidoActual(nuevoPedidoId);
+      await SharedPreferencesService.updatePedidoActual(pedidoId);
 
-      // Log según si es asignación o liberación
-      if (nuevoPedidoId.isEmpty) {
-        print('Pedido actual del repartidor liberado exitosamente');
-      } else {
-        print('Pedido actual del repartidor actualizado a: $nuevoPedidoId');
-      }
-      
+      print('Pedido actual del repartidor actualizado a: $pedidoId');
       return true;
 
     } catch (e) {
-      print('Error al cambiar el pedido actual del repartidor: $e');
+      print('Error al asignar el pedido al repartidor: $e');
       return false;
     }
-  }
-
-  /// Método para asignar un pedido al repartidor (tomar pedido)
-  static Future<bool> asignarPedido(String pedidoId) async {
-    if (pedidoId.isEmpty) {
-      print('Error: El ID del pedido no puede estar vacío');
-      return false;
-    }
-    
-    return await cambiarPedidoActual(pedidoId);
   }
 
   /// Método para liberar el pedido actual del repartidor (entregar/cancelar)
   static Future<bool> liberarPedidoActual() async {
-    return await cambiarPedidoActual('');
+    try {
+      // Obtener el ID del repartidor desde SharedPreferences
+      final String? repartidorId = await SharedPreferencesService.getCurrentUserId();
+      
+      if (repartidorId == null || repartidorId.isEmpty) {
+        print('Error: No se encontró el ID del repartidor en SharedPreferences');
+        return false;
+      }
+
+      // Referencia a la colección de repartidores en Firestore
+      final FirebaseFirestore firestore = FirebaseFirestore.instance;
+      final DocumentReference repartidorRef = firestore
+          .collection('repartidores')
+          .doc(repartidorId);
+
+      // Verificar que el documento existe
+      final DocumentSnapshot repartidorDoc = await repartidorRef.get();
+      if (!repartidorDoc.exists) {
+        print('Error: No se encontró el repartidor con ID: $repartidorId');
+        return false;
+      }
+
+      // Actualizar el pedido actual en Firebase
+      await repartidorRef.update({
+        'pedido_actual': '',
+      });
+
+      // Actualizar el pedido actual en SharedPreferences
+      await SharedPreferencesService.updatePedidoActual('');
+
+      print('Pedido actual del repartidor liberado exitosamente');
+      return true;
+
+    } catch (e) {
+      print('Error al liberar el pedido actual del repartidor: $e');
+      return false;
+    }
   }
 
   /// Método para obtener el pedido actual del repartidor desde Firebase
@@ -221,16 +246,7 @@ class Repartidor extends Persona {
     }
   }
 
-  /// Método para verificar si el repartidor tiene un pedido activo
-  static Future<bool> tienePedidoActivo() async {
-    try {
-      final String? pedidoActual = await obtenerPedidoActual();
-      return pedidoActual != null && pedidoActual.isNotEmpty;
-    } catch (e) {
-      print('Error verificando si tiene pedido activo: $e');
-      return false;
-    }
-  }
+
 
   /// Método para agregar un pedido al historial del repartidor
   static Future<bool> agregarPedidoAlHistorial(String pedidoId) async {
@@ -342,31 +358,5 @@ class Repartidor extends Persona {
     }
   }
 
-  /// Método para obtener solo los datos básicos del repartidor actual (nombre, email, etc.)
-  static Future<Map<String, dynamic>?> obtenerDatosBasicosRepartidorActual() async {
-    try {
-      final Repartidor? repartidor = await obtenerRepartidorActual();
-      
-      if (repartidor == null) {
-        return null;
-      }
 
-      return {
-        'id': repartidor.id,
-        'nombre': repartidor.nombre,
-        'apellido': repartidor.apellido,
-        'email': repartidor.email,
-        'telefono': repartidor.telefono,
-        'cedula': repartidor.cedula,
-        'estado_actual': repartidor.estadoActual,
-        'nombre_completo': '${repartidor.nombre} ${repartidor.apellido}',
-        'tiene_pedido_activo': repartidor.pedidoActual.isNotEmpty,
-        'total_pedidos_historial': repartidor.historialPedidos.length,
-      };
-
-    } catch (e) {
-      print('Error al obtener datos básicos del repartidor: $e');
-      return null;
-    }
-  }
 }
