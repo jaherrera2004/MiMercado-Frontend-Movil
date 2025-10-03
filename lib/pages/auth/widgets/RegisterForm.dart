@@ -30,7 +30,65 @@ class _RegisterFormState extends State<RegisterForm> {
     super.dispose();
   }
 
+  // Validador para campos requeridos
+  String? _validateRequired(String? value, String fieldName) {
+    if (value == null || value.trim().isEmpty) {
+      return '$fieldName es requerido';
+    }
+    return null;
+  }
+
+  // Validador para email
+  String? _validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'El email es requerido';
+    }
+    
+    // Expresión regular para validar formato de email
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    
+    if (!emailRegex.hasMatch(value.trim())) {
+      return 'Ingresa un email válido';
+    }
+    
+    return null;
+  }
+
+  // Validador para contraseña
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'La contraseña es requerida';
+    }
+    
+    if (value.length < 6) {
+      return 'La contraseña debe tener al menos 6 caracteres';
+    }
+    return null;
+  }
+
+  // Validador para teléfono
+  String? _validatePhone(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'El teléfono es requerido';
+    }
+    
+    // Validar que solo contenga números y tenga entre 8 y 15 dígitos
+    final phoneRegex = RegExp(r'^[0-9]{8,15}$');
+    
+    if (!phoneRegex.hasMatch(value.trim())) {
+      return 'Ingresa un teléfono válido (8-15 dígitos)';
+    }
+    
+    return null;
+  }
+
   void _handleRegister() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     try {
       // Crear objeto Usuario con los datos del formulario
       Usuario nuevoUsuario = Usuario(
@@ -47,11 +105,35 @@ class _RegisterFormState extends State<RegisterForm> {
       // Llamar al método registrarUsuario del modelo
       await nuevoUsuario.registrarUsuario();
       
-      // Mensaje de éxito
-      print('Usuario registrado exitosamente');
+      // Mostrar mensaje de éxito
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('¡Usuario registrado exitosamente!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      
+      // Esperar un momento para que el usuario vea el mensaje
+      await Future.delayed(const Duration(seconds: 2));
+      
+      // Navegar al login
+      if (!mounted) return;
+      Navigator.of(context).pop();
       
     } catch (e) {
-      print('Error: ${e.toString()}');
+      // Mostrar mensaje de error
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al registrar usuario: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
   }
 
@@ -76,6 +158,7 @@ class _RegisterFormState extends State<RegisterForm> {
               hint: "Ingresar Nombre",
               primaryColor: primaryColor,
               controller: _nombreController,
+              validator: (value) => _validateRequired(value, 'El nombre'),
             ),
             const SizedBox(height: 15),
             
@@ -84,6 +167,7 @@ class _RegisterFormState extends State<RegisterForm> {
               hint: "Ingresar Apellido",
               primaryColor: primaryColor,
               controller: _apellidoController,
+              validator: (value) => _validateRequired(value, 'El apellido'),
             ),
             const SizedBox(height: 15),
             
@@ -93,6 +177,7 @@ class _RegisterFormState extends State<RegisterForm> {
               primaryColor: primaryColor,
               keyboardType: TextInputType.phone,
               controller: _telefonoController,
+              validator: _validatePhone,
             ),
             const SizedBox(height: 15),
             
@@ -102,6 +187,7 @@ class _RegisterFormState extends State<RegisterForm> {
               primaryColor: primaryColor,
               keyboardType: TextInputType.emailAddress,
               controller: _emailController,
+              validator: _validateEmail,
             ),
             const SizedBox(height: 15),
             
@@ -111,6 +197,7 @@ class _RegisterFormState extends State<RegisterForm> {
               primaryColor: primaryColor,
               obscureText: true,
               controller: _passwordController,
+              validator: _validatePassword,
             ),
 
             const SizedBox(height: 50),
