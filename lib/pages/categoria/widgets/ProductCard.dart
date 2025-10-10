@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductCard extends StatelessWidget {
   final Map<String, dynamic> producto;
@@ -33,10 +34,7 @@ class ProductCard extends StatelessWidget {
               alignment: Alignment.topRight,
               children: [
                 Center(
-                  child: Image.asset(
-                    producto["img"],
-                    height: 80,
-                  ),
+                  child: _ProductImage(imagePath: producto["img"] as String),
                 ),
                 IconButton(
                   onPressed: onAddToCart,
@@ -77,6 +75,67 @@ class ProductCard extends StatelessWidget {
           const SizedBox(height: 8),
         ],
       ),
+    );
+  }
+}
+
+class _ProductImage extends StatelessWidget {
+  final String imagePath;
+  const _ProductImage({required this.imagePath});
+
+  bool get _isNetwork => imagePath.startsWith('http://') || imagePath.startsWith('https://');
+
+  @override
+  Widget build(BuildContext context) {
+    // Debug prints to diagnose why the image isn't loading
+    print('[ProductCard] _ProductImage.build -> imagePath: "' + imagePath + '"');
+    if (imagePath.isEmpty) {
+      print('[ProductCard] Warning: imagePath is empty. Showing fallback asset.');
+      return Image.asset(
+        'lib/resources/temp/image.png',
+        height: 80,
+        fit: BoxFit.contain,
+      );
+    }
+
+    if (_isNetwork) {
+      print('[ProductCard] Detected network image. URL: ' + imagePath);
+      return CachedNetworkImage(
+        imageUrl: imagePath,
+        height: 80,
+        fit: BoxFit.contain,
+        placeholder: (context, url) {
+          print('[ProductCard] Loading network image... URL: ' + url);
+          return const SizedBox(
+            height: 80,
+            width: 80,
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          );
+        },
+        imageBuilder: (context, imageProvider) {
+          print('[ProductCard] Network image loaded successfully: ' + imagePath);
+          return Image(
+            image: imageProvider,
+            height: 80,
+            fit: BoxFit.contain,
+          );
+        },
+        errorWidget: (context, url, error) {
+          print('[ProductCard] ERROR loading network image. URL: ' + url + ' | Error: ' + error.toString());
+          return Image.asset(
+            'lib/resources/temp/image.png',
+            height: 80,
+            fit: BoxFit.contain,
+          );
+        },
+      );
+    }
+
+    print('[ProductCard] Loading asset image. Path: ' + imagePath);
+    return Image.asset(
+      imagePath,
+      height: 80,
+      fit: BoxFit.contain,
     );
   }
 }

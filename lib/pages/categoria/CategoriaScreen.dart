@@ -16,9 +16,11 @@ class CategoriaScreen extends StatefulWidget {
 class _CategoriaScreenState extends State<CategoriaScreen> {
   final FirebaseFirestore firebase = FirebaseFirestore.instance;
   List<Producto> productos = [];
+  List<Producto> _productosFiltrados = [];
   bool isLoading = true;
   String categoriaId = '';
   String categoriaNombre = 'Categoría';
+  String _searchQuery = '';
 
   @override
   void didChangeDependencies() {
@@ -62,6 +64,7 @@ class _CategoriaScreenState extends State<CategoriaScreen> {
         productos = productosFirebase;
         isLoading = false;
       });
+      _aplicarFiltro();
 
     } catch (e) {
       print('❌ Error cargando productos de categoría: $e');
@@ -69,7 +72,27 @@ class _CategoriaScreenState extends State<CategoriaScreen> {
         isLoading = false;
         productos = [];
       });
+      _aplicarFiltro();
     }
+  }
+
+  void _aplicarFiltro() {
+    final query = _searchQuery.trim().toLowerCase();
+    if (query.isEmpty) {
+      setState(() {
+        _productosFiltrados = List<Producto>.from(productos);
+      });
+      return;
+    }
+
+    final filtrados = productos.where((p) {
+      final nombre = p.nombre.toLowerCase();
+      return nombre.contains(query);
+    }).toList();
+
+    setState(() {
+      _productosFiltrados = filtrados;
+    });
   }
 
   @override
@@ -113,7 +136,8 @@ class _CategoriaScreenState extends State<CategoriaScreen> {
               // Barra de búsqueda
               CategoriaSearchBar(
                 onChanged: (value) {
-                  // Lógica de búsqueda
+                  _searchQuery = value;
+                  _aplicarFiltro();
                 },
               ),
               const SizedBox(height: 15),
@@ -161,7 +185,10 @@ class _CategoriaScreenState extends State<CategoriaScreen> {
                 )
               else
                 ProductGrid(
-                  productos: productos.map((producto) => {
+                  productos: (_productosFiltrados.isEmpty && _searchQuery.isEmpty
+                          ? productos
+                          : _productosFiltrados)
+                      .map((producto) => {
                     'id': producto.id, // Agregar el ID del producto
                     'nombre': producto.nombre,
                     'precio': '\$${producto.precio.toStringAsFixed(0)}',

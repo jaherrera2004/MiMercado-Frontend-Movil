@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class CarritoItem extends StatelessWidget {
   final Map<String, dynamic> producto;
@@ -151,19 +152,22 @@ class CarritoItem extends StatelessWidget {
   Widget _buildImage(String imageUrl) {
     // Check if it's a network URL
     if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-      return Image.network(
-        imageUrl,
+      return CachedNetworkImage(
+        imageUrl: imageUrl,
         width: 40,
         height: 40,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Image.asset(
-            'lib/resources/temp/image.png',
-            width: 40,
-            height: 40,
-            fit: BoxFit.cover,
-          );
-        },
+        placeholder: (context, url) => const SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+        errorWidget: (context, url, error) => Image.asset(
+          'lib/resources/temp/image.png',
+          width: 40,
+          height: 40,
+          fit: BoxFit.cover,
+        ),
       );
     } else {
       // It's a local asset

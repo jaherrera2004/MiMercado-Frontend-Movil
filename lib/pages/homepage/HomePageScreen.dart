@@ -19,6 +19,9 @@ class _HomePageState extends State<HomePage> {
   final FirebaseFirestore firebase = FirebaseFirestore.instance;
   List<Categoria> categorias = [];
   List<Producto> productos = [];
+  // Estado para búsqueda
+  String _searchQuery = '';
+  List<Producto> _productosFiltrados = [];
 
   @override
   void initState() {
@@ -61,6 +64,8 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         productos = productosFirebase;
       });
+      // Reaplicar filtro vigente (si hay) con los datos nuevos
+      _aplicarFiltro();
       
     } catch (e) {
       print('Error cargando productos: $e');
@@ -68,7 +73,27 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         productos = [];
       });
+      _aplicarFiltro();
     }
+  }
+
+  void _aplicarFiltro() {
+    final query = _searchQuery.trim().toLowerCase();
+    if (query.isEmpty) {
+      setState(() {
+        _productosFiltrados = List<Producto>.from(productos);
+      });
+      return;
+    }
+
+    final filtrados = productos.where((p) {
+      final nombre = p.nombre.toLowerCase();
+      return nombre.contains(query);
+    }).toList();
+
+    setState(() {
+      _productosFiltrados = filtrados;
+    });
   }
 
   @override
@@ -86,7 +111,8 @@ class _HomePageState extends State<HomePage> {
               // Barra de búsqueda
               CategoriaSearchBar(
                 onChanged: (value) {
-                  // Lógica de búsqueda en home
+                  _searchQuery = value;
+                  _aplicarFiltro();
                 },
               ),
               const SizedBox(height: 15),
@@ -133,7 +159,10 @@ class _HomePageState extends State<HomePage> {
 
               // Grid de productos
               ProductGrid(
-                productos: productos.map((producto) => {
+                productos: (_productosFiltrados.isEmpty && _searchQuery.isEmpty
+                        ? productos
+                        : _productosFiltrados)
+                    .map((producto) => {
                   'id': producto.id, // Agregar el ID del producto
                   'nombre': producto.nombre,
                   'precio': '\$${producto.precio.toStringAsFixed(0)}',
