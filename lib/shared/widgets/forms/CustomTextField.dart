@@ -11,6 +11,7 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final Widget? suffixIcon;
+  final Widget? prefixIcon;
   final bool enabled;
   final int maxLines;
   final double borderRadius;
@@ -25,6 +26,7 @@ class CustomTextField extends StatelessWidget {
     this.controller,
     this.validator,
     this.suffixIcon,
+    this.prefixIcon,
     this.enabled = true,
     this.maxLines = 1,
     this.borderRadius = 8,
@@ -59,6 +61,7 @@ class CustomTextField extends StatelessWidget {
               color: Colors.grey.shade500,
             ),
             suffixIcon: suffixIcon,
+            prefixIcon: prefixIcon,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
             border: OutlineInputBorder(

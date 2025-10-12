@@ -19,6 +19,7 @@ class _RegisterFormState extends State<RegisterForm> {
   final _telefonoController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -158,6 +159,7 @@ class _RegisterFormState extends State<RegisterForm> {
               hint: "Ingresar Nombre",
               primaryColor: primaryColor,
               controller: _nombreController,
+              prefixIcon: const Icon(Icons.person),
               validator: (value) => _validateRequired(value, 'El nombre'),
             ),
             const SizedBox(height: 15),
@@ -167,6 +169,7 @@ class _RegisterFormState extends State<RegisterForm> {
               hint: "Ingresar Apellido",
               primaryColor: primaryColor,
               controller: _apellidoController,
+              prefixIcon: const Icon(Icons.person_outline),
               validator: (value) => _validateRequired(value, 'El apellido'),
             ),
             const SizedBox(height: 15),
@@ -177,6 +180,7 @@ class _RegisterFormState extends State<RegisterForm> {
               primaryColor: primaryColor,
               keyboardType: TextInputType.phone,
               controller: _telefonoController,
+              prefixIcon: const Icon(Icons.phone),
               validator: _validatePhone,
             ),
             const SizedBox(height: 15),
@@ -187,6 +191,7 @@ class _RegisterFormState extends State<RegisterForm> {
               primaryColor: primaryColor,
               keyboardType: TextInputType.emailAddress,
               controller: _emailController,
+              prefixIcon: const Icon(Icons.email),
               validator: _validateEmail,
             ),
             const SizedBox(height: 15),
@@ -195,8 +200,19 @@ class _RegisterFormState extends State<RegisterForm> {
               label: "Contraseña",
               hint: "Ingresar Contraseña",
               primaryColor: primaryColor,
-              obscureText: true,
+              obscureText: _obscurePassword,
               controller: _passwordController,
+              prefixIcon: const Icon(Icons.lock),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              ),
               validator: _validatePassword,
             ),
 
