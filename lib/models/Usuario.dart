@@ -27,6 +27,25 @@ class Usuario extends Persona {
   Future<void> registrarUsuario() async {
     try {
       final firebase = FirebaseFirestore.instance;
+      // Validar que email y teléfono no estén ya registrados en 'usuarios' o 'repartidores'
+      if (email != null && email!.trim().isNotEmpty) {
+        final emailQueryUsuarios = await firebase.collection('usuarios').where('email', isEqualTo: email!.trim().toLowerCase()).get();
+        final emailQueryRepartidores = await firebase.collection('repartidores').where('email', isEqualTo: email!.trim().toLowerCase()).get();
+
+        if (emailQueryUsuarios.docs.isNotEmpty || emailQueryRepartidores.docs.isNotEmpty) {
+          throw Exception('El email proporcionado ya está registrado');
+        }
+      }
+
+      if (telefono != null && telefono!.trim().isNotEmpty) {
+        final telefonoQueryUsuarios = await firebase.collection('usuarios').where('telefono', isEqualTo: telefono!.trim()).get();
+        final telefonoQueryRepartidores = await firebase.collection('repartidores').where('telefono', isEqualTo: telefono!.trim()).get();
+
+        if (telefonoQueryUsuarios.docs.isNotEmpty || telefonoQueryRepartidores.docs.isNotEmpty) {
+          throw Exception('El teléfono proporcionado ya está registrado');
+        }
+      }
+
       await firebase.collection(firebaseCollection).doc().set({
         'nombre': nombre ,
         'apellido': apellido,
@@ -53,7 +72,7 @@ class Usuario extends Persona {
         throw Exception('No hay usuario autenticado');
       }
 
-      print('🔍 Obteniendo direcciones para usuario ID desde SharedPreferences: $currentUserId');
+  // obteniendo direcciones para usuario
       
       final firebase = FirebaseFirestore.instance;
       
@@ -64,16 +83,13 @@ class Usuario extends Persona {
           .get();
 
       if (!userDoc.exists) {
-        print('❌ Usuario no encontrado con ID: $currentUserId');
         throw Exception('Usuario no encontrado');
       }
 
       final userData = userDoc.data() as Map<String, dynamic>;
-      print('✅ Usuario encontrado: ${userData['nombre'] ?? 'Sin nombre'}');
 
       // Obtener las direcciones del array
       final List<dynamic> direccionesData = userData['direcciones'] ?? [];
-      print('📍 Direcciones encontradas: ${direccionesData.length}');
 
       // Convertir a List<Map<String, dynamic>> y agregar índices como ID
       final List<Map<String, dynamic>> direccionesProcesadas = [];
@@ -90,14 +106,13 @@ class Usuario extends Persona {
           'principal': direccionData['principal'] ?? false,
         };
 
-        direccionesProcesadas.add(direccionProcesada);
-        print('✅ Dirección procesada: ${direccionProcesada['nombre']} - ${direccionProcesada['direccion']}');
+  direccionesProcesadas.add(direccionProcesada);
       }
 
       return direccionesProcesadas;
       
     } catch (e) {
-      print('❌ Error obteniendo direcciones: $e');
+      print('Error obteniendo direcciones: $e');
       throw Exception('Error al obtener direcciones: ${e.toString()}');
     }
   }
@@ -112,7 +127,7 @@ class Usuario extends Persona {
     bool esPrincipal = false,
   }) async {
     try {
-      print('💾 Agregando nueva dirección para el usuario actual...');
+  // agregando nueva dirección
       
       // Obtener el ID del usuario actual desde SharedPreferences
       final String? currentUserId = await SharedPreferencesService.getCurrentUserId();
@@ -121,7 +136,7 @@ class Usuario extends Persona {
         throw Exception('No hay usuario autenticado');
       }
 
-      print('🔍 Usuario ID: $currentUserId');
+  // usuario id obtenido
       
       final firebase = FirebaseFirestore.instance;
       
@@ -130,7 +145,6 @@ class Usuario extends Persona {
       final DocumentSnapshot userData = await userDoc.get();
 
       if (!userData.exists) {
-        print('❌ Usuario no encontrado con ID: $currentUserId');
         throw Exception('Usuario no encontrado');
       }
 
@@ -138,14 +152,14 @@ class Usuario extends Persona {
       final Map<String, dynamic> currentData = userData.data() as Map<String, dynamic>;
       List<dynamic> direccionesActuales = List.from(currentData['direcciones'] ?? []);
 
-      print('📍 Direcciones actuales: ${direccionesActuales.length}');
+  // direcciones actuales obtenidas
 
       // Si la nueva dirección es principal, marcar las demás como no principales
       if (esPrincipal) {
         for (int i = 0; i < direccionesActuales.length; i++) {
           direccionesActuales[i]['principal'] = false;
         }
-        print('🏠 Marcando nueva dirección como principal y quitando principal a las demás');
+  // marcando nueva direccion como principal
       }
 
       // Crear el mapa de la nueva dirección
@@ -164,11 +178,10 @@ class Usuario extends Persona {
         'direcciones': direccionesActuales,
       });
 
-      print('✅ Dirección "$nombre" agregada exitosamente');
-      print('📊 Total de direcciones: ${direccionesActuales.length}');
+  // dirección agregada con éxito
       
     } catch (e) {
-      print('❌ Error agregando dirección: $e');
+      print('Error agregando dirección: $e');
       throw Exception('Error al agregar dirección: ${e.toString()}');
     }
   }
@@ -182,7 +195,7 @@ class Usuario extends Persona {
     bool esPrincipal = false,
   }) async {
     try {
-      print('✏️ Editando dirección para el usuario actual...');
+  // editando direccion
       
       // Obtener el ID del usuario actual desde SharedPreferences
       final String? currentUserId = await SharedPreferencesService.getCurrentUserId();
@@ -191,8 +204,7 @@ class Usuario extends Persona {
         throw Exception('No hay usuario autenticado');
       }
 
-      print('🔍 Usuario ID: $currentUserId');
-      print('📝 Editando dirección ID: $direccionId');
+  // usuario id y direccion a editar obtenidos
       
       final firebase = FirebaseFirestore.instance;
       
@@ -201,7 +213,6 @@ class Usuario extends Persona {
       final DocumentSnapshot userData = await userDoc.get();
 
       if (!userData.exists) {
-        print('❌ Usuario no encontrado con ID: $currentUserId');
         throw Exception('Usuario no encontrado');
       }
 
@@ -209,15 +220,14 @@ class Usuario extends Persona {
       final Map<String, dynamic> currentData = userData.data() as Map<String, dynamic>;
       List<dynamic> direccionesActuales = List.from(currentData['direcciones'] ?? []);
 
-      print('📍 Direcciones actuales: ${direccionesActuales.length}');
+  // direcciones actuales obtenidas
 
       // Encontrar el índice de la dirección a editar
       int indexToEdit = -1;
       final direccionIndex = int.tryParse(direccionId) ?? -1;
       
       if (direccionIndex >= 0 && direccionIndex < direccionesActuales.length) {
-        indexToEdit = direccionIndex;
-        print('🎯 Dirección encontrada en índice: $indexToEdit');
+  indexToEdit = direccionIndex;
       } else {
         throw Exception('Índice de dirección inválido: $direccionId');
       }
@@ -229,7 +239,7 @@ class Usuario extends Persona {
             direccionesActuales[i]['principal'] = false;
           }
         }
-        print('🏠 Marcando dirección como principal y quitando principal a las demás');
+  // marcando direccion como principal
       }
 
       // Crear el mapa de la dirección actualizada
@@ -248,11 +258,10 @@ class Usuario extends Persona {
         'direcciones': direccionesActuales,
       });
 
-      print('✅ Dirección "$nombre" editada exitosamente');
-      print('📊 Total de direcciones: ${direccionesActuales.length}');
+  // dirección editada con éxito
       
     } catch (e) {
-      print('❌ Error editando dirección: $e');
+      print('Error editando dirección: $e');
       throw Exception('Error al editar dirección: ${e.toString()}');
     }
   }
@@ -262,7 +271,7 @@ class Usuario extends Persona {
     required String direccionId,
   }) async {
     try {
-      print('🗑️ Eliminando dirección para el usuario actual...');
+  // eliminando direccion
       
       // Obtener el ID del usuario actual desde SharedPreferences
       final String? currentUserId = await SharedPreferencesService.getCurrentUserId();
@@ -271,8 +280,7 @@ class Usuario extends Persona {
         throw Exception('No hay usuario autenticado');
       }
 
-      print('🔍 Usuario ID: $currentUserId');
-      print('🗑️ Eliminando dirección ID: $direccionId');
+  // usuario id y direccion a eliminar obtenidos
       
       final firebase = FirebaseFirestore.instance;
       
@@ -281,7 +289,6 @@ class Usuario extends Persona {
       final DocumentSnapshot userData = await userDoc.get();
 
       if (!userData.exists) {
-        print('❌ Usuario no encontrado con ID: $currentUserId');
         throw Exception('Usuario no encontrado');
       }
 
@@ -289,36 +296,30 @@ class Usuario extends Persona {
       final Map<String, dynamic> currentData = userData.data() as Map<String, dynamic>;
       List<dynamic> direccionesActuales = List.from(currentData['direcciones'] ?? []);
 
-      print('📍 Direcciones actuales: ${direccionesActuales.length}');
+  // direcciones actuales obtenidas
 
       // Encontrar el índice de la dirección a eliminar
       int indexToRemove = -1;
       final direccionIndex = int.tryParse(direccionId) ?? -1;
       
       if (direccionIndex >= 0 && direccionIndex < direccionesActuales.length) {
-        indexToRemove = direccionIndex;
-        print('🎯 Dirección encontrada en índice: $indexToRemove');
+  indexToRemove = direccionIndex;
       } else {
         throw Exception('Índice de dirección inválido: $direccionId');
       }
 
-      // Guardar el nombre de la dirección antes de eliminarla para el log
-      final direccionAEliminar = direccionesActuales[indexToRemove];
-      final nombreDireccion = direccionAEliminar['nombre'] ?? 'Sin nombre';
-
-      // Eliminar la dirección del array
-      direccionesActuales.removeAt(indexToRemove);
+  // Eliminar la dirección del array
+  direccionesActuales.removeAt(indexToRemove);
 
       // Actualizar en Firebase
       await userDoc.update({
         'direcciones': direccionesActuales,
       });
 
-      print('✅ Dirección "$nombreDireccion" eliminada exitosamente');
-      print('📊 Total de direcciones restantes: ${direccionesActuales.length}');
+  // dirección eliminada con éxito
       
     } catch (e) {
-      print('❌ Error eliminando dirección: $e');
+      print('Error eliminando dirección: $e');
       throw Exception('Error al eliminar dirección: ${e.toString()}');
     }
   }
@@ -334,7 +335,7 @@ class Usuario extends Persona {
         throw Exception('No hay usuario autenticado');
       }
 
-      print('🔍 Obteniendo datos básicos del usuario ID: $currentUserId');
+  // obteniendo datos basicos del usuario
       
       final firebase = FirebaseFirestore.instance;
       
@@ -345,7 +346,6 @@ class Usuario extends Persona {
           .get();
 
       if (!userDoc.exists) {
-        print('❌ Usuario no encontrado con ID: $currentUserId');
         return null;
       }
 
@@ -360,11 +360,10 @@ class Usuario extends Persona {
         'telefono': userData['telefono'] ?? '',
       };
 
-      print('✅ Datos básicos obtenidos: ${datosBasicos['nombre']} ${datosBasicos['apellido']}');
       return datosBasicos;
       
     } catch (e) {
-      print('❌ Error obteniendo datos básicos del usuario: $e');
+      print('Error obteniendo datos básicos del usuario: $e');
       throw Exception('Error al obtener datos básicos del usuario: ${e.toString()}');
     }
   }
@@ -384,7 +383,6 @@ class Usuario extends Persona {
           .get();
 
       if (!userDoc.exists) {
-        print('⚠️ Usuario no encontrado con ID: $usuarioId');
         return null;
       }
 
@@ -394,7 +392,6 @@ class Usuario extends Persona {
       final String nombreCompleto = (nombre + ' ' + apellido).trim();
 
       if (nombreCompleto.isEmpty) {
-        print('ℹ️ Usuario $usuarioId no tiene nombre/apellido definidos');
         return null;
       }
 
@@ -413,7 +410,7 @@ class Usuario extends Persona {
     required String email,
   }) async {
     try {
-      print('✏️ Actualizando datos del usuario...');
+  // actualizando datos del usuario
       
       // Obtener el ID del usuario actual desde SharedPreferences
       final String? currentUserId = await SharedPreferencesService.getCurrentUserId();
@@ -422,7 +419,7 @@ class Usuario extends Persona {
         throw Exception('No hay usuario autenticado');
       }
 
-      print('🔍 Usuario ID: $currentUserId');
+  // usuario id obtenido
       
       final firebase = FirebaseFirestore.instance;
       
@@ -431,7 +428,6 @@ class Usuario extends Persona {
       final DocumentSnapshot userData = await userDoc.get();
 
       if (!userData.exists) {
-        print('❌ Usuario no encontrado con ID: $currentUserId');
         throw Exception('Usuario no encontrado');
       }
 
@@ -463,11 +459,10 @@ class Usuario extends Persona {
       // Actualizar el nombre en SharedPreferences también
       await SharedPreferencesService.updateUserName(nombre.trim());
 
-      print('✅ Datos del usuario actualizados exitosamente');
-      print('📊 Nuevos datos: $nombre $apellido - $email');
+  // datos actualizados exitosamente
       
     } catch (e) {
-      print('❌ Error actualizando datos del usuario: $e');
+      print('Error actualizando datos del usuario: $e');
       throw Exception('Error al actualizar datos del usuario: ${e.toString()}');
     }
   }
@@ -478,7 +473,7 @@ class Usuario extends Persona {
     required String contrasenaNueva,
   }) async {
     try {
-      print('🔐 Iniciando proceso de cambio de contraseña...');
+  // iniciando cambio de contraseña
       
       // Obtener el ID del usuario actual desde SharedPreferences
       final String? currentUserId = await SharedPreferencesService.getCurrentUserId();
@@ -487,7 +482,7 @@ class Usuario extends Persona {
         throw Exception('No hay usuario autenticado');
       }
 
-      print('🔍 Usuario ID: $currentUserId');
+  // usuario id obtenido
       
       final firebase = FirebaseFirestore.instance;
       
@@ -496,7 +491,6 @@ class Usuario extends Persona {
       final DocumentSnapshot userData = await userDoc.get();
 
       if (!userData.exists) {
-        print('❌ Usuario no encontrado con ID: $currentUserId');
         throw Exception('Usuario no encontrado');
       }
 
@@ -514,7 +508,7 @@ class Usuario extends Persona {
 
       // Verificar que la contraseña actual sea correcta
       if (passwordGuardada != contrasenaActual.trim()) {
-        print('❌ Contraseña actual incorrecta');
+  // contraseña incorrecta
         throw Exception('La contraseña actual es incorrecta');
       }
 
@@ -528,17 +522,17 @@ class Usuario extends Persona {
         throw Exception('La nueva contraseña debe ser diferente a la actual');
       }
 
-      print('✅ Validaciones de contraseña completadas');
+  // validaciones completadas
 
       // Actualizar la contraseña en Firebase
       await userDoc.update({
         'password': contrasenaNueva.trim(),
       });
 
-      print('✅ Contraseña actualizada exitosamente');
+  // contraseña actualizada con éxito
       
     } catch (e) {
-      print('❌ Error cambiando contraseña: $e');
+      print('Error cambiando contraseña: $e');
       throw Exception('Error al cambiar contraseña: ${e.toString()}');
     }
   }

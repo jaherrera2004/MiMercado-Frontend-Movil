@@ -87,22 +87,11 @@ abstract class Persona {
   /// Método estático para cerrar sesión del usuario actual
   static Future<void> cerrarSesion() async {
     try {
-      print('🚪 Cerrando sesión del usuario...');
-      
-      // Obtener el ID del usuario actual para logging
-      final String? currentUserId = await SharedPreferencesService.getCurrentUserId();
-      
-      if (currentUserId != null && currentUserId.isNotEmpty) {
-        print('👤 Cerrando sesión del usuario ID: $currentUserId');
-      }
-      
-      // Limpiar todos los datos de sesión en SharedPreferences
-      await SharedPreferencesService.clearSessionData();
-      
-      print('✅ Sesión cerrada exitosamente');
-      print('🧹 Datos de sesión eliminados de SharedPreferences');
+  // Limpiar todos los datos de sesión en SharedPreferences
+  await SharedPreferencesService.clearSessionData();
       
     } catch (e) {
+      // Mantener print de error para depuración en caso de fallo al cerrar sesión
       print('❌ Error cerrando sesión: $e');
       throw Exception('Error al cerrar sesión: ${e.toString()}');
     }
