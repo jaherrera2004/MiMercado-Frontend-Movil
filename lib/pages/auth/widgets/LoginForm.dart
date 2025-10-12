@@ -25,6 +25,7 @@ class _LoginFormState extends State<LoginForm> {
   final firebase = FirebaseFirestore.instance;
   
   bool _isLoading = false;
+  bool _obscurePassword = true;
   UserType _selectedUserType = UserType.usuario;
 
   // Validación de email
@@ -208,6 +209,7 @@ class _LoginFormState extends State<LoginForm> {
               hint: "Ingresar Email",
               primaryColor: primaryColor,
               keyboardType: TextInputType.emailAddress,
+              prefixIcon: const Icon(Icons.email),
               controller: _emailController,
               validator: _validateEmail,
             ),
@@ -219,8 +221,19 @@ class _LoginFormState extends State<LoginForm> {
               label: "Contraseña",
               hint: "Ingresar Contraseña",
               primaryColor: primaryColor,
-              obscureText: true,
+              obscureText: _obscurePassword,
               controller: _passwordController,
+              prefixIcon: const Icon(Icons.lock),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              ),
               validator: _validatePassword,
             ),
             
