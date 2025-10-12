@@ -127,10 +127,15 @@ class _RegisterFormState extends State<RegisterForm> {
     } catch (e) {
       // Mostrar mensaje de error
       if (!mounted) return;
-      
+      // Limpiar el mensaje de excepción para no mostrar el prefijo "Exception:" u otras envolturas
+      String raw = e.toString();
+      // Eliminar prefijos comunes
+      String cleaned = raw.replaceFirst(RegExp(r'^Exception:\s*'), '');
+      cleaned = cleaned.replaceFirst(RegExp(r'^Exception\s*'), '');
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al registrar usuario: ${e.toString()}'),
+          content: Text('Error al registrar usuario: $cleaned'),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 3),
         ),

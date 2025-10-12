@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mi_mercado/models/SharedPreferences.dart';
 
-class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
+class HomeAppBar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? onCartPressed;
 
   const HomeAppBar({
@@ -10,21 +11,50 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
+  State<HomeAppBar> createState() => _HomeAppBarState();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class _HomeAppBarState extends State<HomeAppBar> {
+  String? _userName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    try {
+      final name = await SharedPreferencesService.getCurrentUserName();
+      if (!mounted) return;
+      setState(() {
+        _userName = name;
+      });
+    } catch (e) {
+      // Ignore errors, keep null
+      print('Error loading user name: ${e.toString()}');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final displayName = (_userName != null && _userName!.trim().isNotEmpty)
+        ? _userName!.trim().split(' ').first
+        : 'Usuario';
+
     return AppBar(
       automaticallyImplyLeading: false,
       elevation: 0,
       backgroundColor: Colors.white,
       title: Row(
         children: [
-          Image.asset(
-            'lib/resources/address_icon.png',
-            height: 40,
-            width: 40,
-          ),
+          const SizedBox(width: 4),
           const SizedBox(width: 10),
           Text(
-            "Dirección",
+            'Bienvenido, $displayName',
             style: GoogleFonts.inter(
               color: Colors.black,
               fontWeight: FontWeight.bold,
@@ -40,14 +70,11 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             height: 40,
             width: 40,
           ),
-          onPressed: onCartPressed ?? () {
+          onPressed: widget.onCartPressed ?? () {
             Navigator.pushNamed(context, '/carrito');
           },
         ),
       ],
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

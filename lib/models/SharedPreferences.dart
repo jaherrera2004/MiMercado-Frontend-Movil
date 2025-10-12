@@ -50,9 +50,10 @@ class SharedPreferencesService {
       await prefs.setString(_keyPedidoActual, pedidoActual ?? '');
       await prefs.setString(_keyEstadoActual, estadoActual ?? '');
       
-      print('Datos de repartidor guardados: ID=$id, Nombre=$nombre, PedidoActual=${pedidoActual ?? "vacío"}, EstadoActual=${estadoActual ?? "vacío"}');
+  // Datos guardados en SharedPreferences (silencioso en producción)
       
     } catch (e) {
+      // Mantener print de error para facilitar debugging local
       print('Error detallado en saveRepartidorSessionData: $e');
       throw Exception('Error guardando datos de sesión del repartidor: ${e.toString()}');
     }

@@ -53,7 +53,6 @@ class Repartidor extends Persona {
       final String? repartidorId = await SharedPreferencesService.getCurrentUserId();
       
       if (repartidorId == null || repartidorId.isEmpty) {
-        print('Error: No se encontró el ID del repartidor en SharedPreferences');
         return false;
       }
 
@@ -66,7 +65,6 @@ class Repartidor extends Persona {
       // Verificar que el documento existe
       final DocumentSnapshot repartidorDoc = await repartidorRef.get();
       if (!repartidorDoc.exists) {
-        print('Error: No se encontró el repartidor con ID: $repartidorId');
         return false;
       }
 
@@ -78,7 +76,7 @@ class Repartidor extends Persona {
       // Actualizar el estado en SharedPreferences
       await SharedPreferencesService.updateEstadoActual(nuevoEstado.displayName);
 
-      print('Estado del repartidor actualizado exitosamente a: ${nuevoEstado.displayName}');
+  // estado actualizado exitosamente
       return true;
 
     } catch (e) {
@@ -94,7 +92,6 @@ class Repartidor extends Persona {
       final String? repartidorId = await SharedPreferencesService.getCurrentUserId();
       
       if (repartidorId == null || repartidorId.isEmpty) {
-        print('Error: No se encontró el ID del repartidor en SharedPreferences');
         return null;
       }
 
@@ -106,7 +103,6 @@ class Repartidor extends Persona {
           .get();
 
       if (!repartidorDoc.exists) {
-        print('Error: No se encontró el repartidor con ID: $repartidorId');
         return null;
       }
 
@@ -127,7 +123,6 @@ class Repartidor extends Persona {
   /// Método para asignar un pedido al repartidor (tomar pedido)
   static Future<bool> asignarPedido(String pedidoId) async {
     if (pedidoId.isEmpty) {
-      print('Error: El ID del pedido no puede estar vacío');
       return false;
     }
     
@@ -136,7 +131,6 @@ class Repartidor extends Persona {
       final String? repartidorId = await SharedPreferencesService.getCurrentUserId();
       
       if (repartidorId == null || repartidorId.isEmpty) {
-        print('Error: No se encontró el ID del repartidor en SharedPreferences');
         return false;
       }
 
@@ -149,7 +143,6 @@ class Repartidor extends Persona {
       // Verificar que el documento existe
       final DocumentSnapshot repartidorDoc = await repartidorRef.get();
       if (!repartidorDoc.exists) {
-        print('Error: No se encontró el repartidor con ID: $repartidorId');
         return false;
       }
 
@@ -161,7 +154,7 @@ class Repartidor extends Persona {
       // Actualizar el pedido actual en SharedPreferences
       await SharedPreferencesService.updatePedidoActual(pedidoId);
 
-      print('Pedido actual del repartidor actualizado a: $pedidoId');
+  // pedido asignado
       return true;
 
     } catch (e) {
@@ -177,7 +170,6 @@ class Repartidor extends Persona {
       final String? repartidorId = await SharedPreferencesService.getCurrentUserId();
       
       if (repartidorId == null || repartidorId.isEmpty) {
-        print('Error: No se encontró el ID del repartidor en SharedPreferences');
         return false;
       }
 
@@ -190,7 +182,6 @@ class Repartidor extends Persona {
       // Verificar que el documento existe
       final DocumentSnapshot repartidorDoc = await repartidorRef.get();
       if (!repartidorDoc.exists) {
-        print('Error: No se encontró el repartidor con ID: $repartidorId');
         return false;
       }
 
@@ -202,7 +193,7 @@ class Repartidor extends Persona {
       // Actualizar el pedido actual en SharedPreferences
       await SharedPreferencesService.updatePedidoActual('');
 
-      print('Pedido actual del repartidor liberado exitosamente');
+  // pedido liberado
       return true;
 
     } catch (e) {
@@ -218,7 +209,6 @@ class Repartidor extends Persona {
       final String? repartidorId = await SharedPreferencesService.getCurrentUserId();
       
       if (repartidorId == null || repartidorId.isEmpty) {
-        print('Error: No se encontró el ID del repartidor en SharedPreferences');
         return null;
       }
 
@@ -230,7 +220,6 @@ class Repartidor extends Persona {
           .get();
 
       if (!repartidorDoc.exists) {
-        print('Error: No se encontró el repartidor con ID: $repartidorId');
         return null;
       }
 
@@ -269,7 +258,7 @@ class Repartidor extends Persona {
         'historial_pedidos': FieldValue.arrayUnion([pedidoId]),
       });
 
-      print('Pedido $pedidoId agregado al historial del repartidor $repartidorId');
+  // pedido agregado al historial
       return true;
 
     } catch (e) {
@@ -285,7 +274,6 @@ class Repartidor extends Persona {
       final String? repartidorId = await SharedPreferencesService.getCurrentUserId();
       
       if (repartidorId == null || repartidorId.isEmpty) {
-        print('Error: No se pudo obtener el ID del repartidor');
         return [];
       }
 
@@ -296,7 +284,6 @@ class Repartidor extends Persona {
           .get();
 
       if (!repartidorDoc.exists) {
-        print('Error: No se encontró el repartidor con ID: $repartidorId');
         return [];
       }
 
@@ -319,7 +306,6 @@ class Repartidor extends Persona {
       final String? repartidorId = await SharedPreferencesService.getCurrentUserId();
       
       if (repartidorId == null || repartidorId.isEmpty) {
-        print('Error: No se pudo obtener el ID del repartidor desde SharedPreferences');
         return null;
       }
 
@@ -331,7 +317,6 @@ class Repartidor extends Persona {
           .get();
 
       if (!repartidorDoc.exists) {
-        print('Error: No se encontró el repartidor con ID: $repartidorId en Firebase');
         return null;
       }
 

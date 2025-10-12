@@ -88,7 +88,6 @@ class _LoginFormState extends State<LoginForm> {
         _showErrorMessage('Email o contraseña incorrectos');
         return;
       }
-      print(persona.nombre);
       // Login exitoso
       _showSuccessMessage('Inicio de sesión exitoso');
 
