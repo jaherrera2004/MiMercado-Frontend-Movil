@@ -111,12 +111,12 @@ class EstadoIndicator extends StatelessWidget {
   String _getStatusDescription() {
     switch (estado.toLowerCase()) {
       case 'disponible':
-        return 'Listo para recibir pedidos';
+        return 'Listo para tomar pedidos';
       case 'ocupado':
         return 'Actualmente no disponible';
       case 'desconectado':
       default:
-        return 'No estás recibiendo pedidos';
+        return 'No puedes tomar pedidos';
     }
   }
 }

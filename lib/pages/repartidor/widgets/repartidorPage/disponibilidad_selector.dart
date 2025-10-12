@@ -223,6 +223,21 @@ class _DisponibilidadSelectorState extends State<DisponibilidadSelector> {
   }
 
   void _cambiarEstadoConexion(bool conectar) {
+    // Si está Ocupado, no permitir desconectarse
+    if (!conectar && widget.estadoActual == 'Ocupado') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'No puedes desconectarte mientras estás Ocupado. Finaliza o libera el pedido actual.',
+            style: GoogleFonts.inter(color: Colors.white),
+          ),
+          backgroundColor: Colors.orange[700],
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

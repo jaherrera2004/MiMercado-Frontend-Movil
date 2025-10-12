@@ -8,6 +8,7 @@ class ProductoPedido {
   int cantidad;
 
   static double valorDomicilio = 5000; // Valor por defecto
+  static double valorServicio = 2000; // Valor del servicio
 
   ProductoPedido({
     required this.idProducto,

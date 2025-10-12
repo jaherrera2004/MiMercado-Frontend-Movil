@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../shared/widgets/navigation/BackButton.dart';
 import 'EditarUsuarioModal.dart';
 
 /// AppBar personalizado para la pantalla de datos de perfil
@@ -28,30 +27,75 @@ class DatosAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
-      leading: GestureDetector(
-        onTap: () => Navigator.pop(context),
-        child: const CustomBackButton(
-          iconPath: 'lib/resources/go_back_icon.png',
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white,
+              Colors.grey[50]!,
+            ],
+          ),
+        ),
+      ),
+      leading: Container(
+        margin: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 0,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.grey,
+            size: 20,
+          ),
         ),
       ),
       title: Text(
-        "Datos",
+        "Datos del Perfil",
         style: GoogleFonts.inter(
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
+          fontWeight: FontWeight.w600,
+          fontSize: 18,
+          color: Colors.grey[800],
         ),
       ),
       centerTitle: true,
       actions: [
-        IconButton(
-          icon: Image.asset(
-            'lib/resources/editData.png',
-            width: 30,
-            height: 30,
+        Container(
+          margin: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            color: const Color(0xFF58E181),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF58E181).withOpacity(0.3),
+                spreadRadius: 0,
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          onPressed: onEditPressed ?? () {
-            _mostrarModalEditar(context);
-          },
+          child: IconButton(
+            icon: const Icon(
+              Icons.edit_outlined,
+              color: Colors.white,
+              size: 20,
+            ),
+            onPressed: onEditPressed ?? () {
+              _mostrarModalEditar(context);
+            },
+          ),
         ),
       ],
     );
