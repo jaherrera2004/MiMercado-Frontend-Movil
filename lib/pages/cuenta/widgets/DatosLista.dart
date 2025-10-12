@@ -69,15 +69,35 @@ class DatosListaState extends State<DatosLista> {
   Widget build(BuildContext context) {
     return Padding(
       padding: widget.padding!,
-      child: ListView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 50), // Espacio debajo del AppBar
-          
           if (isLoading)
-            const Center(
+            Center(
               child: Padding(
-                padding: EdgeInsets.all(20.0),
-                child: CircularProgressIndicator(),
+                padding: const EdgeInsets.all(40.0),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          const Color(0xFF58E181),
+                        ),
+                        strokeWidth: 3,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Cargando información...',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             )
           else if (error != null)
@@ -86,17 +106,25 @@ class DatosListaState extends State<DatosLista> {
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: Colors.red,
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      child: const Icon(
+                        Icons.error_outline,
+                        size: 40,
+                        color: Colors.red,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'Error al cargar los datos',
                       style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
                         color: Colors.red,
                       ),
                     ),
@@ -105,8 +133,19 @@ class DatosListaState extends State<DatosLista> {
                       'Por favor, inténtalo de nuevo',
                       style: TextStyle(color: Colors.grey[600]),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF58E181),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                       onPressed: () {
                         setState(() {
                           isLoading = true;
@@ -123,18 +162,12 @@ class DatosListaState extends State<DatosLista> {
           else
             // Generar campos dinámicamente con datos reales
             ...datosUsuario.entries.map((entry) {
-              final index = datosUsuario.keys.toList().indexOf(entry.key);
               final campo = entry.key;
               final valor = entry.value;
               
-              return Column(
-                children: [
-                  CamposDatos(
-                    label: campo,
-                    value: valor,
-                  ),
-                  if (index < datosUsuario.length - 1) const Divider(),
-                ],
+              return CamposDatos(
+                label: campo,
+                value: valor,
               );
             }).toList(),
         ],

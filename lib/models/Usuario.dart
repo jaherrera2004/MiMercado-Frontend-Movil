@@ -369,6 +369,42 @@ class Usuario extends Persona {
     }
   }
 
+  /// Método estático para obtener el nombre (nombre + apellido) de un usuario por su ID
+  /// Retorna null si el usuario no existe o no tiene datos de nombre.
+  static Future<String?> obtenerNombrePorId(String usuarioId) async {
+    try {
+      if (usuarioId.isEmpty) {
+        throw Exception('El ID de usuario no puede estar vacío');
+      }
+
+      final firebase = FirebaseFirestore.instance;
+      final DocumentSnapshot userDoc = await firebase
+          .collection('usuarios')
+          .doc(usuarioId)
+          .get();
+
+      if (!userDoc.exists) {
+        print('⚠️ Usuario no encontrado con ID: $usuarioId');
+        return null;
+      }
+
+      final data = userDoc.data() as Map<String, dynamic>;
+      final String nombre = (data['nombre'] ?? '').toString().trim();
+      final String apellido = (data['apellido'] ?? '').toString().trim();
+      final String nombreCompleto = (nombre + ' ' + apellido).trim();
+
+      if (nombreCompleto.isEmpty) {
+        print('ℹ️ Usuario $usuarioId no tiene nombre/apellido definidos');
+        return null;
+      }
+
+      return nombreCompleto;
+    } catch (e) {
+      print('❌ Error obteniendo nombre por ID ($usuarioId): $e');
+      return null;
+    }
+  }
+
   /// Método estático para actualizar los datos básicos del usuario actual
   static Future<void> actualizarDatosUsuario({
     required String nombre,

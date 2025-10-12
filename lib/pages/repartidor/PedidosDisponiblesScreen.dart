@@ -4,6 +4,7 @@ import '../../models/Pedidos.dart';
 import '../../models/Repartidor.dart';
 import 'widgets/pedidosDisponibles/pedido_card.dart';
 import 'widgets/pedidosDisponibles/confirmar_pedido_dialog.dart';
+import './RepartidorPageScreen.dart';
 
 class PedidosDisponiblesScreen extends StatefulWidget {
   const PedidosDisponiblesScreen({super.key});
@@ -19,6 +20,31 @@ class _PedidosDisponiblesScreenState extends State<PedidosDisponiblesScreen> {
   @override
   void initState() {
     super.initState();
+    _verificarEstadoYcargar();
+  }
+
+  Future<void> _verificarEstadoYcargar() async {
+    // Bloquear pantalla si el repartidor está desconectado
+    final estado = await Repartidor.obtenerEstadoActual();
+    if (!mounted) return;
+    if (estado == null || estado == EstadoRepartidor.desconectado || estado == EstadoRepartidor.ocupado) {
+      final String msg = (estado == EstadoRepartidor.ocupado)
+          ? 'Estás ocupado. No puedes ver pedidos en este momento.'
+          : 'Estás desconectado. Cambia tu estado a Disponible para ver pedidos.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            msg,
+            style: GoogleFonts.inter(color: Colors.white),
+          ),
+          backgroundColor: Colors.orange[700],
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      // Regresar a la pantalla anterior
+      Navigator.of(context).pop();
+      return;
+    }
     _cargarPedidos();
   }
 
@@ -87,10 +113,13 @@ class _PedidosDisponiblesScreenState extends State<PedidosDisponiblesScreen> {
               );
             }
             
-            // Remover el pedido de la lista local
-            setState(() {
-              _pedidos.removeAt(index);
-            });
+            // Navegar al panel del repartidor y reemplazar esta pantalla
+            if (!mounted) return;
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => const RepartidorPage(),
+              ),
+            );
           } else {
             _mostrarMensaje(
               'No se pudo tomar el pedido',
@@ -149,7 +178,7 @@ class _PedidosDisponiblesScreenState extends State<PedidosDisponiblesScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _cargarPedidos,
+            onPressed: _verificarEstadoYcargar,
           ),
         ],
       ),

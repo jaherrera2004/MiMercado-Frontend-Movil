@@ -4,6 +4,7 @@ import 'navigation_card.dart';
 import '../../PedidosDisponiblesScreen.dart';
 import '../../HistorialPedidosScreen.dart';
 import '../../DatosRepartidorScreen.dart';
+import '../../../../models/Repartidor.dart';
 
 class PedidosNavigation extends StatelessWidget {
   const PedidosNavigation({super.key});
@@ -30,7 +31,26 @@ class PedidosNavigation extends StatelessWidget {
                 subtitle: 'Ver pedidos para tomar',
                 icon: Icons.shopping_cart,
                 color: const Color(0xFF58E181),
-                onTap: () {
+                onTap: () async {
+                  // Verificar estado del repartidor antes de navegar
+                  final estado = await Repartidor.obtenerEstadoActual();
+                  if (estado == null || estado == EstadoRepartidor.desconectado || estado == EstadoRepartidor.ocupado) {
+                    final String msg = (estado == EstadoRepartidor.ocupado)
+                        ? 'Estás ocupado. No puedes ver pedidos en este momento.'
+                        : 'Debes estar Disponible para ver pedidos';
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          msg,
+                          style: GoogleFonts.inter(color: Colors.white),
+                        ),
+                        backgroundColor: Colors.orange[700],
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                    return;
+                  }
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
