@@ -84,6 +84,7 @@ class _ProductImage extends StatelessWidget {
   const _ProductImage({required this.imagePath});
 
   bool get _isNetwork => imagePath.startsWith('http://') || imagePath.startsWith('https://');
+  static const double imageZoomScale = 1.5;
 
   @override
   Widget build(BuildContext context) {
@@ -91,10 +92,13 @@ class _ProductImage extends StatelessWidget {
     print('[ProductCard] _ProductImage.build -> imagePath: "' + imagePath + '"');
     if (imagePath.isEmpty) {
       print('[ProductCard] Warning: imagePath is empty. Showing fallback asset.');
-      return Image.asset(
-        'lib/resources/temp/image.png',
-        height: 80,
-        fit: BoxFit.contain,
+      return Transform.scale(
+        scale: imageZoomScale,
+        child: Image.asset(
+          'lib/resources/temp/image.png',
+          height: 80,
+          fit: BoxFit.contain,
+        ),
       );
     }
 
@@ -106,36 +110,48 @@ class _ProductImage extends StatelessWidget {
         fit: BoxFit.contain,
         placeholder: (context, url) {
           print('[ProductCard] Loading network image... URL: ' + url);
-          return const SizedBox(
-            height: 80,
-            width: 80,
-            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          return Transform.scale(
+            scale: imageZoomScale,
+            child: const SizedBox(
+              height: 80,
+              width: 80,
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            ),
           );
         },
         imageBuilder: (context, imageProvider) {
           print('[ProductCard] Network image loaded successfully: ' + imagePath);
-          return Image(
-            image: imageProvider,
-            height: 80,
-            fit: BoxFit.contain,
+          return Transform.scale(
+            scale: imageZoomScale,
+            child: Image(
+              image: imageProvider,
+              height: 80,
+              fit: BoxFit.contain,
+            ),
           );
         },
         errorWidget: (context, url, error) {
           print('[ProductCard] ERROR loading network image. URL: ' + url + ' | Error: ' + error.toString());
-          return Image.asset(
-            'lib/resources/temp/image.png',
-            height: 80,
-            fit: BoxFit.contain,
+          return Transform.scale(
+            scale: imageZoomScale,
+            child: Image.asset(
+              'lib/resources/temp/image.png',
+              height: 80,
+              fit: BoxFit.contain,
+            ),
           );
         },
       );
     }
 
     print('[ProductCard] Loading asset image. Path: ' + imagePath);
-    return Image.asset(
-      imagePath,
-      height: 80,
-      fit: BoxFit.contain,
+    return Transform.scale(
+      scale: imageZoomScale,
+      child: Image.asset(
+        imagePath,
+        height: 80,
+        fit: BoxFit.contain,
+      ),
     );
   }
 }
