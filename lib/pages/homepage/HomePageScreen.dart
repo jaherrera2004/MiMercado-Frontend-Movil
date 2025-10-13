@@ -99,7 +99,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
   // int currentIndex = 0; // Eliminado porque no se usa
-  return Scaffold(
+  return WillPopScope(
+    onWillPop: _onWillPop,
+    child: Scaffold(
       backgroundColor: Colors.white,
       appBar: const HomeAppBar(),
       body: SingleChildScrollView(
@@ -204,6 +206,30 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: const HomeBottomNavigation(
         currentIndex: 0,
       ),
+    ),
+  );
+  }
+  Future<bool> _onWillPop() async {
+    // Mostrar diálogo de confirmación
+    final shouldExit = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Salir de la aplicación?'),
+        content: const Text('¿Estás seguro que deseas salir?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Salir'),
+          ),
+        ],
+      ),
     );
+
+    // Si el diálogo se cierra sin seleccionar (null), tratamos como no salir
+    return shouldExit == true;
   }
 }
