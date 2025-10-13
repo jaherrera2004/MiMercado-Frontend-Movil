@@ -253,14 +253,24 @@ class _DireccionesScreenState extends State<DireccionesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: DireccionesAppBar(
-        onAddPressed: _mostrarModalAgregar,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: DireccionesAppBar(
+          onAddPressed: _mostrarModalAgregar,
+        ),
+        body: _buildBody(),
+        bottomNavigationBar: const HomeBottomNavigation(),
       ),
-      body: _buildBody(),
-      bottomNavigationBar: const HomeBottomNavigation(),
     );
+  }
+
+  Future<bool> _onWillPop() async {
+    // Al presionar el botón 'back' del sistema, navegar a la pantalla Home
+    // y limpiar la pila para evitar regresar al login.
+    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+    return false; // evitar el pop por defecto
   }
 
   Widget _buildBody() {
