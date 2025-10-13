@@ -98,7 +98,7 @@ class _DatosPedidosScreenState extends State<DatosPedidosScreen> {
     // Calcular subtotal, domicilio y servicio
     final double total = pedidoCompleto?.costoTotal ?? pedido['total']?.toDouble() ?? 0.0;
     final double domicilio = 5000.0; // Valor fijo por ahora
-    final double servicio = 3000.0; // Valor fijo por ahora
+    final double servicio = 2000.0; // Valor fijo por ahora
     final double subtotal = total - domicilio - servicio;
 
     return Scaffold(

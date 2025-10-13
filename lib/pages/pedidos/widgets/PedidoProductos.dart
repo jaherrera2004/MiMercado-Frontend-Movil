@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class PedidoProductos extends StatelessWidget {
   final List<Map<String, dynamic>> productos;
@@ -66,12 +67,19 @@ class PedidoProductos extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: imagen != null
-                  ? Image.asset(
-                      imagen,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          _buildPlaceholderImage(),
-                    )
+                  ? (imagen.toLowerCase().startsWith('http')
+                      ? CachedNetworkImage(
+                          imageUrl: imagen,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => _buildPlaceholderImage(),
+                          errorWidget: (context, url, error) => _buildPlaceholderImage(),
+                        )
+                      : Image.asset(
+                          imagen,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              _buildPlaceholderImage(),
+                        ))
                   : _buildPlaceholderImage(),
             ),
           ),
