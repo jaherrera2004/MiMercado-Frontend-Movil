@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../shared/widgets/navigation/BackButton.dart';
-import '../../shared/widgets/text/PageTitle.dart';
+import '../shared/widgets/navigation/BackButton.dart';
+import '../shared/widgets/text/PageTitle.dart';
 import 'widgets/RegisterForm.dart';
 
 /// Pantalla de registro de usuario

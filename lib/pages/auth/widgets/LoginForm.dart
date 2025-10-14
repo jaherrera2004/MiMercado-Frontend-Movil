@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../shared/widgets/forms/CustomTextField.dart';
-import '../../../shared/widgets/buttons/PrimaryButton.dart';
-import '../../../shared/widgets/navigation/NavigationLink.dart';
-import '../../../shared/widgets/text/PageTitle.dart';
+import '../../shared/widgets/forms/CustomTextField.dart';
+import '../../shared/widgets/buttons/PrimaryButton.dart';
+import '../../shared/widgets/navigation/NavigationLink.dart';
+import '../../shared/widgets/text/PageTitle.dart';
 import 'UserTypeSelector.dart';
 import '../../../models/Persona.dart';
 import '../../../models/Usuario.dart';

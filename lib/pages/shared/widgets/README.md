@@ -32,7 +32,7 @@ import 'package:mi_mercado/shared/shared.dart';
 
 ### Importación Específica
 ```dart
-import 'package:mi_mercado/shared/widgets/widgets.dart';
+import 'package:mi_mercado/pages/shared/widgets/widgets.dart';
 // Solo los widgets
 ```
 

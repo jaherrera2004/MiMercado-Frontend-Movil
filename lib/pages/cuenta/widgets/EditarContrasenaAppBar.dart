@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../shared/widgets/navigation/BackButton.dart';
+import '../../shared/widgets/navigation/BackButton.dart';
 
 /// AppBar personalizado para la pantalla de editar contraseña
 class EditarContrasenaAppBar extends StatelessWidget implements PreferredSizeWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../shared/widgets/forms/CustomTextField.dart';
-import '../../../shared/widgets/buttons/PrimaryButton.dart';
+import '../../shared/widgets/forms/CustomTextField.dart';
+import '../../shared/widgets/buttons/PrimaryButton.dart';
 import '../models/direccion.dart';
 
 /// Modal para agregar una nueva dirección

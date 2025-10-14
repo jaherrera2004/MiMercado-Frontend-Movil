@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../shared/widgets/widgets.dart';
+import '../../shared/widgets/widgets.dart';
 
 class PagoAppBar extends StatelessWidget implements PreferredSizeWidget {
   const PagoAppBar({super.key});

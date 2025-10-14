@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../shared/widgets/widgets.dart';
+import '../../shared/widgets/widgets.dart';
 import 'PedidoItem.dart';
 
 class PedidosList extends StatelessWidget {
