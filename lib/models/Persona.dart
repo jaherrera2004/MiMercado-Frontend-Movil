@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mi_mercado/models/SharedPreferences.dart';
 import 'Usuario.dart';
+import 'package:bcrypt/bcrypt.dart';
 import 'Repartidor.dart';
 
 abstract class Persona {
@@ -33,50 +34,48 @@ abstract class Persona {
       final firebase = FirebaseFirestore.instance;
       String collection = tipoUsuario == 'usuario' ? 'usuarios' : 'repartidores';
       
-      // Buscar en Firebase por email y password
+      // Buscar en Firebase solo por email
       QuerySnapshot querySnapshot = await firebase
           .collection(collection)
           .where('email', isEqualTo: email)
-          .where('password', isEqualTo: password)
           .get();
-      
+
       if (querySnapshot.docs.isNotEmpty) {
-        // Si se encuentra el usuario, crear la instancia correspondiente
         var userData = querySnapshot.docs.first.data() as Map<String, dynamic>;
         var docId = querySnapshot.docs.first.id;
-        
-        
-        if (tipoUsuario == 'usuario') {
+        String? passwordHash = userData['password'];
 
-          var usuario = Usuario(
-            id: docId,
-            nombre: userData['nombre'],
-            apellido: userData['apellido'],
-            email: userData['email'],
-            password: userData['password'],
-            telefono: userData['telefono'],
-            direcciones: List<Map<String, dynamic>>.from(userData['direcciones'] ?? []),
-            pedidos: userData['pedidos'] ?? [],
-          );
-          
-          return usuario;
-        } else {
-          return Repartidor(
-            id: docId,
-            nombre: userData['nombre'],
-            apellido: userData['apellido'],
-            email: userData['email'],
-            password: userData['password'],
-            telefono: userData['telefono'],
-            cedula: userData['cedula'] ?? '',
-            estadoActual: userData['estado_actual'] ?? '',
-            historialPedidos: userData['historial_pedidos'] ?? [],
-            pedidoActual: userData['pedido_actual'] ?? '',
-          );
+        // Verificar la contraseña usando bcrypt
+        if (passwordHash != null && BCrypt.checkpw(password, passwordHash)) {
+          if (tipoUsuario == 'usuario') {
+            var usuario = Usuario(
+              id: docId,
+              nombre: userData['nombre'],
+              apellido: userData['apellido'],
+              email: userData['email'],
+              password: userData['password'],
+              telefono: userData['telefono'],
+              direcciones: List<Map<String, dynamic>>.from(userData['direcciones'] ?? []),
+              pedidos: userData['pedidos'] ?? [],
+            );
+            return usuario;
+          } else {
+            return Repartidor(
+              id: docId,
+              nombre: userData['nombre'],
+              apellido: userData['apellido'],
+              email: userData['email'],
+              password: userData['password'],
+              telefono: userData['telefono'],
+              cedula: userData['cedula'] ?? '',
+              estadoActual: userData['estado_actual'] ?? '',
+              historialPedidos: userData['historial_pedidos'] ?? [],
+              pedidoActual: userData['pedido_actual'] ?? '',
+            );
+          }
         }
       }
-      
-      // Si no se encuentra, retornar null
+      // Si no se encuentra o la contraseña no coincide, retornar null
       return null;
       
     } catch (e) {

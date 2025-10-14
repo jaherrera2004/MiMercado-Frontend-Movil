@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Persona.dart';
 import 'SharedPreferences.dart';
+import 'package:bcrypt/bcrypt.dart';
 
 class Usuario extends Persona {
 
@@ -46,12 +47,17 @@ class Usuario extends Persona {
         }
       }
 
+      // Hashear la contraseña antes de guardar
+      String? passwordHasheada = password != null && password!.isNotEmpty
+          ? BCrypt.hashpw(password!, BCrypt.gensalt())
+          : null;
+
       await firebase.collection(firebaseCollection).doc().set({
         'nombre': nombre ,
         'apellido': apellido,
         'telefono': telefono ,
         'email': email,
-        'password': password,
+        'password': passwordHasheada,
         'pedidos': pedidos,
         'direcciones': direcciones,
       });
@@ -506,9 +512,8 @@ class Usuario extends Persona {
         throw Exception('La nueva contraseña no puede estar vacía');
       }
 
-      // Verificar que la contraseña actual sea correcta
-      if (passwordGuardada != contrasenaActual.trim()) {
-  // contraseña incorrecta
+      // Verificar que la contraseña actual sea correcta usando bcrypt
+      if (passwordGuardada == null || !BCrypt.checkpw(contrasenaActual.trim(), passwordGuardada)) {
         throw Exception('La contraseña actual es incorrecta');
       }
 
@@ -518,18 +523,17 @@ class Usuario extends Persona {
       }
 
       // Verificar que la nueva contraseña sea diferente a la actual
-      if (contrasenaActual.trim() == contrasenaNueva.trim()) {
+      if (BCrypt.checkpw(contrasenaNueva.trim(), passwordGuardada)) {
         throw Exception('La nueva contraseña debe ser diferente a la actual');
       }
 
-  // validaciones completadas
+      // Hashear la nueva contraseña
+      final String nuevaPasswordHash = BCrypt.hashpw(contrasenaNueva.trim(), BCrypt.gensalt());
 
       // Actualizar la contraseña en Firebase
       await userDoc.update({
-        'password': contrasenaNueva.trim(),
+        'password': nuevaPasswordHash,
       });
-
-  // contraseña actualizada con éxito
       
     } catch (e) {
       print('Error cambiando contraseña: $e');
