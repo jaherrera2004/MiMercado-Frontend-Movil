@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../shared/widgets/text/PageTitle.dart';
+import '../shared/widgets/text/PageTitle.dart';
 import '../categoria/widgets/CategoriaSearchBar.dart';
 import '../categoria/widgets/ProductGrid.dart';
 import 'widgets/widgets.dart';

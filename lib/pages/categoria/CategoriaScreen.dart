@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../shared/widgets/navigation/BackButton.dart';
-import '../../shared/widgets/text/PageTitle.dart';
+import '../shared/widgets/navigation/BackButton.dart';
+import '../shared/widgets/text/PageTitle.dart';
 import '../../models/Producto.dart';
 import '../../models/CarritoService.dart';
 import 'widgets/widgets.dart';

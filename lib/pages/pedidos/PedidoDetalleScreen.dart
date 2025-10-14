@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../shared/widgets/widgets.dart';
+import '../shared/widgets/widgets.dart';
 import '../../models/Pedidos.dart';
 import '../../models/Producto.dart';
 import 'widgets/widgets.dart';

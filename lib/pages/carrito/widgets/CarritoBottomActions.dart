@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../shared/widgets/buttons/PrimaryButton.dart';
+import '../../shared/widgets/buttons/PrimaryButton.dart';
 
 class CarritoBottomActions extends StatelessWidget {
   final VoidCallback onContinuarPago;

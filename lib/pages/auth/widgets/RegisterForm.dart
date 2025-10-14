@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../shared/widgets/forms/CustomTextField.dart';
-import '../../../shared/widgets/buttons/PrimaryButton.dart';
-import '../../../shared/widgets/navigation/NavigationLink.dart';
+import '../../shared/widgets/forms/CustomTextField.dart';
+import '../../shared/widgets/buttons/PrimaryButton.dart';
+import '../../shared/widgets/navigation/NavigationLink.dart';
 import '../../../models/Usuario.dart';
 
 /// Formulario de registro separado del widget principal

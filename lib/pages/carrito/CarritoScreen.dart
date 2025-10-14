@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../shared/widgets/navigation/BackButton.dart';
-import '../../shared/widgets/text/PageTitle.dart';
+import '../shared/widgets/navigation/BackButton.dart';
+import '../shared/widgets/text/PageTitle.dart';
 import '../../models/CarritoService.dart' as carrito_service;
 import 'widgets/widgets.dart';
 

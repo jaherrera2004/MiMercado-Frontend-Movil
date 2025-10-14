@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../shared/widgets/widgets.dart';
+import '../../shared/widgets/widgets.dart';
 
 class PedidosAppBar extends StatelessWidget implements PreferredSizeWidget {
   const PedidosAppBar({super.key});

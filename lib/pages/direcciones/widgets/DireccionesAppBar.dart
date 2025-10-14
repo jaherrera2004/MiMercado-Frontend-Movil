@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../shared/widgets/text/PageTitle.dart';
+import '../../shared/widgets/text/PageTitle.dart';
 
 class DireccionesAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onAddPressed;

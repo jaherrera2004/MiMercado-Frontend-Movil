@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../shared/widgets/navigation/BackButton.dart';
-import '../../shared/widgets/text/PageTitle.dart';
+import '../shared/widgets/navigation/BackButton.dart';
+import '../shared/widgets/text/PageTitle.dart';
 import 'widgets/LoginForm.dart';
 
 /// Pantalla de inicio de sesión
