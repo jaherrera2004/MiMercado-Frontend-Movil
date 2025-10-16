@@ -1,51 +1,5 @@
 import 'package:get_storage/get_storage.dart';
 
-/// Clase que representa un item en el carrito
-class CarritoItem {
-  String idProducto;
-  int cantidad;
-  double precio;
-  String nombre;
-  String? imagenUrl;
-
-  CarritoItem({
-    required this.idProducto,
-    required this.cantidad,
-    required this.precio,
-    required this.nombre,
-    this.imagenUrl,
-  });
-
-  /// Constructor desde Map
-  factory CarritoItem.fromMap(Map<String, dynamic> map) {
-    return CarritoItem(
-      idProducto: map['id_producto'] ?? '',
-      cantidad: map['cantidad'] ?? 0,
-      precio: (map['precio'] ?? 0).toDouble(),
-      nombre: map['nombre'] ?? '',
-      imagenUrl: map['imagen_url'],
-    );
-  }
-
-  /// Convierte a Map
-  Map<String, dynamic> toMap() {
-    return {
-      'id_producto': idProducto,
-      'cantidad': cantidad,
-      'precio': precio,
-      'nombre': nombre,
-      'imagen_url': imagenUrl,
-    };
-  }
-
-  /// Calcula el subtotal del item
-  double get subtotal => precio * cantidad;
-
-  @override
-  String toString() {
-    return 'CarritoItem(producto: $nombre, cantidad: $cantidad, precio: \$${precio.toStringAsFixed(2)})';
-  }
-}
 
 /// Servicio para manejar el carrito de compras usando GetStorage
 class CarritoService {
@@ -194,8 +148,51 @@ class CarritoService {
     return items.fold(0.0, (sum, item) => sum + item.subtotal);
   }
 
-  // ==================== UTILIDADES ====================
+}
 
+/// Clase que representa un item en el carrito
+class CarritoItem {
+  String idProducto;
+  int cantidad;
+  double precio;
+  String nombre;
+  String? imagenUrl;
 
+  CarritoItem({
+    required this.idProducto,
+    required this.cantidad,
+    required this.precio,
+    required this.nombre,
+    this.imagenUrl,
+  });
 
+  /// Constructor desde Map
+  factory CarritoItem.fromMap(Map<String, dynamic> map) {
+    return CarritoItem(
+      idProducto: map['id_producto'] ?? '',
+      cantidad: map['cantidad'] ?? 0,
+      precio: (map['precio'] ?? 0).toDouble(),
+      nombre: map['nombre'] ?? '',
+      imagenUrl: map['imagen_url'],
+    );
+  }
+
+  /// Convierte a Map
+  Map<String, dynamic> toMap() {
+    return {
+      'id_producto': idProducto,
+      'cantidad': cantidad,
+      'precio': precio,
+      'nombre': nombre,
+      'imagen_url': imagenUrl,
+    };
+  }
+
+  /// Calcula el subtotal del item
+  double get subtotal => precio * cantidad;
+
+  @override
+  String toString() {
+    return 'CarritoItem(producto: $nombre, cantidad: $cantidad, precio: \$${precio.toStringAsFixed(2)})';
+  }
 }
