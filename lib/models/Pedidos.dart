@@ -2,40 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mi_mercado/models/SharedPreferences.dart';
 import 'Repartidor.dart';
 
-/// Clase que representa un producto dentro de un pedido
-class ProductoPedido {
-  String idProducto;
-  int cantidad;
 
-  static double valorDomicilio = 5000; // Valor por defecto
-  static double valorServicio = 2000; // Valor del servicio
-
-  ProductoPedido({
-    required this.idProducto,
-    required this.cantidad,
-  });
-
-  /// Constructor desde Map (Firebase/JSON)
-  factory ProductoPedido.fromMap(Map<String, dynamic> map) {
-    return ProductoPedido(
-      idProducto: map['id_producto'] ?? '',
-      cantidad: map['cantidad'] ?? 0,
-    );
-  }
-
-  /// Convierte a Map para guardar en Firebase
-  Map<String, dynamic> toMap() {
-    return {
-      'id_producto': idProducto,
-      'cantidad': cantidad,
-    };
-  }
-
-  @override
-  String toString() {
-    return 'ProductoPedido(idProducto: $idProducto, cantidad: $cantidad)';
-  }
-}
 
 /// Clase principal que representa un Pedido
 class Pedido {
@@ -344,4 +311,38 @@ class Pedido {
 
   @override
   int get hashCode => id.hashCode;
+}
+/// Clase que representa un producto dentro de un pedido
+class ProductoPedido {
+  String idProducto;
+  int cantidad;
+
+  static double valorDomicilio = 5000; // Valor por defecto
+  static double valorServicio = 2000; // Valor del servicio
+
+  ProductoPedido({
+    required this.idProducto,
+    required this.cantidad,
+  });
+
+  /// Constructor desde Map (Firebase/JSON)
+  factory ProductoPedido.fromMap(Map<String, dynamic> map) {
+    return ProductoPedido(
+      idProducto: map['id_producto'] ?? '',
+      cantidad: map['cantidad'] ?? 0,
+    );
+  }
+
+  /// Convierte a Map para guardar en Firebase
+  Map<String, dynamic> toMap() {
+    return {
+      'id_producto': idProducto,
+      'cantidad': cantidad,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'ProductoPedido(idProducto: $idProducto, cantidad: $cantidad)';
+  }
 }
