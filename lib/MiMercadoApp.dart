@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mi_mercado/SplashScreen.dart';
-import 'package:mi_mercado/pages/auth/RegisterScreen.dart';
+
+
+import 'package:mi_mercado/features/auth/presentation/pages/RegisterScreen.dart';
 import 'package:mi_mercado/pages/auth/IniciarSesionScreen.dart';
+
+
 import 'package:mi_mercado/pages/homepage/HomePageScreen.dart';
 import 'package:mi_mercado/pages/categoria/CategoriaScreen.dart';
 import 'package:mi_mercado/pages/carrito/CarritoScreen.dart';
@@ -35,6 +39,7 @@ class MiMercadoApp extends StatelessWidget {
         '/': (context) => SplashScreen(),
         '/registro': (context) => const RegisterScreen(),
         '/iniciar-sesion': (context) => const IniciarSesionScreen(),
+
         '/home': (context) => HomePage(),
         '/categoria': (context) => CategoriaScreen(),
         '/carrito': (context) => CarritoScreen(),
