@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mi_mercado/MiMercadoApp.dart';
 import 'package:mi_mercado/firebase_options.dart';
+import 'package:mi_mercado/core/di/injection.dart';
 import 'package:mi_mercado/models/CarritoService.dart';
 
 Future<void> main() async {
@@ -14,6 +15,9 @@ Future<void> main() async {
   
   // Inicializar GetStorage para el carrito
   await CarritoService.init();
+  
+  // Inicializar el service locator (GetIt)
+  setupLocator();
   
   runApp(const MiMercadoApp());
 }
