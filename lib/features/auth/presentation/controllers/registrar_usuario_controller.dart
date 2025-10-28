@@ -9,9 +9,7 @@ import 'package:mi_mercado/features/auth/domain/useCases/registrar_usuario.dart'
 class RegistrarUsuarioController extends GetxController {
 	// Compilar una sola vez las expresiones regulares para evitar reconstrucciones
 	// y para poder manejar errores de manera centralizada.
-	static final RegExp _emailRegex =
-		RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-	static final RegExp _phoneRegex = RegExp(r'^[0-9]{8,15}$');
+
 	// Controladores de texto utilizados por la UI.
 	final nombreController = TextEditingController();
 	final apellidoController = TextEditingController();
@@ -116,7 +114,7 @@ class RegistrarUsuarioController extends GetxController {
 					final registrarUsuarioUseCase = getIt<RegistrarUsuario>();
 					// Llamar al use case con los parámetros
         	await registrarUsuarioUseCase.call(RegistrarUsuarioParams(usuario: nuevoUsuario));
-          
+
 				} finally {
 					isLoading.value = false;
 				}
