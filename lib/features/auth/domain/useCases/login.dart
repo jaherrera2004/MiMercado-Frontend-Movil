@@ -10,14 +10,15 @@ class Login implements UseCase<void, LoginParams> {
   Login(this._authRepository);
 
   @override
-  Future<dynamic> call(LoginParams params) async {
+  Future<Persona?> call(LoginParams params) async {
     Persona? personaActual;
+    
     if (params.rol == 'usuario') {
       personaActual = await _authRepository.obtenerUsuarioPorEmail(params.email) as Persona?;
     } else if (params.rol == 'repartidor') {
       personaActual = await _authRepository.obtenerRepartidorPorEmail(params.email) as Persona?;
     }
-
+    
     if (personaActual == null) {
       throw InvalidCredentialsFailure();
     }

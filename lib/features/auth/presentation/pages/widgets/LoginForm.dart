@@ -1,5 +1,6 @@
+import 'package:get/get.dart';
+import '../../controllers/login_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../../core/widgets/forms/CustomTextField.dart';
 import '../../../../../core/widgets/buttons/PrimaryButton.dart';
 import '../../../../../core/widgets/navigation/NavigationLink.dart';
@@ -16,11 +17,7 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final firebase = FirebaseFirestore.instance;
-  
-  bool _isLoading = false;
+  late final LoginController _loginController;
   bool _obscurePassword = true;
   UserType _selectedUserType = UserType.usuario;
 
@@ -53,22 +50,30 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
+    _loginController.emailController.dispose();
+    _loginController.passwordController.dispose();
     super.dispose();
+    super.initState();
+    _loginController = Get.put(LoginController());
   }
 
   void _handleLogin() async {
-    // Validar formulario
     if (!_formKey.currentState!.validate()) {
       return;
     }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-   
+    setState(() {}); // Para refrescar el botón si usas Obx
+    _loginController.isLoading.value = true;
+    try {
+      final rol = _selectedUserType == UserType.usuario ? 'usuario' : 'repartidor';
+      final persona = await _loginController.login(rol: rol);
+      _showSuccessMessage('¡Inicio de sesión exitoso!');
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      _showErrorMessage('Error al iniciar sesión: ${e.toString().replaceAll('Exception:', '').trim()}');
+    } finally {
+      _loginController.isLoading.value = false;
+      setState(() {});
+    }
   }
 
   void _showErrorMessage(String message) {
@@ -132,7 +137,7 @@ class _LoginFormState extends State<LoginForm> {
               primaryColor: primaryColor,
               keyboardType: TextInputType.emailAddress,
               prefixIcon: const Icon(Icons.email),
-              controller: _emailController,
+              controller: _loginController.emailController,
               validator: _validateEmail,
             ),
             
@@ -144,7 +149,7 @@ class _LoginFormState extends State<LoginForm> {
               hint: "Ingresar Contraseña",
               primaryColor: primaryColor,
               obscureText: _obscurePassword,
-              controller: _passwordController,
+              controller: _loginController.passwordController,
               prefixIcon: const Icon(Icons.lock),
               suffixIcon: IconButton(
                 icon: Icon(
@@ -166,7 +171,7 @@ class _LoginFormState extends State<LoginForm> {
               text: "Iniciar sesión",
               onPressed: _handleLogin,
               backgroundColor: primaryColor,
-              isLoading: _isLoading,
+              isLoading: _loginController.isLoading.value,
             ),
             
             const SizedBox(height: 20),
