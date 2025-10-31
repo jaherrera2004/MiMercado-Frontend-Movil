@@ -81,6 +81,8 @@ class HomePage extends StatelessWidget {
                         : 'lib/resources/temp/image.png',
                   }).toList(),
                   onAddToCart: (producto) async {
+                    // Añadir el producto al carrito usando el HomePageController helper
+                    await controller.agregarProductoMapAlCarrito(producto);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(

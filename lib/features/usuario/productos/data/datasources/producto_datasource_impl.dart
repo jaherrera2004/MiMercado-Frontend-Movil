@@ -13,7 +13,7 @@ class ProductoDataSourceImpl implements ProductoDataSource {
     try {
       final snapshot = await _firestore.collection(_coleccionProductos).where('stock', isGreaterThan: 0).get();
       final productos = snapshot.docs
-          .map((doc) => Producto.fromMap(doc.data()))
+          .map((doc) => Producto.fromMap({...doc.data(), 'id': doc.id}))
           .toList();
       print('producto_datasource_impl.dart: productos obtenidos (${productos.length})');
       return productos;
@@ -31,7 +31,7 @@ class ProductoDataSourceImpl implements ProductoDataSource {
         .get();
 
       final productos = snapshot.docs
-          .map((doc) => Producto.fromMap(doc.data()))
+          .map((doc) => Producto.fromMap({...doc.data(), 'id': doc.id}))
           .toList();
 
       print('producto_datasource_impl.dart: productos por categoria obtenidos (${productos.length})');
