@@ -1,3 +1,4 @@
+import '../../../../../../core/widgets/common/SnackBarMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/registrar_usuario_controller.dart';
@@ -39,13 +40,8 @@ class _RegisterFormState extends State<RegisterForm> {
     }
     try {
       await _regController.register();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('¡Registro completado correctamente!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ),
-      );
+      if (!mounted) return;
+      SnackBarMessage.showSuccess(context, '¡Registro completado correctamente!');
       Navigator.of(context).pop();
     } catch (e) {
       String? alertMessage;
@@ -67,15 +63,9 @@ class _RegisterFormState extends State<RegisterForm> {
       } else {
         alertMessage = e is Failure ? e.message : e.toString();
       }
-      if (alertMessage != null) {
+      if (alertMessage != null && mounted) {
         final cleaned = alertMessage.replaceAll('Exception:', '').trim();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al registrar usuario: $cleaned'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-          ),
-        );
+        SnackBarMessage.showError(context, 'Error al registrar usuario: $cleaned');
       }
     }
   }
