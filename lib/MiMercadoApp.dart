@@ -8,7 +8,7 @@ import 'package:mi_mercado/features/usuario/productos/presentation/pages/homepag
 import 'package:mi_mercado/pages/auth/IniciarSesionScreen.dart';
 
 
-import 'package:mi_mercado/features/usuario/productos/presentation/pages/productos_filtrados.dart';
+import 'package:mi_mercado/features/usuario/productos/presentation/pages/productos_filtrados_screen.dart';
 import 'package:mi_mercado/pages/carrito/CarritoScreen.dart';
 import 'package:mi_mercado/pages/pago/PagoScreen.dart';
 import 'package:mi_mercado/pages/pedidos/PedidosScreen.dart';
