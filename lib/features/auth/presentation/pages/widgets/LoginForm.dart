@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../../controllers/login_controller.dart';
 import 'package:flutter/material.dart';
+import '../../../../../../core/widgets/common/SnackBarMessage.dart';
 import '../../../../../core/widgets/forms/CustomTextField.dart';
 import '../../../../../core/widgets/buttons/PrimaryButton.dart';
 import '../../../../../core/widgets/navigation/NavigationLink.dart';
@@ -65,36 +66,22 @@ class _LoginFormState extends State<LoginForm> {
     _loginController.isLoading.value = true;
     try {
       final rol = _selectedUserType == UserType.usuario ? 'usuario' : 'repartidor';
-      final persona = await _loginController.login(rol: rol);
-      _showSuccessMessage('¡Inicio de sesión exitoso!');
+      await _loginController.login(rol: rol);
+      if (!mounted) return;
+      SnackBarMessage.showSuccess(context, '¡Inicio de sesión exitoso!');
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
-      _showErrorMessage('Error al iniciar sesión: ${e.toString().replaceAll('Exception:', '').trim()}');
+      if (mounted) {
+        SnackBarMessage.showError(context, 'Error al iniciar sesión: ${e.toString().replaceAll('Exception:', '').trim()}');
+      }
     } finally {
-      _loginController.isLoading.value = false;
-      setState(() {});
+      if (mounted) {
+        _loginController.isLoading.value = false;
+        setState(() {});
+      }
     }
   }
 
-  void _showErrorMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
-
-  void _showSuccessMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
