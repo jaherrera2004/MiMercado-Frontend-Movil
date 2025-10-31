@@ -5,3 +5,6 @@ export 'HomeBottomNavigation.dart';
 export 'ProductGrid.dart';
 export 'CategoriaSearchBar.dart';
 export 'ProductCard.dart';
+export 'CarritoItem.dart';
+export 'CarritoBottomActions.dart';
+export 'CarritoSummary.dart';
