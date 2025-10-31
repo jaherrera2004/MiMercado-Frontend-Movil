@@ -4,10 +4,10 @@ import 'package:mi_mercado/SplashScreen.dart';
 
 
 import 'package:mi_mercado/features/auth/presentation/pages/RegisterScreen.dart';
+import 'package:mi_mercado/features/usuario/home/presentation/pages/homepage_screen.dart';
 import 'package:mi_mercado/pages/auth/IniciarSesionScreen.dart';
 
 
-import 'package:mi_mercado/pages/homepage/HomePageScreen.dart';
 import 'package:mi_mercado/pages/categoria/CategoriaScreen.dart';
 import 'package:mi_mercado/pages/carrito/CarritoScreen.dart';
 import 'package:mi_mercado/pages/pago/PagoScreen.dart';
