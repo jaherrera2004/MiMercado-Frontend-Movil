@@ -13,7 +13,7 @@ import 'package:mi_mercado/features/usuario/productos/presentation/pages/product
 import 'package:mi_mercado/pages/pago/PagoScreen.dart';
 import 'package:mi_mercado/pages/pedidos/PedidosScreen.dart';
 import 'package:mi_mercado/pages/pedidos/PedidoDetalleScreen.dart';
-import 'package:mi_mercado/pages/direcciones/DireccionesScreen.dart';
+import 'package:mi_mercado/features/usuario/direcciones/presentation/pages/direccion_screen.dart';
 import 'package:mi_mercado/pages/cuenta/MiCuentaScreen.dart';
 import 'package:mi_mercado/pages/cuenta/DatosPerfilScreen.dart';
 import 'package:mi_mercado/pages/cuenta/SeguridadScreen.dart';
