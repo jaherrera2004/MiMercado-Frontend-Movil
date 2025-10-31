@@ -1,7 +1,7 @@
 
 import 'package:get/get.dart';
-import 'package:mi_mercado/features/usuario/home/domain/entities/Producto.dart';
-import 'package:mi_mercado/features/usuario/home/domain/useCases/obtener_productos_por_categoria.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/entities/Producto.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/useCases/obtener_productos_por_categoria.dart';
 import 'package:mi_mercado/core/error/failure.dart';
 import 'package:dartz/dartz.dart';
 

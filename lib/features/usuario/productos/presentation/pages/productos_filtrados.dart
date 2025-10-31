@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mi_mercado/core/di/injection.dart';
-import 'package:mi_mercado/features/usuario/home/domain/useCases/obtener_productos_por_categoria.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/useCases/obtener_productos_por_categoria.dart';
 import 'package:get/get.dart';
 import 'package:mi_mercado/core/widgets/navigation/BackButton.dart';
 import 'package:mi_mercado/core/widgets/text/PageTitle.dart';

@@ -1,7 +1,7 @@
 import 'package:mi_mercado/core/error/failure.dart';
 import 'package:mi_mercado/core/useCases/use_case.dart';
-import 'package:mi_mercado/features/usuario/home/domain/entities/Producto.dart';
-import 'package:mi_mercado/features/usuario/home/domain/repositories/producto_repository.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/entities/Producto.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/repositories/producto_repository.dart';
 import 'package:dartz/dartz.dart'; // Either
 
 

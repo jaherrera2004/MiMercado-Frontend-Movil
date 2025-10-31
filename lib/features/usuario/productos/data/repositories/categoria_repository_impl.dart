@@ -1,6 +1,6 @@
-import 'package:mi_mercado/features/usuario/home/domain/datasources/categoria_datasource.dart';
-import 'package:mi_mercado/features/usuario/home/domain/entities/Categoria.dart';
-import 'package:mi_mercado/features/usuario/home/domain/repositories/categoria_repository.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/datasources/categoria_datasource.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/entities/Categoria.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/repositories/categoria_repository.dart';
 
 class CategoriaRepositoryImpl implements CategoriaRepository {
 

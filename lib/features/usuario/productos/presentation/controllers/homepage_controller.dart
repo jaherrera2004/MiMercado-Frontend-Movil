@@ -1,5 +1,5 @@
-import 'package:mi_mercado/features/usuario/home/domain/entities/Categoria.dart';
-import 'package:mi_mercado/features/usuario/home/domain/entities/Producto.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/entities/Categoria.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/entities/Producto.dart';
 import '../../domain/useCases/obtener_categorias.dart';
 import '../../domain/useCases/obtener_productos.dart';
 import 'package:mi_mercado/core/useCases/use_case.dart';

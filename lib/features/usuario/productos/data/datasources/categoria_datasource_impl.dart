@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mi_mercado/features/usuario/home/domain/datasources/categoria_datasource.dart';
-import 'package:mi_mercado/features/usuario/home/domain/entities/Categoria.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/datasources/categoria_datasource.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/entities/Categoria.dart';
 
 class CategoriaDataSourceImpl implements CategoriaDataSource {
 

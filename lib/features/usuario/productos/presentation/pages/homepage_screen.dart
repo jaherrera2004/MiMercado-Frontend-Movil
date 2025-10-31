@@ -3,7 +3,7 @@ import '../controllers/homepage_controller.dart';
 import 'package:mi_mercado/core/di/injection.dart';
 import 'package:flutter/material.dart';
 import 'package:mi_mercado/core/widgets/text/PageTitle.dart';
-import 'package:mi_mercado/features/usuario/home/presentation/pages/widgets/widgets.dart';
+import 'package:mi_mercado/features/usuario/productos/presentation/pages/widgets/widgets.dart';
 
 
 class HomePage extends StatelessWidget {
