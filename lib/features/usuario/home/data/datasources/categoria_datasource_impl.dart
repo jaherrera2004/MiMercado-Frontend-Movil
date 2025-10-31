@@ -15,12 +15,19 @@ class CategoriaDataSourceImpl implements CategoriaDataSource {
     try {
       final snapshot = await _firestore.collection(_coleccionCategorias).get();
       final categorias = snapshot.docs
-          .map((doc) => Categoria.fromMap(doc.data()))
+          .map((doc) {
+            final map = doc.data();
+            return Categoria(
+              id: doc.id,
+              imagenUrl: map['imagen_url'] ?? '',
+              nombre: map['nombre'] ?? '',
+            );
+          })
           .toList();
-      print('categoria_datasoruce_impl.dart: categorías obtenidas (${categorias.length})');
+      print('categoria_datasource_impl.dart: categorías obtenidas (${categorias.length})');
       return categorias;
     } catch (e) {
-      print('categoria_datasoruce_impl.dart: error al obtener categorías: $e');
+      print('categoria_datasource_impl.dart: error al obtener categorías: $e');
       throw Exception('Error al obtener categorías: $e');
     }
   }

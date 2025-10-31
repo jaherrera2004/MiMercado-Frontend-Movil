@@ -8,7 +8,7 @@ import 'package:mi_mercado/features/usuario/home/presentation/pages/homepage_scr
 import 'package:mi_mercado/pages/auth/IniciarSesionScreen.dart';
 
 
-import 'package:mi_mercado/pages/categoria/CategoriaScreen.dart';
+import 'package:mi_mercado/features/usuario/home/presentation/pages/productos_filtrados.dart';
 import 'package:mi_mercado/pages/carrito/CarritoScreen.dart';
 import 'package:mi_mercado/pages/pago/PagoScreen.dart';
 import 'package:mi_mercado/pages/pedidos/PedidosScreen.dart';
@@ -41,7 +41,7 @@ class MiMercadoApp extends StatelessWidget {
         '/iniciar-sesion': (context) => const IniciarSesionScreen(),
 
         '/home': (context) => HomePage(),
-        '/categoria': (context) => CategoriaScreen(),
+        '/categoria': (context) => const CategoriaScreen(),
         '/carrito': (context) => CarritoScreen(),
         '/pago': (context) => PagoScreen(),
         '/pedidos': (context) => const PedidosScreen(),

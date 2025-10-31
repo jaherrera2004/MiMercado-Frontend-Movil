@@ -9,7 +9,8 @@ import 'package:mi_mercado/features/usuario/home/data/datasources/producto_datas
 import 'package:mi_mercado/features/usuario/home/data/repositories/producto_repository_impl.dart';
 import 'package:mi_mercado/features/usuario/home/domain/repositories/producto_repository.dart';
 import 'package:mi_mercado/features/usuario/home/domain/useCases/obtener_productos.dart';
-import 'package:mi_mercado/features/usuario/home/data/datasources/categoria_datasoruce_impl.dart';
+import 'package:mi_mercado/features/usuario/home/domain/useCases/obtener_productos_por_categoria.dart';
+import 'package:mi_mercado/features/usuario/home/data/datasources/categoria_datasource_impl.dart';
 import 'package:mi_mercado/features/usuario/home/data/repositories/categoria_repository_impl.dart';
 import 'package:mi_mercado/features/usuario/home/domain/repositories/categoria_repository.dart';
 import 'package:mi_mercado/features/usuario/home/domain/useCases/obtener_categorias.dart';
@@ -31,6 +32,7 @@ void setupLocator() {
   getIt.registerLazySingleton(() => ProductoDataSourceImpl(FirebaseFirestore.instance));
   getIt.registerLazySingleton<ProductoRepository>(() => ProductoRepositoryImpl(getIt<ProductoDataSourceImpl>()));
   getIt.registerFactory(() => ObtenerProductos(getIt<ProductoRepository>()));
+  getIt.registerFactory(() => ObtenerProductosPorCategoria(getIt<ProductoRepository>()));
 
   // Categorias
   getIt.registerLazySingleton(() => CategoriaDataSourceImpl(FirebaseFirestore.instance));

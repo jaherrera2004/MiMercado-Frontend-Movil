@@ -3,9 +3,7 @@ import 'package:mi_mercado/features/usuario/home/domain/datasources/producto_dat
 import 'package:mi_mercado/features/usuario/home/domain/entities/Producto.dart';
 
 class ProductoDataSourceImpl implements ProductoDataSource {
-
   final FirebaseFirestore _firestore;
-
   final String _coleccionProductos = 'productos';
 
   ProductoDataSourceImpl(this._firestore);
@@ -22,6 +20,27 @@ class ProductoDataSourceImpl implements ProductoDataSource {
     } catch (e) {
       print('producto_datasource_impl.dart: error al obtener productos: $e');
       throw Exception('Error al obtener productos: $e');
+    }
+  }
+
+  @override
+  Future<List<Producto>> obtenerProductosPorCategoria(String categoriaId) async {
+    try {
+      final snapshot = await _firestore.collection(_coleccionProductos)
+        .where('id_categoria', isEqualTo: categoriaId)
+        .get();
+
+      final productos = snapshot.docs
+          .map((doc) => Producto.fromMap(doc.data()))
+          .toList();
+
+      print('producto_datasource_impl.dart: productos por categoria obtenidos (${productos.length})');
+
+      return productos;
+    } catch (e) {
+      
+      print('producto_datasource_impl.dart: error al obtener productos por categoria: $e');
+      throw Exception('Error al obtener productos por categoria: $e');
     }
   }
 }
