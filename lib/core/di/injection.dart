@@ -27,6 +27,16 @@ import 'package:mi_mercado/features/usuario/productos/domain/repositories/catego
 import 'package:mi_mercado/features/usuario/productos/domain/useCases/obtener_categorias.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/controllers/homepage_controller.dart';
 
+// Direcciones
+import 'package:mi_mercado/features/usuario/direcciones/data/datasources/direccion_datasource_impl.dart';
+import 'package:mi_mercado/features/usuario/direcciones/data/repositories/direccion_repository_impl.dart';
+import 'package:mi_mercado/features/usuario/direcciones/domain/repositories/direccion_repository.dart';
+import 'package:mi_mercado/features/usuario/direcciones/domain/useCases/agregar_direccion.dart';
+import 'package:mi_mercado/features/usuario/direcciones/domain/useCases/obtener_direcciones.dart';
+import 'package:mi_mercado/features/usuario/direcciones/domain/useCases/editar_direccion.dart';
+import 'package:mi_mercado/features/usuario/direcciones/domain/useCases/eliminar_direccion.dart';
+import 'package:mi_mercado/features/usuario/direcciones/presentation/controllers/direccion_controller.dart';
+
 final GetIt getIt = GetIt.instance;
 
 void setupLocator() {
@@ -73,5 +83,19 @@ void setupLocator() {
   getIt.registerFactory<HomePageController>(() => HomePageController(
     obtenerCategorias: getIt<ObtenerCategorias>(),
     obtenerProductos: getIt<ObtenerProductos>(),
+  ));
+
+  // Direcciones
+  getIt.registerLazySingleton(() => DireccionDataSourceImpl(FirebaseFirestore.instance));
+  getIt.registerLazySingleton<DireccionRepository>(() => DireccionRepositoryImpl(getIt<DireccionDataSourceImpl>()));
+  getIt.registerFactory(() => AgregarDireccionUseCase(getIt<DireccionRepository>()));
+  getIt.registerFactory(() => ObtenerDireccionesUseCase(getIt<DireccionRepository>()));
+  getIt.registerFactory(() => EditarDireccionUseCase(getIt<DireccionRepository>()));
+  getIt.registerFactory(() => EliminarDireccionUseCase(getIt<DireccionRepository>()));
+  getIt.registerFactory<DireccionController>(() => DireccionController(
+    agregarDireccionUseCase: getIt<AgregarDireccionUseCase>(),
+    obtenerDireccionesUseCase: getIt<ObtenerDireccionesUseCase>(),
+    editarDireccionUseCase: getIt<EditarDireccionUseCase>(),
+    eliminarDireccionUseCase: getIt<EliminarDireccionUseCase>(),
   ));
 }
