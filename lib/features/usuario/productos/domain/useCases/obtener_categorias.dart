@@ -1,7 +1,7 @@
 import 'package:mi_mercado/core/error/failure.dart';
 import 'package:mi_mercado/core/useCases/use_case.dart';
-import 'package:mi_mercado/features/usuario/home/domain/entities/Categoria.dart';
-import 'package:mi_mercado/features/usuario/home/domain/repositories/categoria_repository.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/entities/Categoria.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/repositories/categoria_repository.dart';
 import 'package:dartz/dartz.dart';
 
 class ObtenerCategorias implements UseCase<Either<Failure, List<Categoria>>, NoParams> {

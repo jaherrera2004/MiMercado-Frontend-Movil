@@ -1,6 +1,6 @@
-import 'package:mi_mercado/features/usuario/home/domain/datasources/producto_datasource.dart';
-import 'package:mi_mercado/features/usuario/home/domain/entities/Producto.dart';
-import 'package:mi_mercado/features/usuario/home/domain/repositories/producto_repository.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/datasources/producto_datasource.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/entities/Producto.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/repositories/producto_repository.dart';
 
 class ProductoRepositoryImpl implements ProductoRepository {
   final ProductoDataSource _productoDataSource;

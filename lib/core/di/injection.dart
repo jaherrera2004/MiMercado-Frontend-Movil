@@ -5,16 +5,16 @@ import 'package:mi_mercado/features/auth/data/datasources/auth_datasource_impl.d
 import 'package:mi_mercado/features/auth/data/repositories/auth_repositories_impl.dart';
 import 'package:mi_mercado/features/auth/domain/repositories/auth_repository.dart';
 import 'package:mi_mercado/features/auth/domain/useCases/registrar_usuario.dart';
-import 'package:mi_mercado/features/usuario/home/data/datasources/producto_datasource_impl.dart';
-import 'package:mi_mercado/features/usuario/home/data/repositories/producto_repository_impl.dart';
-import 'package:mi_mercado/features/usuario/home/domain/repositories/producto_repository.dart';
-import 'package:mi_mercado/features/usuario/home/domain/useCases/obtener_productos.dart';
-import 'package:mi_mercado/features/usuario/home/domain/useCases/obtener_productos_por_categoria.dart';
-import 'package:mi_mercado/features/usuario/home/data/datasources/categoria_datasource_impl.dart';
-import 'package:mi_mercado/features/usuario/home/data/repositories/categoria_repository_impl.dart';
-import 'package:mi_mercado/features/usuario/home/domain/repositories/categoria_repository.dart';
-import 'package:mi_mercado/features/usuario/home/domain/useCases/obtener_categorias.dart';
-import 'package:mi_mercado/features/usuario/home/presentation/controllers/homepage_controller.dart';
+import 'package:mi_mercado/features/usuario/productos/data/datasources/producto_datasource_impl.dart';
+import 'package:mi_mercado/features/usuario/productos/data/repositories/producto_repository_impl.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/repositories/producto_repository.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/useCases/obtener_productos.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/useCases/obtener_productos_por_categoria.dart';
+import 'package:mi_mercado/features/usuario/productos/data/datasources/categoria_datasource_impl.dart';
+import 'package:mi_mercado/features/usuario/productos/data/repositories/categoria_repository_impl.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/repositories/categoria_repository.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/useCases/obtener_categorias.dart';
+import 'package:mi_mercado/features/usuario/productos/presentation/controllers/homepage_controller.dart';
 
 final GetIt getIt = GetIt.instance;
 
