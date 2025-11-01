@@ -13,9 +13,17 @@ class LoginController extends GetxController {
 	final isLoading = false.obs;
 
 	@override
+	void onInit() {
+		super.onInit();
+		// Limpiar campos cuando se inicializa
+		emailController.clear();
+		passwordController.clear();
+	}
+
+	@override
 	void onClose() {
-		emailController.dispose();
-		passwordController.dispose();
+		// No disponer los controllers aquí porque el controller puede ser reutilizado
+		// Los controllers serán disposed por Flutter cuando el widget se destruya
 		super.onClose();
 	}
 
@@ -23,7 +31,7 @@ class LoginController extends GetxController {
 		if (value == null || value.trim().isEmpty) {
 			return 'El email es requerido';
 		}
-		final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+		final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 		if (!emailRegex.hasMatch(value.trim())) {
 			return 'Ingresa un email válido';
 		}

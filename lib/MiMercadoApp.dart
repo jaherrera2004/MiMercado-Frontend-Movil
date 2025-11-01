@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mi_mercado/SplashScreen.dart';
+import 'package:mi_mercado/features/auth/presentation/pages/login_screen.dart';
 
 
-import 'package:mi_mercado/features/auth/presentation/pages/RegisterScreen.dart';
+import 'package:mi_mercado/features/auth/presentation/pages/register_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/mi_cuenta_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/datos_perfil_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/seguridad_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/editar_contrasena_screen.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/pages/carrito_screen.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/pages/homepage_screen.dart';
-import 'package:mi_mercado/pages/auth/IniciarSesionScreen.dart';
 
 
 import 'package:mi_mercado/features/usuario/productos/presentation/pages/productos_filtrados_screen.dart';

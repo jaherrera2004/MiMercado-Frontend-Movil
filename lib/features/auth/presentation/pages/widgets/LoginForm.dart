@@ -6,6 +6,7 @@ import '../../../../../core/widgets/forms/CustomTextField.dart';
 import '../../../../../core/widgets/buttons/PrimaryButton.dart';
 import '../../../../../core/widgets/navigation/NavigationLink.dart';
 import '../../../../../core/widgets/text/PageTitle.dart';
+import '../../../../../core/error/failure.dart';
 import 'UserTypeSelector.dart';
 
 /// Formulario de inicio de sesión separado del widget principal
@@ -28,8 +29,8 @@ class _LoginFormState extends State<LoginForm> {
       return 'El email es requerido';
     }
     
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) {
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    if (!emailRegex.hasMatch(value.trim())) {
       return 'Ingresa un email válido';
     }
     
@@ -50,12 +51,16 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   @override
-  void dispose() {
-    _loginController.emailController.dispose();
-    _loginController.passwordController.dispose();
-    super.dispose();
+  void initState() {
     super.initState();
     _loginController = Get.put(LoginController());
+  }
+
+  @override
+  void dispose() {
+    // No disponer los controllers aquí porque pertenecen al controller global
+    // y pueden ser reutilizados
+    super.dispose();
   }
 
   void _handleLogin() async {
@@ -72,7 +77,13 @@ class _LoginFormState extends State<LoginForm> {
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       if (mounted) {
-        SnackBarMessage.showError(context, 'Error al iniciar sesión: ${e.toString().replaceAll('Exception:', '').trim()}');
+        String errorMessage;
+        if (e is Failure) {
+          errorMessage = e.message;
+        } else {
+          errorMessage = e.toString().replaceAll('Exception:', '').trim();
+        }
+        SnackBarMessage.showError(context, errorMessage);
       }
     } finally {
       if (mounted) {
