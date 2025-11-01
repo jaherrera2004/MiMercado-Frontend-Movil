@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'pages/auth/RegisterScreen.dart'; // Asegúrate de importar la pantalla de registro
 
 class SplashScreen extends StatelessWidget {
   @override

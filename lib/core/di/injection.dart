@@ -16,6 +16,7 @@ import 'package:get/get.dart';
 import 'package:mi_mercado/features/auth/data/datasources/auth_datasource_impl.dart';
 import 'package:mi_mercado/features/auth/data/repositories/auth_repositories_impl.dart';
 import 'package:mi_mercado/features/auth/domain/repositories/auth_repository.dart';
+import 'package:mi_mercado/features/auth/domain/useCases/login.dart';
 import 'package:mi_mercado/features/auth/domain/useCases/registrar_usuario.dart';
 import 'package:mi_mercado/features/usuario/productos/data/datasources/producto_datasource_impl.dart';
 import 'package:mi_mercado/features/usuario/productos/data/repositories/producto_repository_impl.dart';
@@ -80,6 +81,7 @@ void setupLocator() {
 
   // Use cases
   getIt.registerFactory(() => RegistrarUsuario(getIt<AuthRepository>()));
+  getIt.registerFactory(() => Login(getIt<AuthRepository>()));
 
   // Productos
   getIt.registerLazySingleton(() => ProductoDataSourceImpl(FirebaseFirestore.instance));
