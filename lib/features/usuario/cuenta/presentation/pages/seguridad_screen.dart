@@ -9,7 +9,7 @@ class SeguridadScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Inicializar el controller
+    // Inicializar el controllerz
     final controller = Get.put(getIt<SeguridadController>());
 
     return Scaffold(
