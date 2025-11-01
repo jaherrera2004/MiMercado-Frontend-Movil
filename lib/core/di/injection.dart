@@ -11,6 +11,7 @@ import 'package:mi_mercado/features/usuario/productos/domain/useCases/calcular_s
 import 'package:mi_mercado/features/usuario/productos/presentation/controllers/carrito_controller.dart';
 import 'package:get_it/get_it.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 
 import 'package:mi_mercado/features/auth/data/datasources/auth_datasource_impl.dart';
 import 'package:mi_mercado/features/auth/data/repositories/auth_repositories_impl.dart';
@@ -36,6 +37,18 @@ import 'package:mi_mercado/features/usuario/direcciones/domain/useCases/obtener_
 import 'package:mi_mercado/features/usuario/direcciones/domain/useCases/editar_direccion.dart';
 import 'package:mi_mercado/features/usuario/direcciones/domain/useCases/eliminar_direccion.dart';
 import 'package:mi_mercado/features/usuario/direcciones/presentation/controllers/direccion_controller.dart';
+
+// Cuenta
+import 'package:mi_mercado/features/usuario/cuenta/data/datasources/usuario_datasource_impl.dart';
+import 'package:mi_mercado/features/usuario/cuenta/data/repositories/usuario_repository_impl.dart';
+import 'package:mi_mercado/features/usuario/cuenta/domain/repositories/usuario_repository.dart';
+import 'package:mi_mercado/features/usuario/cuenta/domain/useCases/obtener_usuario_por_id.dart';
+import 'package:mi_mercado/features/usuario/cuenta/domain/useCases/editar_usuario.dart';
+import 'package:mi_mercado/features/usuario/cuenta/domain/useCases/editar_contrasena.dart';
+import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/mi_cuenta_controller.dart';
+import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/datos_perfil_controller.dart';
+import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/editar_contrasena_controller.dart';
+import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/seguridad_controller.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -98,4 +111,31 @@ void setupLocator() {
     editarDireccionUseCase: getIt<EditarDireccionUseCase>(),
     eliminarDireccionUseCase: getIt<EliminarDireccionUseCase>(),
   ));
+
+  // Cuenta
+  getIt.registerLazySingleton(() => UsuarioDataSourceImpl(FirebaseFirestore.instance));
+  getIt.registerLazySingleton<UsuarioRepository>(() => UsuarioRepositoryImpl(getIt<UsuarioDataSourceImpl>()));
+  getIt.registerFactory<ObtenerUsuarioPorIdUseCase>(() => ObtenerUsuarioPorIdUseCase(getIt<UsuarioRepository>()));
+  getIt.registerFactory<EditarUsuarioUseCase>(() => EditarUsuarioUseCase(getIt<UsuarioRepository>()));
+  getIt.registerFactory<EditarContrasenaUseCase>(() => EditarContrasenaUseCase(getIt<UsuarioRepository>()));
+  getIt.registerFactory<MiCuentaController>(() => MiCuentaController(
+    obtenerUsuarioPorId: getIt<ObtenerUsuarioPorIdUseCase>(),
+    editarUsuario: getIt<EditarUsuarioUseCase>(),
+    editarContrasena: getIt<EditarContrasenaUseCase>(),
+  ));
+  getIt.registerFactory<DatosPerfilController>(() => DatosPerfilController(
+    obtenerUsuarioPorId: getIt<ObtenerUsuarioPorIdUseCase>(),
+    editarUsuario: getIt<EditarUsuarioUseCase>(),
+  ));
+  getIt.registerFactory<EditarContrasenaController>(() => EditarContrasenaController(
+    editarContrasena: getIt<EditarContrasenaUseCase>(),
+  ));
+  getIt.registerFactory<SeguridadController>(() => SeguridadController(
+    editarContrasena: getIt<EditarContrasenaUseCase>(),
+  ));
+
+  // Registro de usecases de cuenta en GetX para widgets que usan Get.find
+  Get.lazyPut<ObtenerUsuarioPorIdUseCase>(() => getIt<ObtenerUsuarioPorIdUseCase>());
+  Get.lazyPut<EditarUsuarioUseCase>(() => getIt<EditarUsuarioUseCase>());
+  Get.lazyPut<EditarContrasenaUseCase>(() => getIt<EditarContrasenaUseCase>());
 }

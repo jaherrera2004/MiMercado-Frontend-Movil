@@ -4,6 +4,10 @@ import 'package:mi_mercado/SplashScreen.dart';
 
 
 import 'package:mi_mercado/features/auth/presentation/pages/RegisterScreen.dart';
+import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/mi_cuenta_screen.dart';
+import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/datos_perfil_screen.dart';
+import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/seguridad_screen.dart';
+import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/editar_contrasena_screen.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/pages/carrito_screen.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/pages/homepage_screen.dart';
 import 'package:mi_mercado/pages/auth/IniciarSesionScreen.dart';
@@ -14,10 +18,6 @@ import 'package:mi_mercado/pages/pago/PagoScreen.dart';
 import 'package:mi_mercado/pages/pedidos/PedidosScreen.dart';
 import 'package:mi_mercado/pages/pedidos/PedidoDetalleScreen.dart';
 import 'package:mi_mercado/features/usuario/direcciones/presentation/pages/direccion_screen.dart';
-import 'package:mi_mercado/pages/cuenta/MiCuentaScreen.dart';
-import 'package:mi_mercado/pages/cuenta/DatosPerfilScreen.dart';
-import 'package:mi_mercado/pages/cuenta/SeguridadScreen.dart';
-import 'package:mi_mercado/pages/cuenta/EditarContrase%C3%B1aScreen.dart';
 import 'package:mi_mercado/pages/repartidor/RepartidorPageScreen.dart';
 
 class MiMercadoApp extends StatelessWidget {
@@ -39,7 +39,6 @@ class MiMercadoApp extends StatelessWidget {
         '/': (context) => SplashScreen(),
         '/registro': (context) => const RegisterScreen(),
         '/iniciar-sesion': (context) => const IniciarSesionScreen(),
-
         '/home': (context) => HomePage(),
         '/categoria': (context) => const CategoriaScreen(),
         '/carrito': (context) => CarritoScreen(),
@@ -48,9 +47,9 @@ class MiMercadoApp extends StatelessWidget {
         '/detalle-pedido': (context) => const DatosPedidosScreen(),
         '/direcciones': (context) => const DireccionesScreen(),
         '/cuenta': (context) => const CuentaScreen(),
-        '/datos-perfil': (context) => const DatosScreen(),
-        '/seguridad': (context) => const PasswordScreen(),
-        '/editar-seguridad': (context) => const EditarSeguridadScreen(),
+        '/datos-perfil': (context) => const DatosPerfilScreen(),
+        '/seguridad': (context) => const SeguridadScreen(),
+        '/editar-seguridad': (context) => const EditarContrasenaScreen(),
         '/repartidor': (context) => const RepartidorPage(),
       },
     );
