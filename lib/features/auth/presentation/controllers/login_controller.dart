@@ -66,6 +66,7 @@ class LoginController extends GetxController {
 
 				if (persona != null) {
 					await SharedPreferencesUtils.saveUserId(persona.id!);
+          await SharedPreferencesUtils.saveUserName(persona.nombre!);
 				}
         
 				return persona;

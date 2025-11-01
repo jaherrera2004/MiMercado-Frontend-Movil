@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mi_mercado/models/SharedPreferences.dart';
+import 'package:mi_mercado/core/utils/shared_preferences_utils.dart';
 
 class HomeAppBar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? onCartPressed;
@@ -28,7 +28,7 @@ class _HomeAppBarState extends State<HomeAppBar> {
 
   Future<void> _loadUserName() async {
     try {
-      final name = await SharedPreferencesService.getCurrentUserName();
+      final name = await SharedPreferencesUtils.getUserName();
       if (!mounted) return;
       setState(() {
         _userName = name;

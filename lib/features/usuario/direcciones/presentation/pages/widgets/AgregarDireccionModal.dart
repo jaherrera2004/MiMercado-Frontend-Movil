@@ -36,7 +36,9 @@ class _AgregarDireccionModalState extends State<AgregarDireccionModal> {
   }
 
   void _guardarDireccion() async {
+    print('AgregarDireccionModal: _guardarDireccion llamado');
     if (_formKey.currentState!.validate()) {
+      print('AgregarDireccionModal: Formulario válido');
       setState(() {
         _isLoading = true;
       });
@@ -51,9 +53,13 @@ class _AgregarDireccionModalState extends State<AgregarDireccionModal> {
           esPrincipal: _esPrincipal,
         );
 
+        print('AgregarDireccionModal: Dirección creada: ${nuevaDireccion.nombre}, idUsuario: ${nuevaDireccion.idUsuario}');
+
         // Llamar al callback que manejará el guardado en Firebase
+        print('AgregarDireccionModal: Llamando onDireccionAgregada');
         await widget.onDireccionAgregada(nuevaDireccion);
         
+        print('AgregarDireccionModal: onDireccionAgregada completado, cerrando modal');
         setState(() {
           _isLoading = false;
         });
@@ -61,13 +67,13 @@ class _AgregarDireccionModalState extends State<AgregarDireccionModal> {
         Navigator.of(context).pop();
         
       } catch (e) {
+        print('AgregarDireccionModal: Error en modal: $e');
         setState(() {
           _isLoading = false;
         });
-        
-        // El error ya se maneja en el método padre, no necesitamos hacer nada aquí
-        print('Error en modal: $e');
       }
+    } else {
+      print('AgregarDireccionModal: Formulario inválido');
     }
   }
 

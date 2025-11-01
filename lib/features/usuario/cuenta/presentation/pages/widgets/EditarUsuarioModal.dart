@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
+import 'package:mi_mercado/core/utils/shared_preferences_utils.dart';
 import 'package:mi_mercado/features/auth/domain/entities/Usuario.dart';
 import 'package:mi_mercado/features/usuario/cuenta/domain/useCases/obtener_usuario_por_id.dart';
 import 'package:mi_mercado/features/usuario/cuenta/domain/useCases/editar_usuario.dart';
-import 'package:mi_mercado/models/SharedPreferences.dart';
 
 /// Modal para editar los datos del usuario
 class EditarUsuarioModal extends StatefulWidget {
@@ -52,7 +52,7 @@ class _EditarUsuarioModalState extends State<EditarUsuarioModal> {
 
   Future<void> _cargarDatosUsuario() async {
     try {
-      final idUsuario = await SharedPreferencesService.getCurrentUserId();
+      final idUsuario = await SharedPreferencesUtils.getUserId();
       if (idUsuario == null) {
         throw Exception('Usuario no autenticado');
       }
@@ -95,7 +95,7 @@ class _EditarUsuarioModalState extends State<EditarUsuarioModal> {
     });
 
     try {
-      final idUsuario = await SharedPreferencesService.getCurrentUserId();
+      final idUsuario = await SharedPreferencesUtils.getUserId();
       if (idUsuario == null) {
         throw Exception('Usuario no autenticado');
       }

@@ -53,6 +53,7 @@ class DireccionDataSourceImpl implements DireccionDataSource {
 
   @override
   Future<List<Direccion>> obtenerDirecciones(String idUsuario) async {
+    print(" direccion_datasource_impl.dart: obteniendo direcciones para usuario ($idUsuario)");
     try {
       final userDoc = await _firestore.collection(_coleccionUsuarios).doc(idUsuario).get();
 
