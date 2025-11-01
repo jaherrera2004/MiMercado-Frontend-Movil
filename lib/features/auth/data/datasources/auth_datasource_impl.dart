@@ -21,7 +21,11 @@ class AuthDataSourceImpl implements AuthDataSource {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        return Usuario.fromMap(querySnapshot.docs.first.data());
+        final doc = querySnapshot.docs.first;
+        final userData = doc.data();
+        // Incluir el ID del documento en el mapa
+        final userDataWithId = {'id': doc.id, ...userData};
+        return Usuario.fromMap(userDataWithId);
       } else {
         return null;
       }
@@ -41,7 +45,11 @@ class AuthDataSourceImpl implements AuthDataSource {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        return Repartidor.fromMap(querySnapshot.docs.first.data());
+        final doc = querySnapshot.docs.first;
+        final repartidorData = doc.data();
+        // Incluir el ID del documento en el mapa
+        final repartidorDataWithId = {'id': doc.id, ...repartidorData};
+        return Repartidor.fromMap(repartidorDataWithId);
       } else {
         return null;
       }

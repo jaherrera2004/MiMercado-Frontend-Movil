@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
+import 'package:mi_mercado/core/utils/shared_preferences_utils.dart';
 import 'package:mi_mercado/features/auth/domain/entities/Usuario.dart';
 import 'package:mi_mercado/features/usuario/cuenta/domain/useCases/obtener_usuario_por_id.dart';
 import 'package:mi_mercado/features/usuario/cuenta/domain/useCases/editar_usuario.dart';
-import 'package:mi_mercado/models/SharedPreferences.dart';
 
 class DatosPerfilController extends GetxController {
   final ObtenerUsuarioPorIdUseCase obtenerUsuarioPorId;
@@ -34,7 +34,7 @@ class DatosPerfilController extends GetxController {
     errorMessage.value = '';
 
     try {
-      final idUsuario = await SharedPreferencesService.getCurrentUserId();
+      final idUsuario = await SharedPreferencesUtils.getUserId();
       if (idUsuario == null) {
         errorMessage.value = 'Usuario no autenticado';
         return;

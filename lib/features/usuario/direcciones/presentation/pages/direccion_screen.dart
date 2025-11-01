@@ -3,26 +3,36 @@ import 'package:get/get.dart';
 import 'package:mi_mercado/features/usuario/direcciones/domain/entities/Direccion.dart';
 import '../controllers/direccion_controller.dart';
 import 'widgets/widgets.dart';
-import 'package:mi_mercado/models/SharedPreferences.dart';
+import 'package:mi_mercado/core/utils/shared_preferences_utils.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/pages/widgets/HomeBottomNavigation.dart';
 
 class DireccionesScreen extends GetView<DireccionController> {
   const DireccionesScreen({super.key});
 
   Future<String?> _getCurrentUserId() async {
-    return await SharedPreferencesService.getCurrentUserId();
+    return await SharedPreferencesUtils.getUserId();
   }
 
   void _mostrarModalAgregar(BuildContext context) async {
+    print('DireccionScreen: _mostrarModalAgregar llamado');
     final idUsuario = await _getCurrentUserId();
+    print('DireccionScreen: idUsuario obtenido: $idUsuario');
+
     if (idUsuario != null) {
+      print('DireccionScreen: Abriendo modal de agregar dirección');
       showDialog(
         context: context,
         builder: (context) => AgregarDireccionModal(
           idUsuario: idUsuario,
-          onDireccionAgregada: (direccion) => controller.agregarDireccion(direccion),
+          onDireccionAgregada: (direccion) async {
+            print('DireccionScreen: Callback onDireccionAgregada llamado con dirección: ${direccion.nombre}');
+            await controller.agregarDireccion(direccion);
+          },
         ),
       );
+    } else {
+      print('DireccionScreen: ERROR - idUsuario es null, no se puede abrir modal');
+      Get.snackbar('Error', 'No se pudo obtener el ID del usuario');
     }
   }
 
@@ -58,6 +68,11 @@ class DireccionesScreen extends GetView<DireccionController> {
 
   @override
   Widget build(BuildContext context) {
+    // Cargar direcciones cuando se abra la pantalla
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.cargarDireccionesUsuario();
+    });
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
