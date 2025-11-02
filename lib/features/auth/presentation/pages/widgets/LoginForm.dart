@@ -74,7 +74,8 @@ class _LoginFormState extends State<LoginForm> {
       await _loginController.login(rol: rol);
       if (!mounted) return;
       SnackBarMessage.showSuccess(context, '¡Inicio de sesión exitoso!');
-      Navigator.pushReplacementNamed(context, '/home');
+      final route = rol == 'repartidor' ? '/repartidor' : '/home';
+      Navigator.pushReplacementNamed(context, route);
     } catch (e) {
       if (mounted) {
         String errorMessage;
