@@ -38,9 +38,42 @@ class ProductoDataSourceImpl implements ProductoDataSource {
 
       return productos;
     } catch (e) {
-      
       print('producto_datasource_impl.dart: error al obtener productos por categoria: $e');
       throw Exception('Error al obtener productos por categoria: $e');
+    }
+  }
+
+  @override
+  Future<List<Producto>> obtenerProductosPorIds(List<String> productoIds) async {
+    try {
+      if (productoIds.isEmpty) {
+        return [];
+      }
+
+      // Firestore tiene un límite de 10 elementos en whereIn, así que dividimos en chunks si es necesario
+      const int chunkSize = 10;
+      List<Producto> allProductos = [];
+
+      for (int i = 0; i < productoIds.length; i += chunkSize) {
+        final end = (i + chunkSize < productoIds.length) ? i + chunkSize : productoIds.length;
+        final chunk = productoIds.sublist(i, end);
+
+        final snapshot = await _firestore.collection(_coleccionProductos)
+          .where(FieldPath.documentId, whereIn: chunk)
+          .get();
+
+        final productos = snapshot.docs
+            .map((doc) => Producto.fromMap({...doc.data(), 'id': doc.id}))
+            .toList();
+
+        allProductos.addAll(productos);
+      }
+
+      print('producto_datasource_impl.dart: productos por IDs obtenidos (${allProductos.length})');
+      return allProductos;
+    } catch (e) {
+      print('producto_datasource_impl.dart: error al obtener productos por IDs: $e');
+      throw Exception('Error al obtener productos por IDs: $e');
     }
   }
 }

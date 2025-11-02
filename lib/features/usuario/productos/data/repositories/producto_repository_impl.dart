@@ -18,4 +18,10 @@ class ProductoRepositoryImpl implements ProductoRepository {
     print('producto_repository_impl.dart: obteniendo productos por categoria desde el datasource');
     return _productoDataSource.obtenerProductosPorCategoria(categoriaId);
   }
+
+  @override
+  Future<List<Producto>> obtenerProductosPorIds(List<String> productoIds) {
+    print('producto_repository_impl.dart: obteniendo productos por IDs desde el datasource');
+    return _productoDataSource.obtenerProductosPorIds(productoIds);
+  }
 }

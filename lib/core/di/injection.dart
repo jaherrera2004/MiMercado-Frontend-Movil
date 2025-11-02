@@ -23,6 +23,7 @@ import 'package:mi_mercado/features/usuario/productos/data/repositories/producto
 import 'package:mi_mercado/features/usuario/productos/domain/repositories/producto_repository.dart';
 import 'package:mi_mercado/features/usuario/productos/domain/useCases/obtener_productos.dart';
 import 'package:mi_mercado/features/usuario/productos/domain/useCases/obtener_productos_por_categoria.dart';
+import 'package:mi_mercado/features/usuario/productos/domain/useCases/obtener_productos_pedido.dart';
 import 'package:mi_mercado/features/usuario/productos/data/datasources/categoria_datasource_impl.dart';
 import 'package:mi_mercado/features/usuario/productos/data/repositories/categoria_repository_impl.dart';
 import 'package:mi_mercado/features/usuario/productos/domain/repositories/categoria_repository.dart';
@@ -38,6 +39,16 @@ import 'package:mi_mercado/features/usuario/direcciones/domain/useCases/obtener_
 import 'package:mi_mercado/features/usuario/direcciones/domain/useCases/editar_direccion.dart';
 import 'package:mi_mercado/features/usuario/direcciones/domain/useCases/eliminar_direccion.dart';
 import 'package:mi_mercado/features/usuario/direcciones/presentation/controllers/direccion_controller.dart';
+
+// Pedidos
+import 'package:mi_mercado/features/pedidos/data/datasources/pedido_datasource_impl.dart';
+import 'package:mi_mercado/features/pedidos/data/repositories/pedido_repository_impl.dart';
+import 'package:mi_mercado/features/pedidos/domain/repositories/pedido_repository.dart';
+import 'package:mi_mercado/features/pedidos/domain/useCases/agregar_pedido.dart';
+import 'package:mi_mercado/features/pedidos/domain/useCases/obtener_pedidos.dart';
+import 'package:mi_mercado/features/pedidos/domain/useCases/obtener_pedido_por_id.dart';
+import 'package:mi_mercado/features/pedidos/presentation/controllers/pedidos_controller.dart';
+import 'package:mi_mercado/features/pedidos/presentation/controllers/pedido_detalle_controller.dart';
 
 // Cuenta
 import 'package:mi_mercado/features/usuario/cuenta/data/datasources/usuario_datasource_impl.dart';
@@ -88,6 +99,7 @@ void setupLocator() {
   getIt.registerLazySingleton<ProductoRepository>(() => ProductoRepositoryImpl(getIt<ProductoDataSourceImpl>()));
   getIt.registerFactory(() => ObtenerProductos(getIt<ProductoRepository>()));
   getIt.registerFactory(() => ObtenerProductosPorCategoria(getIt<ProductoRepository>()));
+  getIt.registerFactory(() => ObtenerProductosPedido(getIt<ProductoRepository>()));
 
   // Categorias
   getIt.registerLazySingleton(() => CategoriaDataSourceImpl(FirebaseFirestore.instance));
@@ -112,6 +124,20 @@ void setupLocator() {
     obtenerDireccionesUseCase: getIt<ObtenerDireccionesUseCase>(),
     editarDireccionUseCase: getIt<EditarDireccionUseCase>(),
     eliminarDireccionUseCase: getIt<EliminarDireccionUseCase>(),
+  ));
+
+  // Pedidos
+  getIt.registerLazySingleton(() => PedidoDataSourceImpl(FirebaseFirestore.instance));
+  getIt.registerLazySingleton<PedidoRepository>(() => PedidoRepositoryImpl(getIt<PedidoDataSourceImpl>()));
+  getIt.registerFactory(() => AgregarPedidoUseCase(getIt<PedidoRepository>()));
+  getIt.registerFactory(() => ObtenerPedidosUseCase(getIt<PedidoRepository>()));
+  getIt.registerFactory(() => ObtenerPedidoPorIdUseCase(getIt<PedidoRepository>()));
+  getIt.registerFactory<PedidosController>(() => PedidosController(
+    obtenerPedidosUseCase: getIt<ObtenerPedidosUseCase>(),
+  ));
+  getIt.registerFactory<PedidoDetalleController>(() => PedidoDetalleController(
+    obtenerPedidoPorIdUseCase: getIt<ObtenerPedidoPorIdUseCase>(),
+    obtenerProductosPedido: getIt<ObtenerProductosPedido>(),
   ));
 
   // Cuenta
