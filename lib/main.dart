@@ -7,6 +7,8 @@ import 'package:mi_mercado/models/CarritoService.dart';
 import 'package:get/get.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/controllers/carrito_controller.dart';
 import 'package:mi_mercado/features/usuario/direcciones/presentation/controllers/direccion_controller.dart';
+import 'package:mi_mercado/features/pedidos/presentation/controllers/pedidos_controller.dart';
+import 'package:mi_mercado/features/pedidos/presentation/controllers/pedido_detalle_controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +28,8 @@ Future<void> main() async {
   // Esto crea la instancia usando GetIt (factory) y la pone en Getx dependency system.
   Get.put(getIt<CarritoController>());
   Get.put(getIt<DireccionController>());
+  Get.put(getIt<PedidosController>());
+  Get.put(getIt<PedidoDetalleController>());
   
   runApp(const MiMercadoApp());
 }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mi_mercado/SplashScreen.dart';
 import 'package:mi_mercado/features/auth/presentation/pages/login_screen.dart';
 
 
 import 'package:mi_mercado/features/auth/presentation/pages/register_screen.dart';
+import 'package:mi_mercado/features/pedidos/presentation/pages/pedidos_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/mi_cuenta_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/datos_perfil_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/seguridad_screen.dart';
@@ -15,8 +17,7 @@ import 'package:mi_mercado/features/usuario/productos/presentation/pages/homepag
 
 import 'package:mi_mercado/features/usuario/productos/presentation/pages/productos_filtrados_screen.dart';
 import 'package:mi_mercado/pages/pago/PagoScreen.dart';
-import 'package:mi_mercado/pages/pedidos/PedidosScreen.dart';
-import 'package:mi_mercado/pages/pedidos/PedidoDetalleScreen.dart';
+import 'package:mi_mercado/features/pedidos/presentation/pages/pedidos_detalle_screen.dart';
 import 'package:mi_mercado/features/usuario/direcciones/presentation/pages/direccion_screen.dart';
 import 'package:mi_mercado/pages/repartidor/RepartidorPageScreen.dart';
 
@@ -25,7 +26,7 @@ class MiMercadoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'MiMercado',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
