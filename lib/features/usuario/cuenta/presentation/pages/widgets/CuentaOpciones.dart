@@ -7,95 +7,244 @@ class CuentaOpciones extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Información personal
-        Opcion(
-          nombre: "Información personal",
-          iconPath: "lib/resources/cedula.png",
-          onTap: () {
-            Navigator.pushNamed(context, '/datos-perfil');
-          },
-        ),
-        
-        // Seguridad
-        Opcion(
-          nombre: "Seguridad",
-          iconPath: "lib/resources/seguridad.png",
-          onTap: () {
-            Navigator.pushNamed(context, '/seguridad');
-          },
-        ),
-        
-        // Cerrar sesión
-        Opcion(
-          nombre: "Cerrar sesión",
-          iconPath: "lib/resources/logout.png",
-          onTap: () {
-            _mostrarDialogoCerrarSesion(context);
-          },
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Título de sección
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Text(
+              'Configuración',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade600,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 8),
+          
+          // Información personal
+          Opcion(
+            nombre: "Información personal",
+            iconPath: "lib/resources/cedula.png",
+            onTap: () {
+              Navigator.pushNamed(context, '/datos-perfil');
+            },
+          ),
+          
+          // Seguridad
+          Opcion(
+            nombre: "Seguridad",
+            iconPath: "lib/resources/seguridad.png",
+            onTap: () {
+              Navigator.pushNamed(context, '/seguridad');
+            },
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // Título de sección
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Text(
+              'Sesión',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade600,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 8),
+          
+          // Cerrar sesión
+          Opcion(
+            nombre: "Cerrar sesión",
+            iconPath: "lib/resources/logout.png",
+            onTap: () {
+              _mostrarDialogoCerrarSesion(context);
+            },
+          ),
+          
+          const SizedBox(height: 40),
+        ],
+      ),
     );
   }
 
-  /// Muestra un diálogo de confirmación para cerrar sesión
+  /// Muestra un diálogo de confirmación para cerrar sesión con diseño moderno
   void _mostrarDialogoCerrarSesion(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Cerrar sesión'),
-          content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Cerrar diálogo
-              },
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop(); // Cerrar diálogo
-                
-                try {
-                  // TODO: Implementar logout usando SharedPreferences o AuthService
-                  // Por ahora solo navegamos al login
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Sesión cerrada exitosamente'),
-                        backgroundColor: Color(0xFF58E181),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                    
-                    // Navegar al splash screen y limpiar el stack de navegación
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/',
-                      (route) => false,
-                    );
-                  }
-                } catch (e) {
-                  // Mostrar mensaje de error
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error al cerrar sesión: ${e.toString().replaceAll('Exception: ', '')}'),
-                        backgroundColor: Colors.red,
-                        duration: const Duration(seconds: 3),
-                      ),
-                    );
-                  }
-                }
-              },
-              child: const Text(
-                'Cerrar sesión',
-                style: TextStyle(color: Colors.red),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          contentPadding: const EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icono decorativo
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.logout,
+                  size: 48,
+                  color: Colors.red.shade400,
+                ),
               ),
-            ),
-          ],
+              
+              const SizedBox(height: 20),
+              
+              // Título
+              const Text(
+                'Cerrar sesión',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Mensaje
+              Text(
+                '¿Estás seguro de que quieres cerrar tu sesión?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.grey.shade600,
+                  height: 1.4,
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Botones
+              Row(
+                children: [
+                  // Botón Cancelar
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: BorderSide(
+                          color: Colors.grey.shade300,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Text(
+                        'Cancelar',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(width: 12),
+                  
+                  // Botón Cerrar sesión
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        
+                        try {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Row(
+                                  children: [
+                                    Icon(Icons.check_circle, color: Colors.white),
+                                    SizedBox(width: 12),
+                                    Text('Sesión cerrada exitosamente'),
+                                  ],
+                                ),
+                                backgroundColor: const Color(0xFF58E181),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                            
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/',
+                              (route) => false,
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Row(
+                                  children: [
+                                    const Icon(Icons.error_outline, color: Colors.white),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        'Error: ${e.toString().replaceAll('Exception: ', '')}',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                backgroundColor: Colors.red,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                duration: const Duration(seconds: 3),
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red.shade400,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Salir',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         );
       },
     );

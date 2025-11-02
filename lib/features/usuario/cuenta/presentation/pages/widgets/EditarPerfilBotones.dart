@@ -16,73 +16,89 @@ class EditarPerfilBotones extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Botón Guardar cambios
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: isLoading ? null : (onGuardar ?? () {
-              // Lógica por defecto para guardar
-            }),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF58E181), // verde
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 0,
+            blurRadius: 15,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Info sobre edición
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF58E181).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: const Color(0xFF58E181).withOpacity(0.2),
               ),
-              disabledBackgroundColor: Colors.grey.shade300,
             ),
-            child: isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : Text(
-                    "Guardar cambios",
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  size: 20,
+                  color: const Color(0xFF58E181),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Usa el botón de editar en la parte superior para modificar tu información',
                     style: GoogleFonts.inter(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: Colors.grey[700],
+                      height: 1.4,
                     ),
                   ),
-          ),
-        ),
-        
-        const SizedBox(height: 15),
-        
-        // Botón Cancelar
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: isLoading ? null : (onCancelar ?? () {
-              Navigator.pop(context);
-            }),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEE6565), // rojo
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              disabledBackgroundColor: Colors.grey.shade300,
-            ),
-            child: Text(
-              "Cancelar",
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+                ),
+              ],
             ),
           ),
-        ),
-        
-        const SizedBox(height: 30),
-      ],
+          
+          const SizedBox(height: 20),
+          
+          // Botón Volver
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: isLoading ? null : (onCancelar ?? () {
+                Navigator.pop(context);
+              }),
+              icon: const Icon(Icons.arrow_back, size: 20),
+              label: Text(
+                "Volver",
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.3,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[100],
+                foregroundColor: Colors.grey[700],
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: BorderSide(
+                    color: Colors.grey[300]!,
+                    width: 1.5,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

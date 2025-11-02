@@ -20,31 +20,46 @@ class CamposDatos extends StatelessWidget {
     final displayValue = value ?? '';
     
     return Container(
-      margin: const EdgeInsets.only(bottom: 16.0),
-      padding: const EdgeInsets.all(20.0),
+      margin: const EdgeInsets.only(bottom: 12.0),
+      padding: const EdgeInsets.all(18.0),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
-          width: 1,
+          color: _getIconColor(displayLabel).withOpacity(0.15),
+          width: 1.5,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.08),
+            spreadRadius: 0,
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Icono según el tipo de dato
           Container(
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: _getIconColor(displayLabel).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  _getIconColor(displayLabel).withOpacity(0.15),
+                  _getIconColor(displayLabel).withOpacity(0.08),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
               _getIcon(displayLabel),
               color: _getIconColor(displayLabel),
-              size: 20,
+              size: 22,
             ),
           ),
           const SizedBox(width: 16),
@@ -56,19 +71,23 @@ class CamposDatos extends StatelessWidget {
                 Text(
                   displayLabel,
                   style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[600],
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[500],
+                    letterSpacing: 0.3,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
                   displayValue.isNotEmpty ? displayValue : 'No especificado',
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: displayValue.isNotEmpty ? Colors.grey[800] : Colors.grey[400],
+                    color: displayValue.isNotEmpty ? Colors.black87 : Colors.grey[400],
+                    letterSpacing: -0.2,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
