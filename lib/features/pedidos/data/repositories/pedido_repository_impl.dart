@@ -8,8 +8,8 @@ class PedidoRepositoryImpl implements PedidoRepository {
   PedidoRepositoryImpl(this.dataSource);
 
   @override
-  Future<void> agregarPedido(Pedido pedido) {
-    print('pedido_repository_impl.dart: agregarPedido (${pedido.id})');
+  Future<String> agregarPedido(Pedido pedido) {
+    print('pedido_repository_impl.dart: agregarPedido');
     return dataSource.agregarPedido(pedido);
   }
 

@@ -12,8 +12,11 @@ class ObtenerPedidosUseCase implements UseCase<Either<Failure, List<Pedido>>, St
   Future<Either<Failure, List<Pedido>>> call(String idUsuario) async {
     try {
       final pedidos = await repository.obtenerPedidos(idUsuario);
-      print('obtener_pedidos.dart: pedidos obtenidos (${pedidos.length})');
-      return Right(pedidos);
+      // Ordenar en Dart: más recientes primero (fecha descendente)
+      final pedidosOrdenados = List<Pedido>.from(pedidos);
+      pedidosOrdenados.sort((a, b) => b.fecha.compareTo(a.fecha));
+      print('obtener_pedidos.dart: pedidos obtenidos (${pedidosOrdenados.length}), ordenados por fecha descendente');
+      return Right(pedidosOrdenados);
     } catch (e) {
       print('obtener_pedidos.dart: error al obtener pedidos: $e');
       return Left(ServerFailure(e.toString()));

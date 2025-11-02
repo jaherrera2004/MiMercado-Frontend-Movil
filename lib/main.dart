@@ -30,9 +30,10 @@ Future<void> main() async {
   Get.put(getIt<DireccionController>());
   Get.put(getIt<PedidosController>());
   Get.put(getIt<PedidoDetalleController>());
+  // PagoController se inicializa cuando se abre la pantalla de pago
   
   runApp(const MiMercadoApp());
 }
 
-  
+
 

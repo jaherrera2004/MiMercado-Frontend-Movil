@@ -11,12 +11,12 @@ import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/mi_cuenta_
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/datos_perfil_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/seguridad_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/editar_contrasena_screen.dart';
+import 'package:mi_mercado/features/usuario/pago/presentation/pages/pago_screen.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/pages/carrito_screen.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/pages/homepage_screen.dart';
 
 
 import 'package:mi_mercado/features/usuario/productos/presentation/pages/productos_filtrados_screen.dart';
-import 'package:mi_mercado/pages/pago/PagoScreen.dart';
 import 'package:mi_mercado/features/pedidos/presentation/pages/pedidos_detalle_screen.dart';
 import 'package:mi_mercado/features/usuario/direcciones/presentation/pages/direccion_screen.dart';
 import 'package:mi_mercado/pages/repartidor/RepartidorPageScreen.dart';
