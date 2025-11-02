@@ -9,7 +9,7 @@ class PedidoDataSourceImpl implements PedidoDataSource {
   PedidoDataSourceImpl(this._firestore);
 
   @override
-  Future<void> agregarPedido(Pedido pedido) async {
+  Future<String> agregarPedido(Pedido pedido) async {
     try {
       final pedidoMap = {
         'costo_total': pedido.costoTotal,
@@ -24,8 +24,10 @@ class PedidoDataSourceImpl implements PedidoDataSource {
         }).toList(),
       };
 
-      await _firestore.collection(_coleccionPedidos).doc(pedido.id).set(pedidoMap);
-      print('pedido_datasource_impl.dart: pedido agregado (${pedido.id})');
+      // Usar add() para que Firestore genere el ID automáticamente
+      final docRef = await _firestore.collection(_coleccionPedidos).add(pedidoMap);
+      print('pedido_datasource_impl.dart: pedido agregado con ID (${docRef.id})');
+      return docRef.id;
     } catch (e) {
       print('pedido_datasource_impl.dart: error al agregar pedido: $e');
       throw Exception('Error al agregar pedido: $e');

@@ -61,6 +61,7 @@ import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/mi_c
 import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/datos_perfil_controller.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/editar_contrasena_controller.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/seguridad_controller.dart';
+import 'package:mi_mercado/features/usuario/pago/presentation/controllers/pago_controller.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -160,6 +161,15 @@ void setupLocator() {
   ));
   getIt.registerFactory<SeguridadController>(() => SeguridadController(
     editarContrasena: getIt<EditarContrasenaUseCase>(),
+  ));
+
+  // Pago
+  getIt.registerFactory<PagoController>(() => PagoController(
+    obtenerDireccionesUseCase: getIt<ObtenerDireccionesUseCase>(),
+    agregarPedidoUseCase: getIt<AgregarPedidoUseCase>(),
+    subtotalCarritoUseCase: getIt<SubtotalCarritoUseCase>(),
+    obtenerItemsCarritoUseCase: getIt<ObtenerItemsCarritoUseCase>(),
+    vaciarCarritoUseCase: getIt<VaciarCarritoUseCase>(),
   ));
 
   // Registro de usecases de cuenta en GetX para widgets que usan Get.find
