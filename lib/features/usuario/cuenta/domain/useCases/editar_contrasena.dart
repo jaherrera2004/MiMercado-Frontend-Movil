@@ -1,9 +1,9 @@
 import 'package:mi_mercado/core/error/failure.dart';
 import 'package:mi_mercado/core/useCases/use_case.dart';
+import 'package:mi_mercado/core/utils/shared_preferences_utils.dart';
 import '../repositories/usuario_repository.dart';
 import 'package:mi_mercado/core/utils/bcrypt_utils.dart';
 import 'package:dartz/dartz.dart';
-import 'package:mi_mercado/models/SharedPreferences.dart';
 
 class EditarContrasenaUseCase implements UseCase<Either<Failure, void>, EditarContrasenaParams> {
   final UsuarioRepository repository;
@@ -13,7 +13,7 @@ class EditarContrasenaUseCase implements UseCase<Either<Failure, void>, EditarCo
   Future<Either<Failure, void>> call(EditarContrasenaParams params) async {
     try {
       // Obtener el idUsuario desde SharedPreferences
-      final idUsuario = await SharedPreferencesService.getCurrentUserId();
+      final idUsuario = await SharedPreferencesUtils.getUserId();
       if (idUsuario == null) {
         return Left(ServerFailure('Usuario no autenticado'));
       }

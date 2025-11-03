@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:mi_mercado/features/repartidor/pedidos/presentation/controllers/pedido_actual_controller.dart';
 import '../../controllers/login_controller.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../core/widgets/common/SnackBarMessage.dart';
@@ -8,6 +9,8 @@ import '../../../../../core/widgets/navigation/NavigationLink.dart';
 import '../../../../../core/widgets/text/PageTitle.dart';
 import '../../../../../core/error/failure.dart';
 import 'UserTypeSelector.dart';
+import '../../../../../features/repartidor/home/presentation/controllers/repartidor_home_controller.dart';
+import '../../../../../../core/di/injection.dart';
 
 /// Formulario de inicio de sesión separado del widget principal
 class LoginForm extends StatefulWidget {
@@ -75,6 +78,18 @@ class _LoginFormState extends State<LoginForm> {
       if (!mounted) return;
       SnackBarMessage.showSuccess(context, '¡Inicio de sesión exitoso!');
       final route = rol == 'repartidor' ? '/repartidor' : '/home';
+      
+      // Inicializar el controlador del repartidor si es necesario
+      if (rol == 'repartidor') {
+        final controller = Get.put(getIt<RepartidorHomeController>());
+        final controllerPedidoActual = Get.put(getIt<PedidoActualController>());
+        print('LoginForm: controlador del repartidor inicializado, cargando estado...');
+        // Forzar la carga del estado después de un pequeño delay para asegurar que todo esté listo
+        Future.delayed(const Duration(milliseconds: 100), () {
+          controller.cargarEstadoRepartidor();
+        });
+      }
+      
       Navigator.pushReplacementNamed(context, route);
     } catch (e) {
       if (mounted) {

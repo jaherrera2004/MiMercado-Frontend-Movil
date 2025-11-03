@@ -1,14 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mi_mercado/MiMercadoApp.dart';
+import 'package:mi_mercado/features/repartidor/pedidos/presentation/controllers/pedidos_disponibles_controller.dart';
 import 'package:mi_mercado/firebase_options.dart';
 import 'package:mi_mercado/core/di/injection.dart';
-import 'package:mi_mercado/models/CarritoService.dart';
 import 'package:get/get.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/controllers/carrito_controller.dart';
 import 'package:mi_mercado/features/usuario/direcciones/presentation/controllers/direccion_controller.dart';
 import 'package:mi_mercado/features/pedidos/presentation/controllers/pedidos_controller.dart';
 import 'package:mi_mercado/features/pedidos/presentation/controllers/pedido_detalle_controller.dart';
+import 'package:mi_mercado/features/repartidor/home/presentation/controllers/repartidor_home_controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,8 +19,6 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   
-  // Inicializar GetStorage para el carrito
-  await CarritoService.init();
   
   // Inicializar el service locator (GetIt)
   setupLocator();
@@ -30,6 +29,8 @@ Future<void> main() async {
   Get.put(getIt<DireccionController>());
   Get.put(getIt<PedidosController>());
   Get.put(getIt<PedidoDetalleController>());
+  Get.put(getIt<RepartidorHomeController>());
+  Get.put(getIt<PedidosDisponiblesController>());
   // PagoController se inicializa cuando se abre la pantalla de pago
   
   runApp(const MiMercadoApp());

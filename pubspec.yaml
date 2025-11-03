@@ -65,5 +65,4 @@ flutter:
 
   assets:
     - lib/resources/
-    - lib/resources/temp/
 
