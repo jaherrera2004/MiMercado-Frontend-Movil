@@ -1,3 +1,5 @@
+import 'package:mi_mercado/features/repartidor/pedidos/presentation/controllers/pedido_actual_controller.dart';
+import 'package:mi_mercado/features/repartidor/pedidos/presentation/controllers/productos_pedido_controller.dart';
 import 'package:mi_mercado/features/usuario/productos/data/datasources/carrito_datasource_impl.dart';
 import 'package:mi_mercado/features/usuario/productos/data/repositories/carrito_repository_impl.dart';
 import 'package:mi_mercado/features/usuario/productos/domain/repositories/carrito_repository.dart';
@@ -47,8 +49,11 @@ import 'package:mi_mercado/features/pedidos/domain/repositories/pedido_repositor
 import 'package:mi_mercado/features/pedidos/domain/useCases/agregar_pedido.dart';
 import 'package:mi_mercado/features/pedidos/domain/useCases/obtener_pedidos.dart';
 import 'package:mi_mercado/features/pedidos/domain/useCases/obtener_pedido_por_id.dart';
+import 'package:mi_mercado/features/pedidos/domain/useCases/obtener_pedido_actual_repartidor.dart';
+import 'package:mi_mercado/features/pedidos/domain/useCases/obtener_pedidos_disponibles.dart';
 import 'package:mi_mercado/features/pedidos/presentation/controllers/pedidos_controller.dart';
 import 'package:mi_mercado/features/pedidos/presentation/controllers/pedido_detalle_controller.dart';
+import 'package:mi_mercado/features/repartidor/pedidos/presentation/controllers/pedidos_disponibles_controller.dart';
 
 // Cuenta
 import 'package:mi_mercado/features/usuario/cuenta/data/datasources/usuario_datasource_impl.dart';
@@ -62,6 +67,9 @@ import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/dato
 import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/editar_contrasena_controller.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/seguridad_controller.dart';
 import 'package:mi_mercado/features/usuario/pago/presentation/controllers/pago_controller.dart';
+
+// Repartidor
+import 'package:mi_mercado/features/repartidor/home/presentation/controllers/repartidor_home_controller.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -133,6 +141,8 @@ void setupLocator() {
   getIt.registerFactory(() => AgregarPedidoUseCase(getIt<PedidoRepository>()));
   getIt.registerFactory(() => ObtenerPedidosUseCase(getIt<PedidoRepository>()));
   getIt.registerFactory(() => ObtenerPedidoPorIdUseCase(getIt<PedidoRepository>()));
+  getIt.registerFactory(() => ObtenerPedidoActualRepartidorUseCase(getIt<PedidoRepository>()));
+  getIt.registerFactory(() => ObtenerPedidosDisponiblesUseCase(getIt<PedidoRepository>()));
   getIt.registerFactory<PedidosController>(() => PedidosController(
     obtenerPedidosUseCase: getIt<ObtenerPedidosUseCase>(),
   ));
@@ -140,6 +150,10 @@ void setupLocator() {
     obtenerPedidoPorIdUseCase: getIt<ObtenerPedidoPorIdUseCase>(),
     obtenerProductosPedido: getIt<ObtenerProductosPedido>(),
   ));
+  getIt.registerFactory<PedidosDisponiblesController>(() => PedidosDisponiblesController(
+    obtenerPedidosDisponiblesUseCase: getIt<ObtenerPedidosDisponiblesUseCase>(),
+  ));
+ 
 
   // Cuenta
   getIt.registerLazySingleton(() => UsuarioDataSourceImpl(FirebaseFirestore.instance));
@@ -176,4 +190,22 @@ void setupLocator() {
   Get.lazyPut<ObtenerUsuarioPorIdUseCase>(() => getIt<ObtenerUsuarioPorIdUseCase>());
   Get.lazyPut<EditarUsuarioUseCase>(() => getIt<EditarUsuarioUseCase>());
   Get.lazyPut<EditarContrasenaUseCase>(() => getIt<EditarContrasenaUseCase>());
+
+  // Repartidor
+  getIt.registerFactory<RepartidorHomeController>(() => RepartidorHomeController(
+    obtenerPedidoActualUseCase: getIt<ObtenerPedidoActualRepartidorUseCase>(),
+  ));
+  getIt.registerFactory<PedidoActualController>(() => PedidoActualController(
+    obtenerPedidoActualUseCase: getIt<ObtenerPedidoActualRepartidorUseCase>(),
+    obtenerUsuarioPorIdUseCase: getIt<ObtenerUsuarioPorIdUseCase>(),
+  ));
+  getIt.registerFactory<ProductosPedidoController>(() => ProductosPedidoController(
+    obtenerProductosPedido: getIt<ObtenerProductosPedido>(),
+  ));
+
+  // Registro en GetX para widgets que usan GetView
+  Get.lazyPut<RepartidorHomeController>(() => getIt<RepartidorHomeController>());
+  Get.lazyPut<PedidosDisponiblesController>(() => getIt<PedidosDisponiblesController>());
+  Get.lazyPut<PedidoActualController>(() => getIt<PedidoActualController>());
+  Get.lazyPut<ProductosPedidoController>(() => getIt<ProductosPedidoController>());
 }

@@ -76,4 +76,63 @@ class PedidoDataSourceImpl implements PedidoDataSource {
       throw Exception('Error al obtener pedido por ID: $e');
     }
   }
+
+  @override
+  Future<Pedido?> obtenerPedidoActualRepartidor(String idRepartidor) async {
+    try {
+      print('pedido_datasource_impl.dart: buscando pedidos para repartidor $idRepartidor con estados ["En Proceso", "En Camino"]');
+      
+      final querySnapshot = await _firestore
+          .collection(_coleccionPedidos)
+          .where('id_repartidor', isEqualTo: idRepartidor)
+          .where('estado', whereIn: ['En Proceso', 'En Camino'])
+          .limit(1)
+          .get();
+
+      print('pedido_datasource_impl.dart: encontrados ${querySnapshot.docs.length} pedidos para repartidor $idRepartidor');
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final doc = querySnapshot.docs.first;
+        final data = doc.data();
+        data['id'] = doc.id;
+        final pedido = Pedido.fromMap(data);
+        print('pedido_datasource_impl.dart: pedido encontrado - ID: ${pedido.id}, Estado: ${pedido.estado}, Repartidor: ${pedido.idRepartidor}');
+        return pedido;
+      } else {
+        print('pedido_datasource_impl.dart: no hay pedido activo para el repartidor ($idRepartidor)');
+        return null;
+      }
+    } catch (e) {
+      print('pedido_datasource_impl.dart: error al obtener pedido actual del repartidor: $e');
+      throw Exception('Error al obtener pedido actual del repartidor: $e');
+    }
+  }
+
+  @override
+  Future<List<Pedido>> obtenerPedidosDisponibles() async {
+    try {
+      print('pedido_datasource_impl.dart: obteniendo pedidos disponibles (estado: "En Proceso", sin repartidor asignado)');
+      
+      final querySnapshot = await _firestore
+          .collection(_coleccionPedidos)
+          .where('estado', isEqualTo: 'En Proceso')
+          .where('id_repartidor', isEqualTo: '') // Pedidos sin repartidor asignado
+          .get();
+
+      final pedidos = querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return Pedido.fromMap(data);
+      }).toList();
+
+      // Ordenar por fecha en Dart (más antiguos primero - FIFO)
+      pedidos.sort((a, b) => a.fecha.compareTo(b.fecha));
+
+      print('pedido_datasource_impl.dart: encontrados ${pedidos.length} pedidos disponibles');
+      return pedidos;
+    } catch (e) {
+      print('pedido_datasource_impl.dart: error al obtener pedidos disponibles: $e');
+      throw Exception('Error al obtener pedidos disponibles: $e');
+    }
+  }
 }

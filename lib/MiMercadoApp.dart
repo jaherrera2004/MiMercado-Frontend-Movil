@@ -7,6 +7,7 @@ import 'package:mi_mercado/features/auth/presentation/pages/login_screen.dart';
 
 import 'package:mi_mercado/features/auth/presentation/pages/register_screen.dart';
 import 'package:mi_mercado/features/pedidos/presentation/pages/pedidos_screen.dart';
+import 'package:mi_mercado/features/repartidor/pedidos/presentation/pages/pedido_actual_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/mi_cuenta_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/datos_perfil_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/seguridad_screen.dart';
@@ -19,7 +20,9 @@ import 'package:mi_mercado/features/usuario/productos/presentation/pages/homepag
 import 'package:mi_mercado/features/usuario/productos/presentation/pages/productos_filtrados_screen.dart';
 import 'package:mi_mercado/features/pedidos/presentation/pages/pedidos_detalle_screen.dart';
 import 'package:mi_mercado/features/usuario/direcciones/presentation/pages/direccion_screen.dart';
-import 'package:mi_mercado/pages/repartidor/RepartidorPageScreen.dart';
+
+import 'package:mi_mercado/features/repartidor/home/presentation/pages/repartidor_home_screen.dart';
+import 'package:mi_mercado/features/repartidor/pedidos/presentation/pages/pedidos_disponibles_screen.dart';
 
 class MiMercadoApp extends StatelessWidget {
   const MiMercadoApp({super.key});
@@ -51,7 +54,9 @@ class MiMercadoApp extends StatelessWidget {
         '/datos-perfil': (context) => const DatosPerfilScreen(),
         '/seguridad': (context) => const SeguridadScreen(),
         '/editar-seguridad': (context) => const EditarContrasenaScreen(),
-        '/repartidor': (context) => const RepartidorPage(),
+        '/repartidor': (context) => const RepartidorHomeScreen(),
+        '/pedidos-disponibles': (context) => const PedidosDisponiblesScreen(),
+        '/pedido-actual': (context) => const PedidoActualScreen(),
       },
     );
   }
