@@ -187,10 +187,6 @@ flutter build ios
 
 Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
 
-## 👥 Autores
-
-- **Jaherrera2004** - *Desarrollo principal*
-
 ## 🙏 Agradecimientos
 
 - Flutter Community
