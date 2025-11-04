@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mi_mercado/core/di/injection.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/datos_perfil_controller.dart';
 import 'widgets/widgets.dart';
 
@@ -10,7 +9,7 @@ class DatosPerfilScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Inicializar el controller
-    final controller = Get.put(getIt<DatosPerfilController>());
+    final controller = Get.find<DatosPerfilController>();
 
     return Scaffold(
       backgroundColor: Colors.grey[50],

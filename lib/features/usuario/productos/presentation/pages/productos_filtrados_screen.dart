@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:mi_mercado/core/di/injection.dart';
-import 'package:mi_mercado/features/usuario/productos/domain/useCases/obtener_productos_por_categoria.dart';
 import 'package:get/get.dart';
 import 'package:mi_mercado/core/widgets/navigation/BackButton.dart';
 import 'package:mi_mercado/core/widgets/text/PageTitle.dart';
 import '../controllers/productos_filtrados_controller.dart';
 import 'widgets/widgets.dart';
+import 'package:mi_mercado/core/widgets/common/SnackBarMessage.dart';
 
 class CategoriaScreen extends StatelessWidget {
   const CategoriaScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ProductosFiltradosController(
-      obtenerProductosPorCategoria: getIt<ObtenerProductosPorCategoria>(),
-    ));
+    final controller = Get.find<ProductosFiltradosController>();
 
     // Obtener argumentos y cargar productos
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -125,13 +122,7 @@ class CategoriaScreen extends StatelessWidget {
                       // Añadir el producto al carrito usando el controller local
                       await controller.agregarProductoMapAlCarrito(producto);
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${producto["nombre"]} agregado al carrito'),
-                            duration: const Duration(seconds: 2),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
+                        SnackBarMessage.showSuccess(context, '${producto["nombre"]} agregado al carrito');
                       }
                     },
                   );

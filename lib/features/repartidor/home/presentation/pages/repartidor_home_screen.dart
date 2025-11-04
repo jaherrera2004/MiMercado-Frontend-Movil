@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mi_mercado/core/utils/shared_preferences_utils.dart';
 import 'package:mi_mercado/features/repartidor/home/presentation/controllers/repartidor_home_controller.dart';
 import 'package:mi_mercado/features/repartidor/datos/presentation/pages/datos_repartidor_screen.dart';
+import 'package:mi_mercado/core/widgets/common/SnackBarMessage.dart';
 
 class RepartidorHomeScreen extends GetView<RepartidorHomeController> {
   const RepartidorHomeScreen({super.key});
@@ -385,21 +386,6 @@ class RepartidorHomeScreen extends GetView<RepartidorHomeController> {
     );
   }
 
-  void _mostrarMensaje(String titulo, String mensaje, {bool esError = false}) {
-    Get.snackbar(
-      titulo,
-      mensaje,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: esError ? Colors.red[600] : const Color(0xFF58E181),
-      colorText: Colors.white,
-      icon: Icon(
-        esError ? Icons.error : Icons.info,
-        color: Colors.white,
-      ),
-      duration: const Duration(seconds: 3),
-    );
-  }
-
   Future<void> _cerrarSesion() async {
     try {
       await SharedPreferencesUtils.clearAll();
@@ -407,7 +393,7 @@ class RepartidorHomeScreen extends GetView<RepartidorHomeController> {
       print('Error al cerrar sesión: $e');
     }
 
-    _mostrarMensaje('Sesión cerrada', 'Sesión cerrada exitosamente');
+    SnackBarMessage.showSuccess(Get.context!, 'Sesión cerrada exitosamente');
     Get.offAllNamed('/');
   }
 
@@ -421,11 +407,7 @@ class RepartidorHomeScreen extends GetView<RepartidorHomeController> {
 
   void _verPedidosDisponibles() {
     if (controller.estadoActual.value == 'Ocupado') {
-      _mostrarMensaje(
-        'No disponible',
-        'No puedes ver pedidos disponibles mientras tienes un pedido activo',
-        esError: true
-      );
+      SnackBarMessage.showError(Get.context!, 'No puedes ver pedidos disponibles mientras tienes un pedido activo');
       return;
     }
     
@@ -435,7 +417,7 @@ class RepartidorHomeScreen extends GetView<RepartidorHomeController> {
   void _verPedidoActual() {
     final pedido = controller.pedidoActual.value;
     if (pedido == null) {
-      _mostrarMensaje('Error', 'No tienes un pedido activo', esError: true);
+      SnackBarMessage.showError(Get.context!, 'No tienes un pedido activo');
       return;
     }
 

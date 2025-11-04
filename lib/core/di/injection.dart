@@ -20,6 +20,8 @@ import 'package:mi_mercado/features/auth/data/repositories/auth_repositories_imp
 import 'package:mi_mercado/features/auth/domain/repositories/auth_repository.dart';
 import 'package:mi_mercado/features/auth/domain/useCases/login.dart';
 import 'package:mi_mercado/features/auth/domain/useCases/registrar_usuario.dart';
+import 'package:mi_mercado/features/auth/presentation/controllers/login_controller.dart';
+import 'package:mi_mercado/features/auth/presentation/controllers/registrar_usuario_controller.dart';
 import 'package:mi_mercado/features/usuario/productos/data/datasources/producto_datasource_impl.dart';
 import 'package:mi_mercado/features/usuario/productos/data/repositories/producto_repository_impl.dart';
 import 'package:mi_mercado/features/usuario/productos/domain/repositories/producto_repository.dart';
@@ -31,6 +33,7 @@ import 'package:mi_mercado/features/usuario/productos/data/repositories/categori
 import 'package:mi_mercado/features/usuario/productos/domain/repositories/categoria_repository.dart';
 import 'package:mi_mercado/features/usuario/productos/domain/useCases/obtener_categorias.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/controllers/homepage_controller.dart';
+import 'package:mi_mercado/features/usuario/productos/presentation/controllers/productos_filtrados_controller.dart';
 
 // Direcciones
 import 'package:mi_mercado/features/usuario/direcciones/data/datasources/direccion_datasource_impl.dart';
@@ -102,13 +105,10 @@ void setupLocator() {
     vaciarCarritoUseCase: getIt<VaciarCarritoUseCase>(),
     subtotalUseCase: getIt<SubtotalCarritoUseCase>(),
   ));
-  // Data sources
+
+  // Auth
   getIt.registerLazySingleton(() => AuthDataSourceImpl(FirebaseFirestore.instance));
-
-  // Repositories
   getIt.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(getIt<AuthDataSourceImpl>()));
-
-  // Use cases
   getIt.registerFactory(() => RegistrarUsuario(getIt<AuthRepository>()));
   getIt.registerFactory(() => Login(getIt<AuthRepository>()));
 
@@ -124,11 +124,18 @@ void setupLocator() {
   getIt.registerLazySingleton<CategoriaRepository>(() => CategoriaRepositoryImpl(getIt<CategoriaDataSourceImpl>()));
   getIt.registerFactory(() => ObtenerCategorias(getIt<CategoriaRepository>()));
 
-  // Controller
+  // HomePage Controller (related to products and categories)
   getIt.registerFactory<HomePageController>(() => HomePageController(
     obtenerCategorias: getIt<ObtenerCategorias>(),
     obtenerProductos: getIt<ObtenerProductos>(),
   ));
+
+  // Productos Filtrados Controller
+  getIt.registerFactory(() => ProductosFiltradosController(obtenerProductosPorCategoria: getIt<ObtenerProductosPorCategoria>()));
+
+  // Auth Controllers
+  getIt.registerFactory(() => LoginController());
+  getIt.registerFactory(() => RegistrarUsuarioController());
 
   // Direcciones
   getIt.registerLazySingleton(() => DireccionDataSourceImpl(FirebaseFirestore.instance));
@@ -166,7 +173,6 @@ void setupLocator() {
     obtenerPedidosDisponiblesUseCase: getIt<ObtenerPedidosDisponiblesUseCase>(),
     tomarPedidoUseCase: getIt<TomarPedidoUseCase>(),
   ));
- 
 
   // Cuenta
   getIt.registerLazySingleton(() => UsuarioDataSourceImpl(FirebaseFirestore.instance));
@@ -199,11 +205,6 @@ void setupLocator() {
     vaciarCarritoUseCase: getIt<VaciarCarritoUseCase>(),
   ));
 
-  // Registro de usecases de cuenta en GetX para widgets que usan Get.find
-  Get.lazyPut<ObtenerUsuarioPorIdUseCase>(() => getIt<ObtenerUsuarioPorIdUseCase>());
-  Get.lazyPut<EditarUsuarioUseCase>(() => getIt<EditarUsuarioUseCase>());
-  Get.lazyPut<EditarContrasenaUseCase>(() => getIt<EditarContrasenaUseCase>());
-
   // Repartidor
   getIt.registerLazySingleton(() => RepartidorDataSourceImpl(FirebaseFirestore.instance));
   getIt.registerLazySingleton<RepartidorRepository>(() => RepartidorRepositoryImpl(getIt<RepartidorDataSourceImpl>()));
@@ -226,9 +227,27 @@ void setupLocator() {
     obtenerHistorialPedidosUseCase: getIt<ObtenerHistorialPedidosUseCase>(),
   ));
 
-  // Registro en GetX para widgets que usan GetView
+  // GetX registrations for use cases and controllers
+  Get.lazyPut<ObtenerUsuarioPorIdUseCase>(() => getIt<ObtenerUsuarioPorIdUseCase>());
+  Get.lazyPut<EditarUsuarioUseCase>(() => getIt<EditarUsuarioUseCase>());
+  Get.lazyPut<EditarContrasenaUseCase>(() => getIt<EditarContrasenaUseCase>());
   Get.lazyPut<RepartidorHomeController>(() => getIt<RepartidorHomeController>());
   Get.lazyPut<PedidoActualController>(() => getIt<PedidoActualController>());
   Get.lazyPut<ProductosPedidoController>(() => getIt<ProductosPedidoController>());
   Get.lazyPut<HistorialPedidosController>(() => getIt<HistorialPedidosController>());
+  Get.put(getIt<CarritoController>());
+  Get.put(getIt<DireccionController>());
+  Get.put(getIt<PedidosController>());
+  Get.put(getIt<PedidoDetalleController>());
+  Get.put(getIt<PedidosDisponiblesController>());
+  Get.lazyPut(() => getIt<HomePageController>(), fenix: true);
+  Get.lazyPut(() => getIt<PagoController>(), fenix: true);
+  Get.lazyPut(() => getIt<DatosPerfilController>(), fenix: true);
+  Get.lazyPut(() => getIt<EditarContrasenaController>(), fenix: true);
+  Get.lazyPut(() => getIt<SeguridadController>(), fenix: true);
+  Get.lazyPut(() => getIt<MiCuentaController>(), fenix: true);
+  Get.lazyPut(() => getIt<DatosRepartidorController>(), fenix: true);
+  Get.lazyPut(() => getIt<ProductosFiltradosController>(), fenix: true);
+  Get.lazyPut(() => getIt<LoginController>(), fenix: true);
+  Get.lazyPut(() => getIt<RegistrarUsuarioController>(), fenix: true);
 }

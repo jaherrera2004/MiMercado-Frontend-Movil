@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mi_mercado/core/di/injection.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/seguridad_controller.dart';
 import 'widgets/widgets.dart';
 
@@ -10,7 +9,7 @@ class SeguridadScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Inicializar el controllerz
-    final controller = Get.put(getIt<SeguridadController>());
+    final controller = Get.find<SeguridadController>();
 
     return Scaffold(
       appBar: const SeguridadAppBar(),

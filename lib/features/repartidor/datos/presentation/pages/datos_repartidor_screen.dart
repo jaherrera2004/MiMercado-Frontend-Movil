@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mi_mercado/features/repartidor/datos/presentation/controllers/datos_repartidor_controller.dart';
-import 'package:mi_mercado/core/di/injection.dart';
 
 class DatosRepartidorScreen extends StatefulWidget {
   const DatosRepartidorScreen({super.key});
@@ -17,10 +16,6 @@ class _DatosRepartidorScreenState extends State<DatosRepartidorScreen> {
   @override
   void initState() {
     super.initState();
-    // Crear el controlador si no existe
-    if (!Get.isRegistered<DatosRepartidorController>()) {
-      Get.put(getIt<DatosRepartidorController>());
-    }
     controller = Get.find<DatosRepartidorController>();
   }
 

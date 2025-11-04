@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mi_mercado/core/di/injection.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/editar_contrasena_controller.dart';
 import 'widgets/widgets.dart';
 
@@ -20,7 +19,7 @@ class _EditarContrasenaScreenState extends State<EditarContrasenaScreen> {
   @override
   void initState() {
     super.initState();
-    controller = Get.put(getIt<EditarContrasenaController>());
+    controller = Get.find<EditarContrasenaController>();
     
     contrasenaActualController = TextEditingController(text: controller.contrasenaActualController.value);
     nuevaContrasenaController = TextEditingController(text: controller.nuevaContrasenaController.value);

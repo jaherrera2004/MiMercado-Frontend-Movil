@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mi_mercado/core/di/injection.dart';
 import 'package:mi_mercado/features/usuario/pago/presentation/controllers/pago_controller.dart';
 import 'widgets/widgets.dart';
+import 'package:mi_mercado/core/widgets/common/SnackBarMessage.dart';
 
 class PagoScreen extends StatefulWidget {
   const PagoScreen({super.key});
@@ -18,10 +18,6 @@ class _PagoScreenState extends State<PagoScreen> {
   @override
   void initState() {
     super.initState();
-    // Inicializar el PagoController cuando se abre la pantalla
-    if (!Get.isRegistered<PagoController>()) {
-      Get.put(getIt<PagoController>());
-    }
     controller = Get.find<PagoController>();
   }
 
@@ -243,25 +239,13 @@ class _PaymentButton extends StatelessWidget {
 
     if (success) {
       // Mostrar mensaje de éxito
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('¡Pedido realizado con éxito!'),
-          backgroundColor: Color(0xFF58E181),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      SnackBarMessage.showSuccess(context, '¡Pedido realizado con éxito!');
 
       // Navegar a la pantalla de pedidos
       Navigator.pushReplacementNamed(context, '/pedidos');
     } else {
       // Mostrar mensaje de error
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error al procesar el pedido. Verifica tu dirección y conexión.'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
-        ),
-      );
+      SnackBarMessage.showError(context, 'Error al procesar el pedido. Verifica tu dirección y conexión.');
     }
   }
 
