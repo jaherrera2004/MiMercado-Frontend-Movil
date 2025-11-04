@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:mi_mercado/features/repartidor/pedidos/presentation/controllers/pedido_actual_controller.dart';
 import '../../controllers/login_controller.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../core/widgets/common/SnackBarMessage.dart';
@@ -82,7 +81,6 @@ class _LoginFormState extends State<LoginForm> {
       // Inicializar el controlador del repartidor si es necesario
       if (rol == 'repartidor') {
         final controller = Get.put(getIt<RepartidorHomeController>());
-        final controllerPedidoActual = Get.put(getIt<PedidoActualController>());
         print('LoginForm: controlador del repartidor inicializado, cargando estado...');
         // Forzar la carga del estado después de un pequeño delay para asegurar que todo esté listo
         Future.delayed(const Duration(milliseconds: 100), () {

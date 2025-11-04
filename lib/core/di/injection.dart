@@ -51,9 +51,13 @@ import 'package:mi_mercado/features/pedidos/domain/useCases/obtener_pedidos.dart
 import 'package:mi_mercado/features/pedidos/domain/useCases/obtener_pedido_por_id.dart';
 import 'package:mi_mercado/features/pedidos/domain/useCases/obtener_pedido_actual_repartidor.dart';
 import 'package:mi_mercado/features/pedidos/domain/useCases/obtener_pedidos_disponibles.dart';
+import 'package:mi_mercado/features/pedidos/domain/useCases/obtener_historial_pedidos.dart';
+import 'package:mi_mercado/features/pedidos/domain/useCases/actualizar_estado_pedido.dart';
+import 'package:mi_mercado/features/pedidos/domain/useCases/tomar_pedido.dart';
 import 'package:mi_mercado/features/pedidos/presentation/controllers/pedidos_controller.dart';
 import 'package:mi_mercado/features/pedidos/presentation/controllers/pedido_detalle_controller.dart';
 import 'package:mi_mercado/features/repartidor/pedidos/presentation/controllers/pedidos_disponibles_controller.dart';
+import 'package:mi_mercado/features/repartidor/pedidos/presentation/controllers/historial_pedidos_controller.dart';
 
 // Cuenta
 import 'package:mi_mercado/features/usuario/cuenta/data/datasources/usuario_datasource_impl.dart';
@@ -143,6 +147,9 @@ void setupLocator() {
   getIt.registerFactory(() => ObtenerPedidoPorIdUseCase(getIt<PedidoRepository>()));
   getIt.registerFactory(() => ObtenerPedidoActualRepartidorUseCase(getIt<PedidoRepository>()));
   getIt.registerFactory(() => ObtenerPedidosDisponiblesUseCase(getIt<PedidoRepository>()));
+  getIt.registerFactory(() => ObtenerHistorialPedidosUseCase(getIt<PedidoRepository>()));
+  getIt.registerFactory(() => ActualizarEstadoPedidoUseCase(getIt<PedidoRepository>()));
+  getIt.registerFactory(() => TomarPedidoUseCase(getIt<PedidoRepository>()));
   getIt.registerFactory<PedidosController>(() => PedidosController(
     obtenerPedidosUseCase: getIt<ObtenerPedidosUseCase>(),
   ));
@@ -152,6 +159,7 @@ void setupLocator() {
   ));
   getIt.registerFactory<PedidosDisponiblesController>(() => PedidosDisponiblesController(
     obtenerPedidosDisponiblesUseCase: getIt<ObtenerPedidosDisponiblesUseCase>(),
+    tomarPedidoUseCase: getIt<TomarPedidoUseCase>(),
   ));
  
 
@@ -198,14 +206,18 @@ void setupLocator() {
   getIt.registerFactory<PedidoActualController>(() => PedidoActualController(
     obtenerPedidoActualUseCase: getIt<ObtenerPedidoActualRepartidorUseCase>(),
     obtenerUsuarioPorIdUseCase: getIt<ObtenerUsuarioPorIdUseCase>(),
+    actualizarEstadoPedidoUseCase: getIt<ActualizarEstadoPedidoUseCase>(),
   ));
   getIt.registerFactory<ProductosPedidoController>(() => ProductosPedidoController(
     obtenerProductosPedido: getIt<ObtenerProductosPedido>(),
   ));
+  getIt.registerFactory<HistorialPedidosController>(() => HistorialPedidosController(
+    obtenerHistorialPedidosUseCase: getIt<ObtenerHistorialPedidosUseCase>(),
+  ));
 
   // Registro en GetX para widgets que usan GetView
   Get.lazyPut<RepartidorHomeController>(() => getIt<RepartidorHomeController>());
-  Get.lazyPut<PedidosDisponiblesController>(() => getIt<PedidosDisponiblesController>());
   Get.lazyPut<PedidoActualController>(() => getIt<PedidoActualController>());
   Get.lazyPut<ProductosPedidoController>(() => getIt<ProductosPedidoController>());
+  Get.lazyPut<HistorialPedidosController>(() => getIt<HistorialPedidosController>());
 }

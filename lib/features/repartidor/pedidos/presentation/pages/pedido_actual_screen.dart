@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mi_mercado/features/repartidor/pedidos/presentation/controllers/pedido_actual_controller.dart';
 import 'package:mi_mercado/features/repartidor/pedidos/presentation/pages/widgets/productos_pedido_modal.dart';
+import 'package:mi_mercado/features/repartidor/home/presentation/controllers/repartidor_home_controller.dart';
 import 'package:mi_mercado/features/pedidos/domain/entities/Pedido.dart';
 
 class PedidoActualScreen extends GetView<PedidoActualController> {
@@ -813,18 +814,50 @@ class PedidoActualScreen extends GetView<PedidoActualController> {
             ),
           ),
           ElevatedButton(
-            onPressed: () {
-              Get.back();
-              // TODO: Implementar confirmación de entrega
-              Get.snackbar(
-                '¡Entrega confirmada!',
-                'El pedido ha sido marcado como entregado',
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: Colors.green[600],
-                colorText: Colors.white,
-                icon: const Icon(Icons.check_circle, color: Colors.white),
+            onPressed: () async {
+              Get.back(); // Cerrar el diálogo
+
+              // Mostrar indicador de carga
+              Get.dialog(
+                const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF58E181)),
+                  ),
+                ),
+                barrierDismissible: false,
               );
-              controller.limpiarPedidoActual();
+
+              // Llamar al método del controller para marcar como entregado
+              final exito = await controller.marcarComoEntregado();
+
+              Get.back(); // Cerrar indicador de carga
+
+              if (exito) {
+                Get.snackbar(
+                  '¡Entrega confirmada!',
+                  'El pedido ha sido marcado como entregado exitosamente',
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.green[600],
+                  colorText: Colors.white,
+                  icon: const Icon(Icons.check_circle, color: Colors.white),
+                  duration: const Duration(seconds: 3),
+                );
+                
+                // Actualizar el estado del repartidor y volver al home
+                final repartidorController = Get.find<RepartidorHomeController>();
+                await repartidorController.cargarEstadoRepartidor();
+                Get.back();
+              } else {
+                Get.snackbar(
+                  'Error',
+                  controller.errorMessage.value ?? 'No se pudo marcar el pedido como entregado',
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.red[600],
+                  colorText: Colors.white,
+                  icon: const Icon(Icons.error, color: Colors.white),
+                  duration: const Duration(seconds: 4),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green[600],

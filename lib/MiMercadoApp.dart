@@ -7,6 +7,7 @@ import 'package:mi_mercado/features/auth/presentation/pages/login_screen.dart';
 
 import 'package:mi_mercado/features/auth/presentation/pages/register_screen.dart';
 import 'package:mi_mercado/features/pedidos/presentation/pages/pedidos_screen.dart';
+import 'package:mi_mercado/features/repartidor/pedidos/presentation/pages/historial_pedidos_screen.dart';
 import 'package:mi_mercado/features/repartidor/pedidos/presentation/pages/pedido_actual_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/mi_cuenta_screen.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/pages/datos_perfil_screen.dart';
@@ -57,6 +58,7 @@ class MiMercadoApp extends StatelessWidget {
         '/repartidor': (context) => const RepartidorHomeScreen(),
         '/pedidos-disponibles': (context) => const PedidosDisponiblesScreen(),
         '/pedido-actual': (context) => const PedidoActualScreen(),
+        '/historial-pedidos': (context) => const HistorialPedidosScreen(),
       },
     );
   }

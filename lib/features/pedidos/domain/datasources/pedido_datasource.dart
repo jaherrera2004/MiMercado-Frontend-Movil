@@ -7,4 +7,7 @@ abstract class PedidoDataSource {
   Future<Pedido?> obtenerPedidoPorId(String id);
   Future<Pedido?> obtenerPedidoActualRepartidor(String idRepartidor);
   Future<List<Pedido>> obtenerPedidosDisponibles();
+  Future<List<Pedido>> obtenerHistorialPedidos(String idRepartidor);
+  Future<void> actualizarEstadoPedido(String idPedido, String nuevoEstado);
+  Future<void> tomarPedido(String idPedido, String idRepartidor);
 }
