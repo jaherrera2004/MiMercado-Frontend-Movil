@@ -74,6 +74,11 @@ import 'package:mi_mercado/features/usuario/pago/presentation/controllers/pago_c
 
 // Repartidor
 import 'package:mi_mercado/features/repartidor/home/presentation/controllers/repartidor_home_controller.dart';
+import 'package:mi_mercado/features/repartidor/datos/data/datasources/repartidor_datasource_impl.dart';
+import 'package:mi_mercado/features/repartidor/datos/data/repositories/repartidor_repository_impl.dart';
+import 'package:mi_mercado/features/repartidor/datos/domain/repositories/repartidor_repository.dart';
+import 'package:mi_mercado/features/repartidor/datos/domain/useCases/obtener_datos_repartidor.dart';
+import 'package:mi_mercado/features/repartidor/datos/presentation/controllers/datos_repartidor_controller.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -200,8 +205,14 @@ void setupLocator() {
   Get.lazyPut<EditarContrasenaUseCase>(() => getIt<EditarContrasenaUseCase>());
 
   // Repartidor
+  getIt.registerLazySingleton(() => RepartidorDataSourceImpl(FirebaseFirestore.instance));
+  getIt.registerLazySingleton<RepartidorRepository>(() => RepartidorRepositoryImpl(getIt<RepartidorDataSourceImpl>()));
+  getIt.registerFactory(() => ObtenerDatosRepartidorUseCase(getIt<RepartidorRepository>()));
   getIt.registerFactory<RepartidorHomeController>(() => RepartidorHomeController(
     obtenerPedidoActualUseCase: getIt<ObtenerPedidoActualRepartidorUseCase>(),
+  ));
+  getIt.registerFactory<DatosRepartidorController>(() => DatosRepartidorController(
+    obtenerDatosRepartidorUseCase: getIt<ObtenerDatosRepartidorUseCase>(),
   ));
   getIt.registerFactory<PedidoActualController>(() => PedidoActualController(
     obtenerPedidoActualUseCase: getIt<ObtenerPedidoActualRepartidorUseCase>(),

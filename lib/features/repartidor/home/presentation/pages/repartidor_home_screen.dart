@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mi_mercado/core/utils/shared_preferences_utils.dart';
 import 'package:mi_mercado/features/repartidor/home/presentation/controllers/repartidor_home_controller.dart';
+import 'package:mi_mercado/features/repartidor/datos/presentation/pages/datos_repartidor_screen.dart';
 
 class RepartidorHomeScreen extends GetView<RepartidorHomeController> {
   const RepartidorHomeScreen({super.key});
@@ -411,8 +412,7 @@ class RepartidorHomeScreen extends GetView<RepartidorHomeController> {
   }
 
   void _verDatosPersonales() {
-    // TODO: Implementar navegación a datos personales
-    _mostrarMensaje('Próximamente', 'Funcionalidad de datos personales próximamente', esError: false);
+    Get.to(() => const DatosRepartidorScreen());
   }
 
   void _verHistorialPedidos() {
