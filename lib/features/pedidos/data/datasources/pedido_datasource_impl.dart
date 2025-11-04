@@ -135,4 +135,71 @@ class PedidoDataSourceImpl implements PedidoDataSource {
       throw Exception('Error al obtener pedidos disponibles: $e');
     }
   }
+
+  @override
+  Future<List<Pedido>> obtenerHistorialPedidos(String idRepartidor) async {
+    try {
+      print('pedido_datasource_impl.dart: obteniendo historial de pedidos para repartidor $idRepartidor');
+      
+      final querySnapshot = await _firestore
+          .collection(_coleccionPedidos)
+          .where('id_repartidor', isEqualTo: idRepartidor)
+          .where('estado', isEqualTo: 'Entregado')
+          .get();
+
+      final pedidos = querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return Pedido.fromMap(data);
+      }).toList();
+
+      // Ordenar por fecha en Dart (más recientes primero)
+      pedidos.sort((a, b) => b.fecha.compareTo(a.fecha));
+
+      print('pedido_datasource_impl.dart: encontrados ${pedidos.length} pedidos completados para repartidor $idRepartidor');
+      return pedidos;
+    } catch (e) {
+      print('pedido_datasource_impl.dart: error al obtener historial de pedidos: $e');
+      throw Exception('Error al obtener historial de pedidos: $e');
+    }
+  }
+
+  @override
+  Future<void> actualizarEstadoPedido(String idPedido, String nuevoEstado) async {
+    try {
+      print('pedido_datasource_impl.dart: actualizando estado del pedido $idPedido a $nuevoEstado');
+
+      await _firestore.collection(_coleccionPedidos).doc(idPedido).update({
+        'estado': nuevoEstado,
+      });
+
+      print('pedido_datasource_impl.dart: estado del pedido $idPedido actualizado exitosamente a $nuevoEstado');
+    } catch (e) {
+      print('pedido_datasource_impl.dart: error al actualizar estado del pedido: $e');
+      throw Exception('Error al actualizar estado del pedido: $e');
+    }
+  }
+
+  @override
+  Future<void> tomarPedido(String idPedido, String idRepartidor) async {
+    try {
+      print('pedido_datasource_impl.dart: asignando pedido $idPedido al repartidor $idRepartidor');
+
+      // Actualizar el pedido
+      await _firestore.collection(_coleccionPedidos).doc(idPedido).update({
+        'id_repartidor': idRepartidor,
+        'estado': 'En Camino',
+      });
+
+      // Actualizar el pedido_actual del repartidor
+      await _firestore.collection('repartidores').doc(idRepartidor).update({
+        'pedido_actual': idPedido,
+      });
+
+      print('pedido_datasource_impl.dart: pedido $idPedido asignado exitosamente al repartidor $idRepartidor');
+    } catch (e) {
+      print('pedido_datasource_impl.dart: error al asignar pedido al repartidor: $e');
+      throw Exception('Error al asignar pedido al repartidor: $e');
+    }
+  }
 }

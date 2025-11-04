@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mi_mercado/features/repartidor/pedidos/presentation/controllers/pedidos_disponibles_controller.dart';
 import 'package:mi_mercado/features/pedidos/domain/entities/Pedido.dart';
 import 'package:mi_mercado/features/repartidor/home/presentation/controllers/repartidor_home_controller.dart';
+import 'package:mi_mercado/features/repartidor/pedidos/presentation/pages/widgets/productos_pedido_modal.dart';
 
 class PedidosDisponiblesScreen extends GetView<PedidosDisponiblesController> {
   const PedidosDisponiblesScreen({super.key});
@@ -280,10 +281,71 @@ class PedidosDisponiblesScreen extends GetView<PedidosDisponiblesController> {
             Row(
               children: [
                 Expanded(
-                  child: _buildInfoChip(
-                    icon: Icons.shopping_bag,
-                    label: '${pedido.listaProductos.length} productos',
-                    color: Colors.blue,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => ProductosPedidoModal.mostrar(pedido.listaProductos),
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              const Color(0xFF58E181).withOpacity(0.15),
+                              const Color(0xFF58E181).withOpacity(0.08),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: const Color(0xFF58E181).withOpacity(0.4),
+                            width: 1.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF58E181).withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF58E181).withOpacity(0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.shopping_bag_outlined,
+                                size: 16,
+                                color: Color(0xFF58E181),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '${pedido.listaProductos.length} producto${pedido.listaProductos.length != 1 ? 's' : ''}',
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF58E181),
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios,
+                              size: 12,
+                              color: Color(0xFF58E181),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -512,6 +574,11 @@ class PedidosDisponiblesScreen extends GetView<PedidosDisponiblesController> {
         icon: const Icon(Icons.check_circle, color: Colors.white),
         duration: const Duration(seconds: 3),
       );
+      
+      // Actualizar el estado del repartidor y volver al home
+      final repartidorController = Get.find<RepartidorHomeController>();
+      await repartidorController.cargarEstadoRepartidor();
+      Get.back();
     } else {
       Get.snackbar(
         'Error',

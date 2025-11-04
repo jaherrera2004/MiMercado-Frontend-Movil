@@ -416,8 +416,7 @@ class RepartidorHomeScreen extends GetView<RepartidorHomeController> {
   }
 
   void _verHistorialPedidos() {
-    // TODO: Implementar navegación a historial
-    _mostrarMensaje('Próximamente', 'Funcionalidad de historial próximamente', esError: false);
+    Get.toNamed('/historial-pedidos');
   }
 
   void _verPedidosDisponibles() {

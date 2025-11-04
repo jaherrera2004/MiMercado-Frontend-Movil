@@ -36,4 +36,22 @@ class PedidoRepositoryImpl implements PedidoRepository {
     print('pedido_repository_impl.dart: obtenerPedidosDisponibles');
     return dataSource.obtenerPedidosDisponibles();
   }
+
+  @override
+  Future<List<Pedido>> obtenerHistorialPedidos(String idRepartidor) {
+    print('pedido_repository_impl.dart: obtenerHistorialPedidos ($idRepartidor)');
+    return dataSource.obtenerHistorialPedidos(idRepartidor);
+  }
+
+  @override
+  Future<void> actualizarEstadoPedido(String idPedido, String nuevoEstado) {
+    print('pedido_repository_impl.dart: actualizarEstadoPedido ($idPedido, $nuevoEstado)');
+    return dataSource.actualizarEstadoPedido(idPedido, nuevoEstado);
+  }
+
+  @override
+  Future<void> tomarPedido(String idPedido, String idRepartidor) {
+    print('pedido_repository_impl.dart: tomarPedido ($idPedido, $idRepartidor)');
+    return dataSource.tomarPedido(idPedido, idRepartidor);
+  }
 }

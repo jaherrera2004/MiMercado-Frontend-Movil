@@ -1,9 +1,12 @@
 import 'package:get/get.dart';
+import 'package:mi_mercado/core/utils/shared_preferences_utils.dart';
 import 'package:mi_mercado/features/pedidos/domain/useCases/obtener_pedidos_disponibles.dart';
+import 'package:mi_mercado/features/pedidos/domain/useCases/tomar_pedido.dart';
 import 'package:mi_mercado/features/pedidos/domain/entities/Pedido.dart';
 
 class PedidosDisponiblesController extends GetxController {
   final ObtenerPedidosDisponiblesUseCase obtenerPedidosDisponiblesUseCase;
+  final TomarPedidoUseCase tomarPedidoUseCase;
 
   // Estado observable
   final pedidosDisponibles = <Pedido>[].obs;
@@ -12,6 +15,7 @@ class PedidosDisponiblesController extends GetxController {
 
   PedidosDisponiblesController({
     required this.obtenerPedidosDisponiblesUseCase,
+    required this.tomarPedidoUseCase,
   });
 
   @override
@@ -56,16 +60,40 @@ class PedidosDisponiblesController extends GetxController {
   /// Toma un pedido disponible (lo asigna al repartidor actual)
   Future<bool> tomarPedido(String pedidoId) async {
     try {
-      // Aquí iría la lógica para tomar el pedido
-      // Por ahora solo simulamos que se tomó exitosamente
-      print('PedidosDisponiblesController: Tomando pedido $pedidoId');
-      
-      // Remover el pedido de la lista local
-      pedidosDisponibles.removeWhere((pedido) => pedido.id == pedidoId);
-      
-      return true;
+      // Obtener el ID del repartidor actual
+      final repartidorId = await SharedPreferencesUtils.getUserId();
+
+      if (repartidorId == null) {
+        errorMessage.value = 'No se pudo obtener el ID del repartidor';
+        print('PedidosDisponiblesController: Error - ID de repartidor no encontrado');
+        return false;
+      }
+
+      print('PedidosDisponiblesController: Tomando pedido $pedidoId para repartidor $repartidorId');
+
+      final result = await tomarPedidoUseCase.call(
+        TomarPedidoParams(
+          idPedido: pedidoId,
+          idRepartidor: repartidorId,
+        ),
+      );
+
+      return result.fold(
+        (failure) {
+          errorMessage.value = failure.message;
+          print('PedidosDisponiblesController: Error al tomar pedido: ${failure.message}');
+          return false;
+        },
+        (_) {
+          // Remover el pedido de la lista local después de tomarlo exitosamente
+          pedidosDisponibles.removeWhere((pedido) => pedido.id == pedidoId);
+          print('PedidosDisponiblesController: Pedido $pedidoId tomado exitosamente');
+          return true;
+        },
+      );
     } catch (e) {
-      print('PedidosDisponiblesController: Error al tomar pedido: $e');
+      errorMessage.value = e.toString();
+      print('PedidosDisponiblesController: Error inesperado al tomar pedido: $e');
       return false;
     }
   }
