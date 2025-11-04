@@ -38,13 +38,23 @@ class UsuarioDataSourceImpl implements UsuarioDataSource {
       final userDoc = _firestore.collection(_coleccionUsuarios).doc(usuario.id);
 
       // Verificar que el usuario existe
-      final userData = await userDoc.get();
-      if (!userData.exists) {
+      final userDataSnap = await userDoc.get();
+      if (!userDataSnap.exists) {
         throw Exception('Usuario no encontrado');
       }
 
+      // Obtener los datos actuales para conservar password y direcciones
+      final userData = userDataSnap.data() as Map<String, dynamic>;
+      final passwordActual = userData['password'] ?? '';
+      final direccionesActuales = userData['direcciones'] ?? [];
+
+      // Construir el nuevo documento sin modificar password ni direcciones
+      final nuevoDoc = usuario.toDocument();
+      nuevoDoc['password'] = passwordActual;
+      nuevoDoc['direcciones'] = direccionesActuales;
+
       // Actualizar los datos del usuario
-      await userDoc.update(usuario.toDocument());
+      await userDoc.update(nuevoDoc);
 
       print('usuario_datasource_impl.dart: usuario editado (${usuario.nombre})');
     } catch (e) {

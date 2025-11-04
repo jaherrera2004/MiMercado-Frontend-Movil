@@ -26,7 +26,7 @@ class _RegisterFormState extends State<RegisterForm> {
   void initState() {
     super.initState();
     // Use GetX controller for form fields and registration logic
-    _regController = Get.put(RegistrarUsuarioController());
+    _regController = Get.find<RegistrarUsuarioController>();
   }
 
   void _handleRegister() async {

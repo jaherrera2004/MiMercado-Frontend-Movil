@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'opcion.dart';
+import '../../../../../../core/widgets/common/SnackBarMessage.dart';
 
 /// Widget que contiene todas las opciones del menú de cuenta
 class CuentaOpciones extends StatelessWidget {
@@ -173,23 +174,7 @@ class CuentaOpciones extends StatelessWidget {
                         
                         try {
                           if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Row(
-                                  children: [
-                                    Icon(Icons.check_circle, color: Colors.white),
-                                    SizedBox(width: 12),
-                                    Text('Sesión cerrada exitosamente'),
-                                  ],
-                                ),
-                                backgroundColor: const Color(0xFF58E181),
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                duration: const Duration(seconds: 2),
-                              ),
-                            );
+                            SnackBarMessage.showSuccess(context, 'Sesión cerrada exitosamente');
                             
                             Navigator.pushNamedAndRemoveUntil(
                               context,
@@ -199,27 +184,7 @@ class CuentaOpciones extends StatelessWidget {
                           }
                         } catch (e) {
                           if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Row(
-                                  children: [
-                                    const Icon(Icons.error_outline, color: Colors.white),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Text(
-                                        'Error: ${e.toString().replaceAll('Exception: ', '')}',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                backgroundColor: Colors.red,
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                duration: const Duration(seconds: 3),
-                              ),
-                            );
+                            SnackBarMessage.showError(context, 'Error: ${e.toString().replaceAll('Exception: ', '')}');
                           }
                         }
                       },

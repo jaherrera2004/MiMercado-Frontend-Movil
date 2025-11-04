@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 import '../controllers/homepage_controller.dart';
-import 'package:mi_mercado/core/di/injection.dart';
 import 'package:flutter/material.dart';
 import 'package:mi_mercado/core/widgets/text/PageTitle.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/pages/widgets/widgets.dart';
+import 'package:mi_mercado/core/widgets/common/SnackBarMessage.dart';
 
 
 class HomePage extends StatelessWidget {
@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
   // Inyecta el controlador usando GetIt
-  final controller = Get.put(getIt<HomePageController>());
+  final controller = Get.find<HomePageController>();
     return WillPopScope(
       onWillPop: () => _onWillPop(context),
       child: Scaffold(
@@ -80,17 +80,11 @@ class HomePage extends StatelessWidget {
                         ? producto.imagenUrl
                         : 'lib/resources/temp/image.png',
                   }).toList(),
-                  onAddToCart: (producto) async {
+                    onAddToCart: (producto) async {
                     // Añadir el producto al carrito usando el HomePageController helper
                     await controller.agregarProductoMapAlCarrito(producto);
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${producto["nombre"]} agregado al carrito'),
-                          duration: const Duration(seconds: 2),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
+                      SnackBarMessage.showSuccess(context, '${producto["nombre"]} agregado al carrito');
                     }
                   },
                 ),

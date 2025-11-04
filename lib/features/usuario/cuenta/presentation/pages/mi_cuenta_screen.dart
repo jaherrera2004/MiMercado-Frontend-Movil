@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mi_mercado/core/di/injection.dart';
 import 'package:mi_mercado/features/usuario/cuenta/presentation/controllers/mi_cuenta_controller.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/pages/widgets/HomeBottomNavigation.dart';
 import 'widgets/widgets.dart';
@@ -12,7 +11,7 @@ class CuentaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Inicializar el controller (usado por los widgets hijos)
-    Get.put(getIt<MiCuentaController>());
+    Get.find<MiCuentaController>();
 
     return PopScope(
       canPop: false,

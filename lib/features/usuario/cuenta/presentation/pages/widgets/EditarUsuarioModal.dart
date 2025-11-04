@@ -5,6 +5,7 @@ import 'package:mi_mercado/core/utils/shared_preferences_utils.dart';
 import 'package:mi_mercado/features/auth/domain/entities/Usuario.dart';
 import 'package:mi_mercado/features/usuario/cuenta/domain/useCases/obtener_usuario_por_id.dart';
 import 'package:mi_mercado/features/usuario/cuenta/domain/useCases/editar_usuario.dart';
+import '../../../../../../core/widgets/common/SnackBarMessage.dart';
 
 /// Modal para editar los datos del usuario
 class EditarUsuarioModal extends StatefulWidget {
@@ -80,7 +81,7 @@ class _EditarUsuarioModalState extends State<EditarUsuarioModal> {
         setState(() {
           _isLoading = false;
         });
-        _showErrorSnackBar('Error al cargar los datos: ${e.toString()}');
+        SnackBarMessage.showError(context, 'Error al cargar los datos: ${e.toString()}');
       }
     }
   }
@@ -121,14 +122,14 @@ class _EditarUsuarioModalState extends State<EditarUsuarioModal> {
         (_) {
           if (mounted) {
             Navigator.of(context).pop();
-            _showSuccessSnackBar('Datos actualizados exitosamente');
+            SnackBarMessage.showSuccess(context, 'Datos actualizados exitosamente');
             widget.onUsuarioEditado?.call();
           }
         },
       );
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar('Error al guardar: ${e.toString()}');
+        SnackBarMessage.showError(context, 'Error al guardar: ${e.toString()}');
       }
     } finally {
       if (mounted) {
@@ -137,26 +138,6 @@ class _EditarUsuarioModalState extends State<EditarUsuarioModal> {
         });
       }
     }
-  }
-
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
-
-  void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
-    );
   }
 
   String? _validateRequired(String? value, String fieldName) {

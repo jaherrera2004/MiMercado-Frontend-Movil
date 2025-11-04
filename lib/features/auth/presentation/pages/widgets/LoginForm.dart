@@ -9,7 +9,6 @@ import '../../../../../core/widgets/text/PageTitle.dart';
 import '../../../../../core/error/failure.dart';
 import 'UserTypeSelector.dart';
 import '../../../../../features/repartidor/home/presentation/controllers/repartidor_home_controller.dart';
-import '../../../../../../core/di/injection.dart';
 
 /// Formulario de inicio de sesión separado del widget principal
 class LoginForm extends StatefulWidget {
@@ -55,7 +54,7 @@ class _LoginFormState extends State<LoginForm> {
   @override
   void initState() {
     super.initState();
-    _loginController = Get.put(LoginController());
+    _loginController = Get.find<LoginController>();
   }
 
   @override
@@ -80,7 +79,7 @@ class _LoginFormState extends State<LoginForm> {
       
       // Inicializar el controlador del repartidor si es necesario
       if (rol == 'repartidor') {
-        final controller = Get.put(getIt<RepartidorHomeController>());
+        final controller = Get.find<RepartidorHomeController>();
         print('LoginForm: controlador del repartidor inicializado, cargando estado...');
         // Forzar la carga del estado después de un pequeño delay para asegurar que todo esté listo
         Future.delayed(const Duration(milliseconds: 100), () {
