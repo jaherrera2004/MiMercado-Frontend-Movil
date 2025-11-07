@@ -91,7 +91,36 @@ flutter run --platform ios
 flutter run --platform web
 ```
 
-## 📱 Cómo Usar la Aplicación
+## 🎨 Personalización de la App
+
+### Cambiar Nombre de la Aplicación
+El nombre de la app se configura en varios lugares:
+
+1. **pubspec.yaml**: Campo `name`
+2. **Android**: `android/app/src/main/AndroidManifest.xml` (android:label)
+3. **iOS**: `ios/Runner/Info.plist` (CFBundleDisplayName)
+
+### Cambiar Logo/Icono de la Aplicación
+1. Coloca tu logo PNG en `assets/images/app_icon.png`
+   - **Tamaño recomendado**: 1024x1024 píxeles
+   - **Formato**: PNG con fondo transparente
+   - **Resolución**: Alta calidad (300 DPI mínimo)
+
+2. Ejecuta los comandos:
+```bash
+flutter pub run flutter_launcher_icons
+```
+
+3. Reconstruye la aplicación:
+```bash
+# Para Android
+flutter clean && flutter build apk
+
+# Para iOS
+flutter clean && flutter build ios
+```
+
+Los iconos se generarán automáticamente para todas las densidades de pantalla (Android/iOS/Web).
 
 ### Flujo de Usuario Cliente
 

@@ -68,15 +68,15 @@ flutter:
     - lib/resources/
     - assets/images/
 
-  # Configuración de iconos de la aplicación
-  flutter_icons:
-    android: "launcher_icon"
-    ios: true
+# Configuración de iconos de la aplicación
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/app_icon.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
     image_path: "assets/images/app_icon.png"
-    min_sdk_android: 21 # android min sdk min:16, default 21
-    web:
-      generate: true
-      image_path: "assets/images/app_icon.png"
-      background_color: "#58E181"
-      theme_color: "#58E181"
+    background_color: "#58E181"
+    theme_color: "#58E181"
 
