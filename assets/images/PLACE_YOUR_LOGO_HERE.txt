@@ -1,0 +1,10 @@
+# Coloca aquí tu logo de la aplicación
+# Nombre del archivo: app_icon.png
+# Especificaciones:
+# - Formato: PNG
+# - Tamaño: 1024x1024 píxeles (recomendado)
+# - Fondo: Transparente
+# - Resolución: Alta calidad
+
+# Después de colocar tu logo aquí, ejecuta:
+# flutter pub run flutter_launcher_icons
