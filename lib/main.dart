@@ -13,8 +13,8 @@ Future<void> main() async {
   );
   
   
-  // Inicializar el service locator (GetIt)
-  setupLocator();
+  // Inicializar las dependencias con GetX
+  setupDependencies();
 
   // PagoController se inicializa cuando se abre la pantalla de pago
   
