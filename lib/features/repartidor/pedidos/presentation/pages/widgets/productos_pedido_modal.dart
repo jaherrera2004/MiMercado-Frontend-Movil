@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mi_mercado/core/di/injection.dart';
 import 'package:mi_mercado/features/pedidos/domain/entities/Pedido.dart';
 import 'package:mi_mercado/features/repartidor/pedidos/presentation/controllers/productos_pedido_controller.dart';
 import 'package:mi_mercado/features/usuario/productos/domain/entities/Producto.dart';
@@ -28,30 +27,18 @@ class _ProductosPedidoModalContent extends StatefulWidget {
 
 class _ProductosPedidoModalContentState extends State<_ProductosPedidoModalContent> {
   late ProductosPedidoController controller;
-  late String tag;
 
   @override
   void initState() {
     super.initState();
-    // Crear una instancia específica del controlador para este modal
-    controller = ProductosPedidoController(
-      obtenerProductosPedido: getIt(),
-    );
-    tag = 'modal_${controller.hashCode}';
-    Get.put(controller, tag: tag);
+    // Obtener la instancia del controlador desde GetX
+    controller = Get.find<ProductosPedidoController>();
 
     // Cargar productos cuando se abre el modal
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final productoIds = widget.productosPedido.map((p) => p.idProducto).toList();
       controller.cargarProductosPedido(productoIds);
     });
-  }
-
-  @override
-  void dispose() {
-    // Limpiar el controlador cuando se cierra el modal
-    Get.delete<ProductosPedidoController>(tag: tag);
-    super.dispose();
   }
 
   @override
@@ -112,8 +99,7 @@ class _ProductosPedidoModalContentState extends State<_ProductosPedidoModalConte
             // Content
             Flexible(
               child: Obx(() {
-                final ctrl = Get.find<ProductosPedidoController>(tag: tag);
-                if (ctrl.isLoading.value) {
+                if (controller.isLoading.value) {
                   return Container(
                     padding: const EdgeInsets.all(40),
                     child: const Column(
@@ -135,7 +121,7 @@ class _ProductosPedidoModalContentState extends State<_ProductosPedidoModalConte
                   );
                 }
 
-                if (ctrl.errorMessage.value != null) {
+                if (controller.errorMessage.value != null) {
                   return Container(
                     padding: const EdgeInsets.all(24),
                     child: Column(
@@ -157,7 +143,7 @@ class _ProductosPedidoModalContentState extends State<_ProductosPedidoModalConte
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          ctrl.errorMessage.value!,
+                          controller.errorMessage.value!,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.inter(
                             fontSize: 14,
@@ -168,7 +154,7 @@ class _ProductosPedidoModalContentState extends State<_ProductosPedidoModalConte
                         ElevatedButton.icon(
                           onPressed: () {
                             final productoIds = widget.productosPedido.map((p) => p.idProducto).toList();
-                            ctrl.cargarProductosPedido(productoIds);
+                            controller.cargarProductosPedido(productoIds);
                           },
                           icon: const Icon(Icons.refresh),
                           label: const Text('Reintentar'),
@@ -185,7 +171,7 @@ class _ProductosPedidoModalContentState extends State<_ProductosPedidoModalConte
                   );
                 }
 
-                final productos = ctrl.productos;
+                final productos = controller.productos;
 
                 if (productos.isEmpty) {
                   return Container(

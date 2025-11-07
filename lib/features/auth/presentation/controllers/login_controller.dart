@@ -3,7 +3,6 @@ import 'package:mi_mercado/features/auth/domain/entities/Persona.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mi_mercado/core/di/injection.dart';
 import 'package:mi_mercado/features/auth/domain/useCases/login.dart';
 
 class LoginController extends GetxController {
@@ -60,7 +59,7 @@ class LoginController extends GetxController {
 
 		isLoading.value = true;
 			try {
-				final loginUseCase = getIt<Login>();
+				final loginUseCase = Get.find<Login>();
 				final params = LoginParams(email: email, password: password, rol: rol);
 				final persona = await loginUseCase.call(params);
 

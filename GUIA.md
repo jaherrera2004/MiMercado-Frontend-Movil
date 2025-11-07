@@ -258,38 +258,38 @@ lib/core/
 
 ---
 
-## 💉 Inyección de Dependencias
+## 💉 Inyección de Dependencias con GetX
 
-### ¿Qué es GetIt?
+### ¿Qué es GetX para inyección de dependencias?
 
-**GetIt** es un **Service Locator** que permite registrar y obtener instancias de clases en toda la aplicación. Es el corazón de la inyección de dependencias.
+**GetX** incluye un poderoso sistema de inyección de dependencias integrado que reemplaza completamente la necesidad de GetIt. Todas las dependencias se registran usando `Get.put()`, `Get.lazyPut()`, etc.
 
 ### Archivo: `lib/core/di/injection.dart`
 
-Este archivo configura **todas** las dependencias de la aplicación.
+Este archivo configura **todas** las dependencias de la aplicación usando solo GetX.
 
 ### ⚠️ **REGLA CRÍTICA: Registro Obligatorio**
 
-**SI CREAS un repositorio, use case, datasource o controller, SI O SI debes registrarlo en `injection.dart`.**
+**SI CREAS un repositorio, use case, datasource o controller, SI O SI debes registrarlo en `setupDependencies()`.**
 
-- ✅ **DataSources** → `registerLazySingleton()`
-- ✅ **Repositories** → `registerLazySingleton<Interface>()`
-- ✅ **Use Cases** → `registerFactory()`
-- ✅ **Controllers** → `registerFactory()` + `Get.lazyPut()` (doble registro)
+- ✅ **DataSources** → `Get.put(instance, permanent: true)`
+- ✅ **Repositories** → `Get.put<Interface>(implementation, permanent: true)`
+- ✅ **Use Cases** → `Get.lazyPut(() => UseCase(repository))`
+- ✅ **Controllers** → `Get.put()` o `Get.lazyPut()` según necesidad
 
 **Si no registras una clase, la aplicación fallará con errores de inyección de dependencias.**
 
-### Tipos de registro en GetIt
+### Tipos de registro en GetX
 
 ```dart
-// 1. registerLazySingleton - Singleton perezoso (se crea la primera vez que se solicita)
-getIt.registerLazySingleton(() => ProductoDataSourceImpl(FirebaseFirestore.instance));
+// 1. Get.put() - Instancia inmediata (se crea al registrar)
+Get.put(ProductoDataSourceImpl(FirebaseFirestore.instance), permanent: true);
 
-// 2. registerSingleton - Singleton inmediato (se crea al registrar)
-getIt.registerSingleton<MiClase>(MiClase());
+// 2. Get.lazyPut() - Instancia perezosa (se crea la primera vez que se solicita)
+Get.lazyPut(() => ProductoRepositoryImpl(Get.find<ProductoDataSourceImpl>()));
 
-// 3. registerFactory - Nueva instancia cada vez que se solicita
-getIt.registerFactory(() => ObtenerProductos(getIt<ProductoRepository>()));
+// 3. Get.lazyPut() con fenix - Se recrea automáticamente si es destruida
+Get.lazyPut(() => HomePageController(), fenix: true);
 ```
 
 ### 📋 Orden de registro (IMPORTANTE)
@@ -297,26 +297,24 @@ getIt.registerFactory(() => ObtenerProductos(getIt<ProductoRepository>()));
 El orden de registro es **crítico**. Debes registrar las dependencias de abajo hacia arriba:
 
 ```dart
-void setupLocator() {
+void setupDependencies() {
   // 1️⃣ PRIMERO: DataSources (no tienen dependencias)
-  getIt.registerLazySingleton(() => ProductoDataSourceImpl(FirebaseFirestore.instance));
+  Get.put(ProductoDataSourceImpl(FirebaseFirestore.instance), permanent: true);
   
   // 2️⃣ SEGUNDO: Repositories (dependen de DataSources)
-  getIt.registerLazySingleton<ProductoRepository>(
-    () => ProductoRepositoryImpl(getIt<ProductoDataSourceImpl>())
+  Get.put<ProductoRepository>(
+    ProductoRepositoryImpl(Get.find<ProductoDataSourceImpl>()), 
+    permanent: true
   );
   
   // 3️⃣ TERCERO: Use Cases (dependen de Repositories)
-  getIt.registerFactory(() => ObtenerProductos(getIt<ProductoRepository>()));
+  Get.lazyPut(() => ObtenerProductos(Get.find<ProductoRepository>()));
   
   // 4️⃣ CUARTO: Controllers (dependen de Use Cases)
-  getIt.registerFactory<HomePageController>(() => HomePageController(
-    obtenerCategorias: getIt<ObtenerCategorias>(),
-    obtenerProductos: getIt<ObtenerProductos>(),
-  ));
-  
-  // 5️⃣ QUINTO: Registro en GetX (opcional, según necesidad)
-  Get.lazyPut(() => getIt<HomePageController>(), fenix: true);
+  Get.lazyPut(() => HomePageController(
+    obtenerCategorias: Get.find<ObtenerCategorias>(),
+    obtenerProductos: Get.find<ObtenerProductos>(),
+  ), fenix: true);
 }
 ```
 
@@ -324,39 +322,40 @@ void setupLocator() {
 
 | Tipo | Cuándo usar | Ejemplo |
 |------|-------------|---------|
-| `registerLazySingleton` | DataSources, Repositories (una sola instancia) | Firebase connections, HTTP clients |
-| `registerFactory` | Use Cases, Controllers (nueva instancia cada vez) | Use cases sin estado |
-| `registerSingleton` | Servicios que necesitan inicialización inmediata | Configuración de la app |
+| `Get.put(permanent: true)` | DataSources, Repositories (una sola instancia) | Firebase connections, HTTP clients |
+| `Get.lazyPut()` | Use Cases, Controllers (nueva instancia cuando se necesita) | Use cases sin estado |
+| `Get.lazyPut(fenix: true)` | Controllers de pantallas (auto-recreación) | Controllers que pueden ser destruidos |
 
-### 🎯 GetIt + GetX: Registro dual
+### 🎯 GetX: Gestión completa de dependencias
 
-Para controllers, hacemos **doble registro**:
+GetX maneja tanto la **inyección de dependencias** como el **ciclo de vida** y **estado reactivo**:
 
 ```dart
-// GetIt: Para inyección de dependencias
-getIt.registerFactory<HomePageController>(() => HomePageController(
-  obtenerProductos: getIt<ObtenerProductos>(),
-));
+// Registro completo en GetX
+Get.lazyPut(() => HomePageController(
+  obtenerProductos: Get.find<ObtenerProductos>(),
+), fenix: true);
 
-// GetX: Para gestión de estado y lifecycle
-Get.lazyPut(() => getIt<HomePageController>(), fenix: true);
+// Uso en la UI
+final controller = Get.find<HomePageController>();
 ```
 
-**¿Por qué doble registro?**
-- **GetIt**: Maneja la creación y las dependencias
-- **GetX**: Maneja el ciclo de vida y estado reactivo
+**¿Por qué GetX es suficiente?**
+- **Inyección**: `Get.put()`, `Get.lazyPut()`, `Get.find()`
+- **Ciclo de vida**: `onInit()`, `onClose()` automáticos
+- **Estado reactivo**: Variables `.obs` y `Obx()`
 
 ### Parámetros de GetX:
 
 ```dart
 // Get.put() - Instancia inmediata, vive toda la vida de la app
-Get.put(getIt<CarritoController>());
+Get.put(CarritoController(), permanent: true);
 
 // Get.lazyPut() - Instancia perezosa (se crea al usar Get.find())
-Get.lazyPut(() => getIt<HomePageController>());
+Get.lazyPut(() => HomePageController());
 
 // Get.lazyPut() con fenix - Se recrea automáticamente si es destruida
-Get.lazyPut(() => getIt<PagoController>(), fenix: true);
+Get.lazyPut(() => PagoController(), fenix: true);
 ```
 
 ### 🚀 Inicialización en `main.dart`
@@ -371,13 +370,13 @@ Future<void> main() async {
   );
   
   // ⭐ INICIALIZAR INYECCIÓN DE DEPENDENCIAS
-  setupLocator();
+  setupDependencies();
   
   runApp(const MiMercadoApp());
 }
 ```
 
-**IMPORTANTE**: `setupLocator()` se llama **UNA SOLA VEZ** al inicio de la app.
+**IMPORTANTE**: `setupDependencies()` se llama **UNA SOLA VEZ** al inicio de la app.
 
 ---
 
@@ -512,7 +511,7 @@ contador.update((val) {
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Obtener el controller (ya registrado en GetIt + GetX)
+    // Obtener el controller (ya registrado en GetX)
     final controller = Get.find<HomePageController>();
     
     return Scaffold(
@@ -540,7 +539,7 @@ Hay **3 formas** de inicializar un controller en GetX:
 #### 1. Get.put() - Instancia inmediata
 ```dart
 // En injection.dart
-Get.put(getIt<CarritoController>());
+Get.put(CarritoController(), permanent: true);
 
 // En la UI
 final controller = Get.find<CarritoController>();
@@ -550,7 +549,7 @@ final controller = Get.find<CarritoController>();
 #### 2. Get.lazyPut() - Instancia perezosa
 ```dart
 // En injection.dart
-Get.lazyPut(() => getIt<HomePageController>());
+Get.lazyPut(() => HomePageController());
 
 // En la UI (se crea aquí la primera vez)
 final controller = Get.find<HomePageController>();
@@ -560,7 +559,7 @@ final controller = Get.find<HomePageController>();
 #### 3. Get.lazyPut() con fenix - Auto-recreación
 ```dart
 // En injection.dart
-Get.lazyPut(() => getIt<PagoController>(), fenix: true);
+Get.lazyPut(() => PagoController(), fenix: true);
 
 // Se recrea automáticamente si fue destruido
 ```
@@ -916,35 +915,33 @@ import 'package:mi_mercado/features/usuario/favoritos/domain/useCases/eliminar_f
 import 'package:mi_mercado/features/usuario/favoritos/domain/useCases/verificar_favorito.dart';
 import 'package:mi_mercado/features/usuario/favoritos/presentation/controllers/favoritos_controller.dart';
 
-void setupLocator() {
+void setupDependencies() {
   // ... código existente ...
 
-  // ⭐ FAVORITOS - AGREGAR AL FINAL DE setupLocator()
+  // ⭐ FAVORITOS - AGREGAR AL FINAL DE setupDependencies()
   
   // 1. DataSource
-  getIt.registerLazySingleton(() => FavoritoDataSourceImpl(FirebaseFirestore.instance));
+  Get.put(FavoritoDataSourceImpl(FirebaseFirestore.instance), permanent: true);
   
   // 2. Repository
-  getIt.registerLazySingleton<FavoritoRepository>(
-    () => FavoritoRepositoryImpl(getIt<FavoritoDataSourceImpl>())
+  Get.put<FavoritoRepository>(
+    FavoritoRepositoryImpl(Get.find<FavoritoDataSourceImpl>()), 
+    permanent: true
   );
   
   // 3. Use Cases
-  getIt.registerFactory(() => ObtenerFavoritosUseCase(getIt<FavoritoRepository>()));
-  getIt.registerFactory(() => AgregarFavoritoUseCase(getIt<FavoritoRepository>()));
-  getIt.registerFactory(() => EliminarFavoritoUseCase(getIt<FavoritoRepository>()));
-  getIt.registerFactory(() => VerificarFavoritoUseCase(getIt<FavoritoRepository>()));
+  Get.lazyPut(() => ObtenerFavoritosUseCase(Get.find<FavoritoRepository>()));
+  Get.lazyPut(() => AgregarFavoritoUseCase(Get.find<FavoritoRepository>()));
+  Get.lazyPut(() => EliminarFavoritoUseCase(Get.find<FavoritoRepository>()));
+  Get.lazyPut(() => VerificarFavoritoUseCase(Get.find<FavoritoRepository>()));
   
   // 4. Controller
-  getIt.registerFactory<FavoritosController>(() => FavoritosController(
-    obtenerFavoritosUseCase: getIt<ObtenerFavoritosUseCase>(),
-    agregarFavoritoUseCase: getIt<AgregarFavoritoUseCase>(),
-    eliminarFavoritoUseCase: getIt<EliminarFavoritoUseCase>(),
-    verificarFavoritoUseCase: getIt<VerificarFavoritoUseCase>(),
-  ));
-  
-  // 5. GetX Registration
-  Get.lazyPut(() => getIt<FavoritosController>(), fenix: true);
+  Get.lazyPut(() => FavoritosController(
+    obtenerFavoritosUseCase: Get.find<ObtenerFavoritosUseCase>(),
+    agregarFavoritoUseCase: Get.find<AgregarFavoritoUseCase>(),
+    eliminarFavoritoUseCase: Get.find<EliminarFavoritoUseCase>(),
+    verificarFavoritoUseCase: Get.find<VerificarFavoritoUseCase>(),
+  ), fenix: true);
 }
 ```
 

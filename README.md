@@ -26,7 +26,7 @@ La aplicación sigue una **Arquitectura Hexagonal (Clean Architecture)** con las
 ```
 lib/
 ├── core/                    # Núcleo de la aplicación
-│   ├── di/                 # Inyección de dependencias (GetIt)
+│   ├── di/                 # Inyección de dependencias (GetX)
 │   ├── error/              # Manejo de errores
 │   ├── useCases/           # Casos de uso
 │   ├── utils/              # Utilidades comunes
@@ -47,8 +47,7 @@ lib/
 - **Firebase**:
   - Authentication: Autenticación de usuarios
   - Firestore: Base de datos en tiempo real
-- **GetX**: Gestión de estado y navegación
-- **GetIt**: Inyección de dependencias
+- **GetX**: Gestión de estado, navegación e inyección de dependencias
 - **Google Fonts**: Tipografía consistente
 - **Shared Preferences**: Almacenamiento local
 - **Cached Network Image**: Carga optimizada de imágenes

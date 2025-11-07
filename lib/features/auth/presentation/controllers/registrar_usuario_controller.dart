@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mi_mercado/core/di/injection.dart';
 import 'package:mi_mercado/core/error/failure.dart';
 import 'package:mi_mercado/features/auth/domain/entities/Usuario.dart';
 import 'package:mi_mercado/features/auth/domain/useCases/registrar_usuario.dart';
@@ -110,8 +109,8 @@ class RegistrarUsuarioController extends GetxController {
 						direcciones: [],
 					);
 
-					// Obtener el usecase desde el service locator (registrado en el composition root)
-					final registrarUsuarioUseCase = getIt<RegistrarUsuario>();
+					// Obtener el usecase desde GetX (registrado en el composition root)
+					final registrarUsuarioUseCase = Get.find<RegistrarUsuario>();
 					// Llamar al use case con los parámetros
         	await registrarUsuarioUseCase.call(RegistrarUsuarioParams(usuario: nuevoUsuario));
 

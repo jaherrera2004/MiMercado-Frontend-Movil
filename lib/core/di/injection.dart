@@ -11,7 +11,6 @@ import 'package:mi_mercado/features/usuario/productos/domain/useCases/eliminar_p
 import 'package:mi_mercado/features/usuario/productos/domain/useCases/vaciar_carrito.dart';
 import 'package:mi_mercado/features/usuario/productos/domain/useCases/calcular_subtotal.dart';
 import 'package:mi_mercado/features/usuario/productos/presentation/controllers/carrito_controller.dart';
-import 'package:get_it/get_it.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
@@ -83,171 +82,167 @@ import 'package:mi_mercado/features/repartidor/datos/domain/repositories/reparti
 import 'package:mi_mercado/features/repartidor/datos/domain/useCases/obtener_datos_repartidor.dart';
 import 'package:mi_mercado/features/repartidor/datos/presentation/controllers/datos_repartidor_controller.dart';
 
-final GetIt getIt = GetIt.instance;
+/// Configuración de inyección de dependencias usando solo GetX
+/// Todas las dependencias se registran usando Get.put() y Get.lazyPut()
+void setupDependencies() {
+  // ===== DATA SOURCES (Singleton - una instancia compartida) =====
+  Get.put(CarritoDataSourceImpl(), permanent: true);
+  Get.put(AuthDataSourceImpl(FirebaseFirestore.instance), permanent: true);
+  Get.put(ProductoDataSourceImpl(FirebaseFirestore.instance), permanent: true);
+  Get.put(CategoriaDataSourceImpl(FirebaseFirestore.instance), permanent: true);
+  Get.put(DireccionDataSourceImpl(FirebaseFirestore.instance), permanent: true);
+  Get.put(PedidoDataSourceImpl(FirebaseFirestore.instance), permanent: true);
+  Get.put(UsuarioDataSourceImpl(FirebaseFirestore.instance), permanent: true);
+  Get.put(RepartidorDataSourceImpl(FirebaseFirestore.instance), permanent: true);
 
-void setupLocator() {
+  // ===== REPOSITORIES (Singleton - implementan interfaces) =====
+  Get.put<CarritoRepository>(CarritoRepositoryImpl(Get.find<CarritoDataSourceImpl>()), permanent: true);
+  Get.put<AuthRepository>(AuthRepositoryImpl(Get.find<AuthDataSourceImpl>()), permanent: true);
+  Get.put<ProductoRepository>(ProductoRepositoryImpl(Get.find<ProductoDataSourceImpl>()), permanent: true);
+  Get.put<CategoriaRepository>(CategoriaRepositoryImpl(Get.find<CategoriaDataSourceImpl>()), permanent: true);
+  Get.put<DireccionRepository>(DireccionRepositoryImpl(Get.find<DireccionDataSourceImpl>()), permanent: true);
+  Get.put<PedidoRepository>(PedidoRepositoryImpl(Get.find<PedidoDataSourceImpl>()), permanent: true);
+  Get.put<UsuarioRepository>(UsuarioRepositoryImpl(Get.find<UsuarioDataSourceImpl>()), permanent: true);
+  Get.put<RepartidorRepository>(RepartidorRepositoryImpl(Get.find<RepartidorDataSourceImpl>()), permanent: true);
+
+  // ===== USE CASES (Factory - nueva instancia cada vez) =====
   // Carrito
-  getIt.registerLazySingleton(() => CarritoDataSourceImpl());
-  getIt.registerLazySingleton<CarritoRepository>(() => CarritoRepositoryImpl(getIt<CarritoDataSourceImpl>()));
-  getIt.registerFactory(() => AgregarProductoCarritoUseCase(getIt<CarritoRepository>()));
-  getIt.registerFactory(() => ObtenerItemsCarritoUseCase(getIt<CarritoRepository>()));
-  getIt.registerFactory(() => IncrementarCantidadCarritoUseCase(getIt<CarritoRepository>()));
-  getIt.registerFactory(() => DecrementarCantidadCarritoUseCase(getIt<CarritoRepository>()));
-  getIt.registerFactory(() => EliminarProductoCarritoUseCase(getIt<CarritoRepository>()));
-  getIt.registerFactory(() => VaciarCarritoUseCase(getIt<CarritoRepository>()));
-  getIt.registerFactory(() => SubtotalCarritoUseCase(getIt<CarritoRepository>()));
-  getIt.registerFactory<CarritoController>(() => CarritoController(
-    agregarProductoUseCase: getIt<AgregarProductoCarritoUseCase>(),
-    obtenerItemsUseCase: getIt<ObtenerItemsCarritoUseCase>(),
-    incrementarCantidadUseCase: getIt<IncrementarCantidadCarritoUseCase>(),
-    decrementarCantidadUseCase: getIt<DecrementarCantidadCarritoUseCase>(),
-    eliminarProductoUseCase: getIt<EliminarProductoCarritoUseCase>(),
-    vaciarCarritoUseCase: getIt<VaciarCarritoUseCase>(),
-    subtotalUseCase: getIt<SubtotalCarritoUseCase>(),
-  ));
+  Get.lazyPut(() => AgregarProductoCarritoUseCase(Get.find<CarritoRepository>()));
+  Get.lazyPut(() => ObtenerItemsCarritoUseCase(Get.find<CarritoRepository>()));
+  Get.lazyPut(() => IncrementarCantidadCarritoUseCase(Get.find<CarritoRepository>()));
+  Get.lazyPut(() => DecrementarCantidadCarritoUseCase(Get.find<CarritoRepository>()));
+  Get.lazyPut(() => EliminarProductoCarritoUseCase(Get.find<CarritoRepository>()));
+  Get.lazyPut(() => VaciarCarritoUseCase(Get.find<CarritoRepository>()));
+  Get.lazyPut(() => SubtotalCarritoUseCase(Get.find<CarritoRepository>()));
 
   // Auth
-  getIt.registerLazySingleton(() => AuthDataSourceImpl(FirebaseFirestore.instance));
-  getIt.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(getIt<AuthDataSourceImpl>()));
-  getIt.registerFactory(() => RegistrarUsuario(getIt<AuthRepository>()));
-  getIt.registerFactory(() => Login(getIt<AuthRepository>()));
+  Get.lazyPut(() => RegistrarUsuario(Get.find<AuthRepository>()));
+  Get.lazyPut(() => Login(Get.find<AuthRepository>()));
 
   // Productos
-  getIt.registerLazySingleton(() => ProductoDataSourceImpl(FirebaseFirestore.instance));
-  getIt.registerLazySingleton<ProductoRepository>(() => ProductoRepositoryImpl(getIt<ProductoDataSourceImpl>()));
-  getIt.registerFactory(() => ObtenerProductos(getIt<ProductoRepository>()));
-  getIt.registerFactory(() => ObtenerProductosPorCategoria(getIt<ProductoRepository>()));
-  getIt.registerFactory(() => ObtenerProductosPedido(getIt<ProductoRepository>()));
+  Get.lazyPut(() => ObtenerProductos(Get.find<ProductoRepository>()));
+  Get.lazyPut(() => ObtenerProductosPorCategoria(Get.find<ProductoRepository>()));
+  Get.lazyPut(() => ObtenerProductosPedido(Get.find<ProductoRepository>()));
 
   // Categorias
-  getIt.registerLazySingleton(() => CategoriaDataSourceImpl(FirebaseFirestore.instance));
-  getIt.registerLazySingleton<CategoriaRepository>(() => CategoriaRepositoryImpl(getIt<CategoriaDataSourceImpl>()));
-  getIt.registerFactory(() => ObtenerCategorias(getIt<CategoriaRepository>()));
-
-  // HomePage Controller (related to products and categories)
-  getIt.registerFactory<HomePageController>(() => HomePageController(
-    obtenerCategorias: getIt<ObtenerCategorias>(),
-    obtenerProductos: getIt<ObtenerProductos>(),
-  ));
-
-  // Productos Filtrados Controller
-  getIt.registerFactory(() => ProductosFiltradosController(obtenerProductosPorCategoria: getIt<ObtenerProductosPorCategoria>()));
-
-  // Auth Controllers
-  getIt.registerFactory(() => LoginController());
-  getIt.registerFactory(() => RegistrarUsuarioController());
+  Get.lazyPut(() => ObtenerCategorias(Get.find<CategoriaRepository>()));
 
   // Direcciones
-  getIt.registerLazySingleton(() => DireccionDataSourceImpl(FirebaseFirestore.instance));
-  getIt.registerLazySingleton<DireccionRepository>(() => DireccionRepositoryImpl(getIt<DireccionDataSourceImpl>()));
-  getIt.registerFactory(() => AgregarDireccionUseCase(getIt<DireccionRepository>()));
-  getIt.registerFactory(() => ObtenerDireccionesUseCase(getIt<DireccionRepository>()));
-  getIt.registerFactory(() => EditarDireccionUseCase(getIt<DireccionRepository>()));
-  getIt.registerFactory(() => EliminarDireccionUseCase(getIt<DireccionRepository>()));
-  getIt.registerFactory<DireccionController>(() => DireccionController(
-    agregarDireccionUseCase: getIt<AgregarDireccionUseCase>(),
-    obtenerDireccionesUseCase: getIt<ObtenerDireccionesUseCase>(),
-    editarDireccionUseCase: getIt<EditarDireccionUseCase>(),
-    eliminarDireccionUseCase: getIt<EliminarDireccionUseCase>(),
-  ));
+  Get.lazyPut(() => AgregarDireccionUseCase(Get.find<DireccionRepository>()));
+  Get.lazyPut(() => ObtenerDireccionesUseCase(Get.find<DireccionRepository>()));
+  Get.lazyPut(() => EditarDireccionUseCase(Get.find<DireccionRepository>()));
+  Get.lazyPut(() => EliminarDireccionUseCase(Get.find<DireccionRepository>()));
 
   // Pedidos
-  getIt.registerLazySingleton(() => PedidoDataSourceImpl(FirebaseFirestore.instance));
-  getIt.registerLazySingleton<PedidoRepository>(() => PedidoRepositoryImpl(getIt<PedidoDataSourceImpl>()));
-  getIt.registerFactory(() => AgregarPedidoUseCase(getIt<PedidoRepository>()));
-  getIt.registerFactory(() => ObtenerPedidosUseCase(getIt<PedidoRepository>()));
-  getIt.registerFactory(() => ObtenerPedidoPorIdUseCase(getIt<PedidoRepository>()));
-  getIt.registerFactory(() => ObtenerPedidoActualRepartidorUseCase(getIt<PedidoRepository>()));
-  getIt.registerFactory(() => ObtenerPedidosDisponiblesUseCase(getIt<PedidoRepository>()));
-  getIt.registerFactory(() => ObtenerHistorialPedidosUseCase(getIt<PedidoRepository>()));
-  getIt.registerFactory(() => ActualizarEstadoPedidoUseCase(getIt<PedidoRepository>()));
-  getIt.registerFactory(() => TomarPedidoUseCase(getIt<PedidoRepository>()));
-  getIt.registerFactory<PedidosController>(() => PedidosController(
-    obtenerPedidosUseCase: getIt<ObtenerPedidosUseCase>(),
-  ));
-  getIt.registerFactory<PedidoDetalleController>(() => PedidoDetalleController(
-    obtenerPedidoPorIdUseCase: getIt<ObtenerPedidoPorIdUseCase>(),
-    obtenerProductosPedido: getIt<ObtenerProductosPedido>(),
-  ));
-  getIt.registerFactory<PedidosDisponiblesController>(() => PedidosDisponiblesController(
-    obtenerPedidosDisponiblesUseCase: getIt<ObtenerPedidosDisponiblesUseCase>(),
-    tomarPedidoUseCase: getIt<TomarPedidoUseCase>(),
-  ));
+  Get.lazyPut(() => AgregarPedidoUseCase(Get.find<PedidoRepository>()));
+  Get.lazyPut(() => ObtenerPedidosUseCase(Get.find<PedidoRepository>()));
+  Get.lazyPut(() => ObtenerPedidoPorIdUseCase(Get.find<PedidoRepository>()));
+  Get.lazyPut(() => ObtenerPedidoActualRepartidorUseCase(Get.find<PedidoRepository>()));
+  Get.lazyPut(() => ObtenerPedidosDisponiblesUseCase(Get.find<PedidoRepository>()));
+  Get.lazyPut(() => ObtenerHistorialPedidosUseCase(Get.find<PedidoRepository>()));
+  Get.lazyPut(() => ActualizarEstadoPedidoUseCase(Get.find<PedidoRepository>()));
+  Get.lazyPut(() => TomarPedidoUseCase(Get.find<PedidoRepository>()));
 
   // Cuenta
-  getIt.registerLazySingleton(() => UsuarioDataSourceImpl(FirebaseFirestore.instance));
-  getIt.registerLazySingleton<UsuarioRepository>(() => UsuarioRepositoryImpl(getIt<UsuarioDataSourceImpl>()));
-  getIt.registerFactory<ObtenerUsuarioPorIdUseCase>(() => ObtenerUsuarioPorIdUseCase(getIt<UsuarioRepository>()));
-  getIt.registerFactory<EditarUsuarioUseCase>(() => EditarUsuarioUseCase(getIt<UsuarioRepository>()));
-  getIt.registerFactory<EditarContrasenaUseCase>(() => EditarContrasenaUseCase(getIt<UsuarioRepository>()));
-  getIt.registerFactory<MiCuentaController>(() => MiCuentaController(
-    obtenerUsuarioPorId: getIt<ObtenerUsuarioPorIdUseCase>(),
-    editarUsuario: getIt<EditarUsuarioUseCase>(),
-    editarContrasena: getIt<EditarContrasenaUseCase>(),
-  ));
-  getIt.registerFactory<DatosPerfilController>(() => DatosPerfilController(
-    obtenerUsuarioPorId: getIt<ObtenerUsuarioPorIdUseCase>(),
-    editarUsuario: getIt<EditarUsuarioUseCase>(),
-  ));
-  getIt.registerFactory<EditarContrasenaController>(() => EditarContrasenaController(
-    editarContrasena: getIt<EditarContrasenaUseCase>(),
-  ));
-  getIt.registerFactory<SeguridadController>(() => SeguridadController(
-    editarContrasena: getIt<EditarContrasenaUseCase>(),
-  ));
-
-  // Pago
-  getIt.registerFactory<PagoController>(() => PagoController(
-    obtenerDireccionesUseCase: getIt<ObtenerDireccionesUseCase>(),
-    agregarPedidoUseCase: getIt<AgregarPedidoUseCase>(),
-    subtotalCarritoUseCase: getIt<SubtotalCarritoUseCase>(),
-    obtenerItemsCarritoUseCase: getIt<ObtenerItemsCarritoUseCase>(),
-    vaciarCarritoUseCase: getIt<VaciarCarritoUseCase>(),
-  ));
+  Get.lazyPut(() => ObtenerUsuarioPorIdUseCase(Get.find<UsuarioRepository>()));
+  Get.lazyPut(() => EditarUsuarioUseCase(Get.find<UsuarioRepository>()));
+  Get.lazyPut(() => EditarContrasenaUseCase(Get.find<UsuarioRepository>()));
 
   // Repartidor
-  getIt.registerLazySingleton(() => RepartidorDataSourceImpl(FirebaseFirestore.instance));
-  getIt.registerLazySingleton<RepartidorRepository>(() => RepartidorRepositoryImpl(getIt<RepartidorDataSourceImpl>()));
-  getIt.registerFactory(() => ObtenerDatosRepartidorUseCase(getIt<RepartidorRepository>()));
-  getIt.registerFactory<RepartidorHomeController>(() => RepartidorHomeController(
-    obtenerPedidoActualUseCase: getIt<ObtenerPedidoActualRepartidorUseCase>(),
-  ));
-  getIt.registerFactory<DatosRepartidorController>(() => DatosRepartidorController(
-    obtenerDatosRepartidorUseCase: getIt<ObtenerDatosRepartidorUseCase>(),
-  ));
-  getIt.registerFactory<PedidoActualController>(() => PedidoActualController(
-    obtenerPedidoActualUseCase: getIt<ObtenerPedidoActualRepartidorUseCase>(),
-    obtenerUsuarioPorIdUseCase: getIt<ObtenerUsuarioPorIdUseCase>(),
-    actualizarEstadoPedidoUseCase: getIt<ActualizarEstadoPedidoUseCase>(),
-  ));
-  getIt.registerFactory<ProductosPedidoController>(() => ProductosPedidoController(
-    obtenerProductosPedido: getIt<ObtenerProductosPedido>(),
-  ));
-  getIt.registerFactory<HistorialPedidosController>(() => HistorialPedidosController(
-    obtenerHistorialPedidosUseCase: getIt<ObtenerHistorialPedidosUseCase>(),
-  ));
+  Get.lazyPut(() => ObtenerDatosRepartidorUseCase(Get.find<RepartidorRepository>()));
 
-  // GetX registrations for use cases and controllers
-  Get.lazyPut<ObtenerUsuarioPorIdUseCase>(() => getIt<ObtenerUsuarioPorIdUseCase>());
-  Get.lazyPut<EditarUsuarioUseCase>(() => getIt<EditarUsuarioUseCase>());
-  Get.lazyPut<EditarContrasenaUseCase>(() => getIt<EditarContrasenaUseCase>());
-  Get.lazyPut<RepartidorHomeController>(() => getIt<RepartidorHomeController>());
-  Get.lazyPut<PedidoActualController>(() => getIt<PedidoActualController>());
-  Get.lazyPut<ProductosPedidoController>(() => getIt<ProductosPedidoController>());
-  Get.lazyPut<HistorialPedidosController>(() => getIt<HistorialPedidosController>());
-  Get.put(getIt<CarritoController>());
-  Get.put(getIt<DireccionController>());
-  Get.put(getIt<PedidosController>());
-  Get.put(getIt<PedidoDetalleController>());
-  Get.put(getIt<PedidosDisponiblesController>());
-  Get.lazyPut(() => getIt<HomePageController>(), fenix: true);
-  Get.lazyPut(() => getIt<PagoController>(), fenix: true);
-  Get.lazyPut(() => getIt<DatosPerfilController>(), fenix: true);
-  Get.lazyPut(() => getIt<EditarContrasenaController>(), fenix: true);
-  Get.lazyPut(() => getIt<SeguridadController>(), fenix: true);
-  Get.lazyPut(() => getIt<MiCuentaController>(), fenix: true);
-  Get.lazyPut(() => getIt<DatosRepartidorController>(), fenix: true);
-  Get.lazyPut(() => getIt<ProductosFiltradosController>(), fenix: true);
-  Get.lazyPut(() => getIt<LoginController>(), fenix: true);
-  Get.lazyPut(() => getIt<RegistrarUsuarioController>(), fenix: true);
+  // ===== CONTROLLERS =====
+  // Controllers que necesitan existir toda la vida de la app
+  Get.put(CarritoController(
+    agregarProductoUseCase: Get.find<AgregarProductoCarritoUseCase>(),
+    obtenerItemsUseCase: Get.find<ObtenerItemsCarritoUseCase>(),
+    incrementarCantidadUseCase: Get.find<IncrementarCantidadCarritoUseCase>(),
+    decrementarCantidadUseCase: Get.find<DecrementarCantidadCarritoUseCase>(),
+    eliminarProductoUseCase: Get.find<EliminarProductoCarritoUseCase>(),
+    vaciarCarritoUseCase: Get.find<VaciarCarritoUseCase>(),
+    subtotalUseCase: Get.find<SubtotalCarritoUseCase>(),
+  ), permanent: true);
+
+  Get.put(DireccionController(
+    agregarDireccionUseCase: Get.find<AgregarDireccionUseCase>(),
+    obtenerDireccionesUseCase: Get.find<ObtenerDireccionesUseCase>(),
+    editarDireccionUseCase: Get.find<EditarDireccionUseCase>(),
+    eliminarDireccionUseCase: Get.find<EliminarDireccionUseCase>(),
+  ), permanent: true);
+
+  Get.put(PedidosController(
+    obtenerPedidosUseCase: Get.find<ObtenerPedidosUseCase>(),
+  ), permanent: true);
+
+  Get.put(PedidoDetalleController(
+    obtenerPedidoPorIdUseCase: Get.find<ObtenerPedidoPorIdUseCase>(),
+    obtenerProductosPedido: Get.find<ObtenerProductosPedido>(),
+  ), permanent: true);
+
+  Get.put(PedidosDisponiblesController(
+    obtenerPedidosDisponiblesUseCase: Get.find<ObtenerPedidosDisponiblesUseCase>(),
+    tomarPedidoUseCase: Get.find<TomarPedidoUseCase>(),
+  ), permanent: true);
+
+  // Controllers perezosos (se crean cuando se necesitan)
+  Get.lazyPut(() => HomePageController(
+    obtenerCategorias: Get.find<ObtenerCategorias>(),
+    obtenerProductos: Get.find<ObtenerProductos>(),
+  ), fenix: true);
+
+  Get.lazyPut(() => ProductosFiltradosController(
+    obtenerProductosPorCategoria: Get.find<ObtenerProductosPorCategoria>(),
+  ), fenix: true);
+
+  Get.lazyPut(() => LoginController(), fenix: true);
+  Get.lazyPut(() => RegistrarUsuarioController(), fenix: true);
+
+  Get.lazyPut(() => PagoController(
+    obtenerDireccionesUseCase: Get.find<ObtenerDireccionesUseCase>(),
+    agregarPedidoUseCase: Get.find<AgregarPedidoUseCase>(),
+    subtotalCarritoUseCase: Get.find<SubtotalCarritoUseCase>(),
+    obtenerItemsCarritoUseCase: Get.find<ObtenerItemsCarritoUseCase>(),
+    vaciarCarritoUseCase: Get.find<VaciarCarritoUseCase>(),
+  ), fenix: true);
+
+  Get.lazyPut(() => MiCuentaController(
+    obtenerUsuarioPorId: Get.find<ObtenerUsuarioPorIdUseCase>(),
+    editarUsuario: Get.find<EditarUsuarioUseCase>(),
+    editarContrasena: Get.find<EditarContrasenaUseCase>(),
+  ), fenix: true);
+
+  Get.lazyPut(() => DatosPerfilController(
+    obtenerUsuarioPorId: Get.find<ObtenerUsuarioPorIdUseCase>(),
+    editarUsuario: Get.find<EditarUsuarioUseCase>(),
+  ), fenix: true);
+
+  Get.lazyPut(() => EditarContrasenaController(
+    editarContrasena: Get.find<EditarContrasenaUseCase>(),
+  ), fenix: true);
+
+  Get.lazyPut(() => SeguridadController(
+    editarContrasena: Get.find<EditarContrasenaUseCase>(),
+  ), fenix: true);
+
+  Get.lazyPut(() => RepartidorHomeController(
+    obtenerPedidoActualUseCase: Get.find<ObtenerPedidoActualRepartidorUseCase>(),
+  ), fenix: true);
+
+  Get.lazyPut(() => DatosRepartidorController(
+    obtenerDatosRepartidorUseCase: Get.find<ObtenerDatosRepartidorUseCase>(),
+  ), fenix: true);
+
+  Get.lazyPut(() => PedidoActualController(
+    obtenerPedidoActualUseCase: Get.find<ObtenerPedidoActualRepartidorUseCase>(),
+    obtenerUsuarioPorIdUseCase: Get.find<ObtenerUsuarioPorIdUseCase>(),
+    actualizarEstadoPedidoUseCase: Get.find<ActualizarEstadoPedidoUseCase>(),
+  ), fenix: true);
+
+  Get.lazyPut(() => ProductosPedidoController(
+    obtenerProductosPedido: Get.find<ObtenerProductosPedido>(),
+  ), fenix: true);
+
+  Get.lazyPut(() => HistorialPedidosController(
+    obtenerHistorialPedidosUseCase: Get.find<ObtenerHistorialPedidosUseCase>(),
+  ), fenix: true);
 }
