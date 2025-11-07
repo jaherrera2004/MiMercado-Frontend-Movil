@@ -382,6 +382,23 @@ Future<void> main() async {
 
 ## 🎮 GetX Controllers
 
+### ⚠️ **REGLA CRÍTICA: Cada Vista debe tener un Controller**
+
+**TODAS las pantallas/vistas DEBEN tener su propio Controller.** Esta es una regla fundamental de la arquitectura:
+
+- ✅ **HomePage** → `HomePageController`
+- ✅ **LoginScreen** → `LoginController` 
+- ✅ **ProductoDetallePage** → `ProductoDetalleController`
+- ✅ **CarritoScreen** → `CarritoController`
+
+**¿Por qué?**
+- **Separación de responsabilidades**: Cada vista maneja su propio estado
+- **Reutilización**: Controllers pueden ser compartidos entre vistas relacionadas
+- **Mantenibilidad**: Fácil de encontrar y modificar lógica de cada pantalla
+- **Testing**: Cada controller se puede testear independientemente
+
+**Excepción**: Vistas muy simples (como diálogos modales) pueden compartir controller con la vista padre.
+
 ### ¿Qué es un Controller en GetX?
 
 Un **Controller** es una clase que:
@@ -995,6 +1012,36 @@ class FavoritosScreen extends StatelessWidget {
 
 ## ✅ Mejores Prácticas
 
+### ⚠️ **Regla Fundamental: Un Controller por Vista**
+
+**Cada pantalla/vista debe tener su propio Controller.** No compartir controllers entre vistas diferentes:
+
+```dart
+✅ BIEN - Controllers separados
+class HomePage extends StatelessWidget {
+  final controller = Get.find<HomePageController>();
+  // ...
+}
+
+class ProductoDetallePage extends StatelessWidget {
+  final controller = Get.find<ProductoDetalleController>();
+  // ...
+}
+
+❌ MAL - Compartir controller
+class HomePage extends StatelessWidget {
+  final controller = Get.find<SharedController>(); // ❌
+  // ...
+}
+
+class ProductoDetallePage extends StatelessWidget {
+  final controller = Get.find<SharedController>(); // ❌
+  // ...
+}
+```
+
+**Excepciones**: Solo para vistas muy relacionadas (ej: un modal que pertenece a una pantalla específica).
+
 ### 1. Separación de Responsabilidades
 
 ```dart
@@ -1140,7 +1187,7 @@ class ProductoController extends GetxController {
 - [ ] 5. Crear **Use Cases** en `domain/useCases/`
 - [ ] 6. Implementar **DataSource** en `data/datasources/`
 - [ ] 7. Implementar **Repository** en `data/repositories/`
-- [ ] 8. Crear **Controller** en `presentation/controllers/`
+- [ ] 8. **Crear Controller específico para la vista** en `presentation/controllers/`
 - [ ] 9. Registrar en **injection.dart** (orden: DataSource → Repository → Use Cases → Controller)
 - [ ] 10. Crear **Pages y Widgets** en `presentation/pages/` y `presentation/widgets/`
 - [ ] 11. Usar `Get.find<>()` en la UI
@@ -1156,6 +1203,14 @@ Esta arquitectura puede parecer compleja al principio, pero proporciona:
 - ✅ **Testeable en todas las capas**
 - ✅ **Independiente de frameworks**
 - ✅ **Trabajo en equipo eficiente**
+
+### 📋 Reglas Fundamentales a Recordar:
+
+1. **Cada vista debe tener su propio Controller**
+2. **Registrar TODAS las dependencias en `setupDependencies()`**
+3. **Usar `Get.find<>()` en la UI, nunca crear controllers manualmente**
+4. **Separar lógica de negocio (Use Cases) de lógica de presentación (Controllers)**
+5. **La capa Domain nunca debe depender de frameworks externos**
 
 **Regla de oro**: Cada capa solo conoce la capa inmediatamente inferior. La capa de dominio es completamente independiente.
 
