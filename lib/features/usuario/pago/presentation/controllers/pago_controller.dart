@@ -153,6 +153,8 @@ class PagoController extends GetxController {
   void seleccionarDireccion(String? direccion) {
     direccionSeleccionada.value = direccion;
     print('PagoController: Dirección seleccionada: $direccion');
+    // Recargar las direcciones para actualizar la lista
+    cargarDirecciones();
   }
 
   // Calcular subtotal del carrito

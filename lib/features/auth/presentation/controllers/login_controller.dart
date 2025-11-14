@@ -3,6 +3,7 @@ import 'package:mi_mercado/features/auth/domain/entities/Persona.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:mi_mercado/features/auth/domain/useCases/login.dart';
 
 class LoginController extends GetxController {
@@ -66,6 +67,12 @@ class LoginController extends GetxController {
 				if (persona != null) {
 					await SharedPreferencesUtils.saveUserId(persona.id!);
           await SharedPreferencesUtils.saveUserName(persona.nombre!);
+          
+          // Limpiar el carrito al iniciar sesión
+          final storage = GetStorage();
+          await storage.remove('carrito_items');
+          await storage.remove('carrito_fecha');
+          print('LoginController: Carrito limpiado al iniciar sesión');
 				}
         
 				return persona;
