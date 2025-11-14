@@ -3,24 +3,14 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mi_mercado/features/repartidor/datos/presentation/controllers/datos_repartidor_controller.dart';
 
-class DatosRepartidorScreen extends StatefulWidget {
+class DatosRepartidorScreen extends StatelessWidget {
   const DatosRepartidorScreen({super.key});
 
   @override
-  State<DatosRepartidorScreen> createState() => _DatosRepartidorScreenState();
-}
-
-class _DatosRepartidorScreenState extends State<DatosRepartidorScreen> {
-  late DatosRepartidorController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = Get.find<DatosRepartidorController>();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    // Obtener o crear el controller usando Get.find con fenix behavior
+    final controller = Get.find<DatosRepartidorController>();
+    
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(

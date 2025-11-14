@@ -29,7 +29,7 @@ class PedidosScreen extends GetView<PedidosController> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: const PedidosAppBar(),
+        appBar: PedidosAppBar(onRefresh: _cargarPedidos),
         body: Obx(() {
           if (controller.isLoading.value) {
             return const Center(child: CircularProgressIndicator());

@@ -149,7 +149,7 @@ void setupDependencies() {
   Get.lazyPut(() => EditarContrasenaUseCase(Get.find<UsuarioRepository>()));
 
   // Repartidor
-  Get.lazyPut(() => ObtenerDatosRepartidorUseCase(Get.find<RepartidorRepository>()));
+  Get.put(ObtenerDatosRepartidorUseCase(Get.find<RepartidorRepository>()), permanent: true);
 
   // ===== CONTROLLERS =====
   // Controllers que necesitan existir toda la vida de la app
