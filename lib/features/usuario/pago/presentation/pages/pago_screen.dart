@@ -19,6 +19,10 @@ class _PagoScreenState extends State<PagoScreen> {
   void initState() {
     super.initState();
     controller = Get.find<PagoController>();
+    // Recargar direcciones cuando se crea la pantalla
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.cargarDirecciones();
+    });
   }
 
   @override
@@ -152,7 +156,11 @@ class _AddressSelector extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/direcciones'),
+                onPressed: () async {
+                  await Navigator.pushNamed(context, '/direcciones');
+                  // Recargar direcciones cuando regresa de agregar una
+                  controller.cargarDirecciones();
+                },
                 child: const Text('Agregar dirección'),
               ),
             ],
