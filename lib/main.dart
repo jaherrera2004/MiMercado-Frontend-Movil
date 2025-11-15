@@ -13,7 +13,6 @@ Future<void> main() async {
   );
   
   
-  // Inicializar las dependencias con GetX
   setupDependencies();
 
   
