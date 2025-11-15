@@ -16,7 +16,6 @@ Future<void> main() async {
   // Inicializar las dependencias con GetX
   setupDependencies();
 
-  // PagoController se inicializa cuando se abre la pantalla de pago
   
   runApp(const MiMercadoApp());
 }
